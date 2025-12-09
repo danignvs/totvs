@@ -23,7 +23,6 @@
             color: #333;
             text-align: center;
         }
-        /* Estilos para o link */
         h2 a {
             color: #007bff;
             text-decoration: none;
@@ -37,7 +36,7 @@
             margin-top: 10px;
             font-weight: bold;
             color: #555;
-            flex-grow: 1; /* Para flexbox */
+            flex-grow: 1;
         }
         input[type="text"], select {
             width: calc(100% - 22px);
@@ -46,6 +45,11 @@
             border: 1px solid #ccc;
             border-radius: 4px;
             box-sizing: border-box;
+        }
+        /* Estilo para placeholder (texto de exemplo) */
+        ::placeholder {
+            color: #aaa;
+            opacity: 1;
         }
         .resultado {
             margin-top: 30px;
@@ -65,6 +69,7 @@
             background-color: #fff;
             border: 1px solid #ddd;
             border-radius: 4px;
+            min-height: 20px; /* Garante altura mínima se vazio */
         }
         button {
             background-color: #28a745;
@@ -80,7 +85,7 @@
             background-color: #218838;
         }
 
-        /* Flexbox para responsividade */
+        /* Flexbox */
         .input-group {
             display: flex;
             gap: 20px;
@@ -91,7 +96,6 @@
             min-width: 45%; 
         }
 
-        /* Quebra de linha em telas pequenas (mobile) */
         @media (max-width: 600px) {
             .input-group {
                 flex-direction: column;
@@ -101,7 +105,6 @@
                 min-width: 100%;
             }
         }
-        /* Estilo para esconder o campo de justificativa inicialmente */
         .justificativa-manual {
             display: none;
         }
@@ -110,8 +113,6 @@
 <body>
 
     <div class="container">
-        <!--h1>🛠️ Gerador de Conteúdo de Email</h1-->
-        
         <h2>
             <a href="https://psaproducaototvs.crm2.dynamics.com/main.aspx?appid=ad972b31-8851-eb11-a812-000d3a8852cb&forceUCI=1&pagetype=entitylist&etn=msdyn_project&viewid=ead1f7f9-6dd0-f011-bbd3-00224836edf2&viewType=4230" target="_blank">
                 Gestão de Portfólio - Faturamentos
@@ -122,27 +123,27 @@
         <div class="input-group">
             <div class="input-item">
                 <label for="codProjeto">Cod. Projeto (e Assunto):</label>
-                <input type="text" id="codProjeto" value="" oninput="preencherContrato(); gerarEmail()">
+                <input type="text" id="codProjeto" placeholder="Ex: D...001" oninput="preencherContrato(); gerarEmail()">
             </div>
             <div class="input-item">
                 <label for="codContratoPSA">Cod. Contrato PSA:</label>
-                <input type="text" id="codContratoPSA" value="" oninput="gerarEmail()">
+                <input type="text" id="codContratoPSA" placeholder="Ex: D..." oninput="gerarEmail()">
             </div>
         </div>
 
         <div class="input-group">
             <div class="input-item">
                 <label for="codCliente">Cod. Cliente:</label>
-                <input type="text" id="codCliente" value="" oninput="gerarEmail()">
+                <input type="text" id="codCliente" placeholder="Ex: T..." oninput="gerarEmail()">
             </div>
             <div class="input-item">
                 <label for="valorLiquido">Valor líquido:</label>
-                <input type="text" id="valorLiquido" value="" oninput="gerarEmail()">
+                <input type="text" id="valorLiquido" placeholder="Ex: R$..." oninput="gerarEmail()">
             </div>
         </div>
 
         <label for="nomeProjeto">Nome do Projeto:</label>
-        <input type="text" id="nomeProjeto" value="" oninput="gerarEmail()">
+        <input type="text" id="nomeProjeto" placeholder="" oninput="gerarEmail()">
 
         <label for="tipoAssunto">Tipo de Assunto:</label>
         <select id="tipoAssunto" onchange="gerarEmail()">
@@ -158,7 +159,7 @@
 
         <div id="justificativaManualDiv" class="justificativa-manual">
             <label for="justificativa">Digite sua Justificativa:</label>
-            <input type="text" id="justificativa" value="" oninput="gerarEmail()">
+            <input type="text" id="justificativa" placeholder="Descreva a justificativa aqui..." oninput="gerarEmail()">
         </div>
 
         <div class="resultado">
@@ -175,12 +176,10 @@
     </div>
 
     <script>
-        // Valor padrão da justificativa
         const JUSTIFICATIVA_PADRAO = "Termo de conclusão assinado no repositório do projeto.";
 
         function obterSaudacao() {
             const hora = new Date().getHours();
-            // Bom dia: 05h às 11:59h | Boa tarde: 12h às 17:59h
             if (hora >= 5 && hora < 12) {
                 return "bom dia";
             } else if (hora >= 12 && hora < 18) {
@@ -192,9 +191,13 @@
 
         function preencherContrato() {
             const codProjeto = document.getElementById('codProjeto').value;
-            // O código do contrato é o do projeto menos os 3 últimos dígitos
-            const codContratoPSA = codProjeto.slice(0, -3);
-            document.getElementById('codContratoPSA').value = codContratoPSA;
+            // Só tenta preencher se houver texto, para evitar erros
+            if (codProjeto.length > 3) {
+                const codContratoPSA = codProjeto.slice(0, -3);
+                document.getElementById('codContratoPSA').value = codContratoPSA;
+            } else if (codProjeto.length === 0) {
+                 document.getElementById('codContratoPSA').value = "";
+            }
         }
         
         function mudarJustificativa() {
@@ -203,21 +206,17 @@
             const justificativaDiv = document.getElementById('justificativaManualDiv');
 
             if (tipoJustificativa === 'Padrao') {
-                // Esconde o campo de input e limpa seu valor
                 justificativaDiv.style.display = 'none';
                 inputJustificativa.value = JUSTIFICATIVA_PADRAO;
-            } else { // Outras
-                // Mostra o campo de input e o limpa para o usuário digitar
+            } else { 
                 justificativaDiv.style.display = 'block';
                 inputJustificativa.value = ""; 
-                // Foca no campo para facilitar a digitação
                 inputJustificativa.focus(); 
             }
-            gerarEmail(); // Garante a atualização imediata
+            gerarEmail(); 
         }
 
         function gerarEmail() {
-            // 1. Coleta os valores
             const codProjeto = document.getElementById('codProjeto').value;
             const nomeProjeto = document.getElementById('nomeProjeto').value;
             const tipoAssunto = document.getElementById('tipoAssunto').value;
@@ -227,7 +226,6 @@
             const codCliente = document.getElementById('codCliente').value;
             const valorLiquido = document.getElementById('valorLiquido').value;
             
-            // Pega a justificativa com base na seleção
             let justificativa;
             if (tipoJustificativa === 'Padrao') {
                 justificativa = JUSTIFICATIVA_PADRAO;
@@ -235,16 +233,18 @@
                 justificativa = document.getElementById('justificativa').value;
             }
 
-            // 2. Monta o Assunto Condicional
             let assunto = '';
             if (tipoAssunto === 'Faturamento') {
-                assunto = `${codProjeto} - Solicitação de Faturamento`;
-            } else { // Projeto
-                assunto = `${codProjeto} - ${nomeProjeto}`;
+                // Se o código estiver vazio, deixa o assunto em branco para não mostrar só o traço
+                assunto = codProjeto ? `${codProjeto} - Solicitação de Faturamento` : '';
+            } else { 
+                assunto = (codProjeto && nomeProjeto) ? `${codProjeto} - ${nomeProjeto}` : '';
             }
 
-            // 3. Monta o Corpo do Email com Saudação Dinâmica
             const saudacao = obterSaudacao();
+            
+            // Verifica se os campos principais estão vazios para não gerar um email cheio de buracos
+            // Mas mantém a estrutura visível
             
             const corpoEmail = `Olá, ${saudacao}!
 
@@ -261,13 +261,16 @@ Justificativa: ${justificativa}
 
 Atenciosamente,`;
 
-            // 4. Exibe os resultados
             document.getElementById('resultadoAssunto').textContent = assunto;
             document.getElementById('resultadoCorpo').textContent = corpoEmail;
         }
 
         function copiarTexto(idElemento) {
             const texto = document.getElementById(idElemento).textContent;
+            if (!texto.trim()) {
+                alert('O campo está vazio! Preencha os dados primeiro.');
+                return;
+            }
             navigator.clipboard.writeText(texto).then(() => {
                 alert('Conteúdo copiado para a área de transferência!');
             }).catch(err => {
@@ -276,10 +279,8 @@ Atenciosamente,`;
             });
         }
 
-        // Chama as funções ao carregar a página
         window.onload = function() {
-            preencherContrato();
-            // Garante que a lógica de justificativa seja executada na inicialização (escondendo o campo manual)
+            // Não chamamos preencherContrato aqui para deixar os placeholders visíveis
             mudarJustificativa(); 
             gerarEmail();
         };
