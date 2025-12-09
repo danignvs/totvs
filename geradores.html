@@ -179,7 +179,15 @@
         const JUSTIFICATIVA_PADRAO = "Termo de conclusão assinado no repositório do projeto.";
 
         function obterSaudacao() {
-            const hora = new Date().getHours();
+            // HORÁRIO DE BRASÍLIA
+            // Pega a hora atual convertida especificamente para o fuso de São Paulo
+            const hora = parseInt(new Date().toLocaleString("pt-BR", {
+                timeZone: "America/Sao_Paulo",
+                hour: "numeric",
+                hour12: false
+            }));
+
+            // Bom dia: 05h às 11:59h | Boa tarde: 12h às 17:59h
             if (hora >= 5 && hora < 12) {
                 return "bom dia";
             } else if (hora >= 12 && hora < 18) {
