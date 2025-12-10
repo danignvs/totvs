@@ -131,13 +131,20 @@
             min-width: 45%; 
         }
 
-        @media (max-width: 600px) {
+        @media (max-width:800px) {
             body {
-                padding: 10px;
+                background-color: #ffffff;
+                padding: 0px;
             }
             .container {
                 padding: 20px;
+                border-radius: 0px;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0);
+                border-top: 0px;
             }
+        }
+
+        @media (max-width: 600px) {
             .input-group {
                 flex-direction: column;
                 gap: 0;
@@ -155,10 +162,10 @@
 <body>
 
     <div class="container">
-        <h2>Gestão de Portfólio - Faturamentos
+        <h2 style="margin-bottom: 0;">Gestão de Portfólio - Faturamentos
         </h2>
-            <a style="color: #A44DFF;" href="https://psaproducaototvs.crm2.dynamics.com/main.aspx?appid=ad972b31-8851-eb11-a812-000d3a8852cb&forceUCI=1&pagetype=entitylist&etn=msdyn_project&viewid=ead1f7f9-6dd0-f011-bbd3-00224836edf2&viewType=4230" target="_blank">
-               <h6> https://psaproducaototvs.crm2.dynamics.com/main.aspx?appid=ad972b31-8...</h6>
+            <a style="color: #ccc;" href="https://psaproducaototvs.crm2.dynamics.com/main.aspx?appid=ad972b31-8851-eb11-a812-000d3a8852cb&forceUCI=1&pagetype=entitylist&etn=msdyn_project&viewid=ead1f7f9-6dd0-f011-bbd3-00224836edf2&viewType=4230" target="_blank">
+               <h6 style="margin: 0.5rem 0 1.5rem 0;"> https://psaproducaototvs.crm2.dynamics.com/main.aspx?appid=ad972b31-8...</h6>
             </a>
         
         <div class="input-group">
