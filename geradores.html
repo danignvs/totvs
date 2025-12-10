@@ -122,18 +122,18 @@
         
         <div class="input-group">
             <div class="input-item">
-                <label for="codProjeto">Cod. Projeto (e Assunto):</label>
+                <label for="codProjeto">Cod. projeto (e assunto):</label>
                 <input type="text" id="codProjeto" placeholder="Ex: D...001" oninput="preencherContrato(); gerarEmail()">
             </div>
             <div class="input-item">
-                <label for="codContratoPSA">Cod. Contrato PSA:</label>
+                <label for="codContratoPSA">Cod. contrato PSA:</label>
                 <input type="text" id="codContratoPSA" placeholder="Ex: D..." oninput="gerarEmail()">
             </div>
         </div>
 
         <div class="input-group">
             <div class="input-item">
-                <label for="codCliente">Cod. Cliente:</label>
+                <label for="codCliente">Cod. cliente:</label>
                 <input type="text" id="codCliente" placeholder="Ex: T..." oninput="gerarEmail()">
             </div>
             <div class="input-item">
@@ -142,19 +142,19 @@
             </div>
         </div>
 
-        <label for="nomeProjeto">Nome do Projeto:</label>
+        <label for="nomeProjeto">Nome do projeto:</label>
         <input type="text" id="nomeProjeto" placeholder="" oninput="gerarEmail()">
 
-        <label for="tipoAssunto">Tipo de Assunto:</label>
+        <label for="tipoAssunto">Assunto:</label>
         <select id="tipoAssunto" onchange="gerarEmail()">
-            <option value="Faturamento">Solicitação de Faturamento</option>
-            <option value="Projeto">Nome do Projeto</option>
+            <option value="Faturamento">Solicitação de faturamento</option>
+            <option value="Projeto">Nome do projeto</option>
         </select>
         
         <label for="tipoJustificativa">Justificativa:</label>
         <select id="tipoJustificativa" onchange="mudarJustificativa(); gerarEmail()">
             <option value="Padrao">Padrão (Termo de conclusão assinado...)</option>
-            <option value="Outras">Outras (Digitar texto)</option>
+            <option value="Outras">Outras (digitar abaixo)</option>
         </select>
 
         <div id="justificativaManualDiv" class="justificativa-manual">
@@ -165,13 +165,13 @@
         <div class="resultado">
             <h3>Assunto do Email</h3>
             <pre id="resultadoAssunto"></pre>
-            <button onclick="copiarTexto('resultadoAssunto')">Copiar Assunto</button>
+            <button onclick="copiarTexto('resultadoAssunto')">Copiar assunto</button>
         </div>
 
         <div class="resultado">
             <h3>Corpo do Email</h3>
             <pre id="resultadoCorpo"></pre>
-            <button onclick="copiarTexto('resultadoCorpo')">Copiar Corpo</button>
+            <button onclick="copiarTexto('resultadoCorpo')">Copiar texto</button>
         </div>
     </div>
 
@@ -258,14 +258,15 @@
 
 Favor proceder com o faturamento abaixo:
 
-Cod. Contrato PSA: ${codContratoPSA}
-Cod. Cliente: ${codCliente}
+Cod. contrato PSA: ${codContratoPSA}
+Cod. cliente: ${codCliente}
 Valor líquido: ${valorLiquido}
 
-Cod. Projeto: ${codProjeto}
-Nome do Projeto: ${nomeProjeto}
+Cod. projeto: ${codProjeto}
+Nome do projeto: ${nomeProjeto}
 
 Justificativa: ${justificativa}
+
 
 Atenciosamente,`;
 
