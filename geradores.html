@@ -180,7 +180,6 @@
 
         function obterSaudacao() {
             // HORÁRIO DE BRASÍLIA
-            // Pega a hora atual convertida especificamente para o fuso de São Paulo
             const hora = parseInt(new Date().toLocaleString("pt-BR", {
                 timeZone: "America/Sao_Paulo",
                 hour: "numeric",
@@ -199,7 +198,6 @@
 
         function preencherContrato() {
             const codProjeto = document.getElementById('codProjeto').value;
-            // Só tenta preencher se houver texto, para evitar erros
             if (codProjeto.length > 3) {
                 const codContratoPSA = codProjeto.slice(0, -3);
                 document.getElementById('codContratoPSA').value = codContratoPSA;
@@ -229,10 +227,18 @@
             const nomeProjeto = document.getElementById('nomeProjeto').value;
             const tipoAssunto = document.getElementById('tipoAssunto').value;
             const tipoJustificativa = document.getElementById('tipoJustificativa').value;
-            
             const codContratoPSA = document.getElementById('codContratoPSA').value;
             const codCliente = document.getElementById('codCliente').value;
-            const valorLiquido = document.getElementById('valorLiquido').value;
+            
+            // --- INÍCIO DA MUDANÇA NO VALOR LÍQUIDO ---
+            // Pega o valor e remove espaços extras
+            let valorLiquido = document.getElementById('valorLiquido').value.trim();
+            
+            // Se o usuário digitou algo e NÃO começa com R$, adiciona o R$
+            if (valorLiquido && !valorLiquido.toUpperCase().startsWith("R$")) {
+                valorLiquido = `R$${valorLiquido}`;
+            }
+            // --- FIM DA MUDANÇA ---
             
             let justificativa;
             if (tipoJustificativa === 'Padrao') {
@@ -243,16 +249,12 @@
 
             let assunto = '';
             if (tipoAssunto === 'Faturamento') {
-                // Se o código estiver vazio, deixa o assunto em branco para não mostrar só o traço
                 assunto = codProjeto ? `${codProjeto} - Solicitação de Faturamento` : '';
             } else { 
                 assunto = (codProjeto && nomeProjeto) ? `${codProjeto} - ${nomeProjeto}` : '';
             }
 
             const saudacao = obterSaudacao();
-            
-            // Verifica se os campos principais estão vazios para não gerar um email cheio de buracos
-            // Mas mantém a estrutura visível
             
             const corpoEmail = `Olá, ${saudacao}!
 
@@ -289,7 +291,6 @@ Atenciosamente,`;
         }
 
         window.onload = function() {
-            // Não chamamos preencherContrato aqui para deixar os placeholders visíveis
             mudarJustificativa(); 
             gerarEmail();
         };
