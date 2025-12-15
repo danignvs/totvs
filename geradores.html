@@ -5,42 +5,55 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
     <title>Gerador de Email de Faturamento</title>
+    <link rel="stylesheet" href="style.css">
+
     <style>
-        /* --- ESTILO GERAL --- */
-        body {
-            font-family: 'Segoe UI', Arial, sans-serif; /* Fonte moderna padrão corporativo */
-            margin: 0;
-            padding: 40px 20px;
-            background-color: #002233; /* Fundo Azul Escuro TOTVS */
-            color: #ffffff;
+        /* CSS ESPECÍFICO DESTA PÁGINA (Formulários) */
+        
+        h1 {
+            color: var(--branco);
+            max-width: 700px; 
+            margin: 0 auto;
+            padding-bottom: 30px;
+            font-size: 30px;
         }
 
-        .container {
-            max-width: 600px;
-            margin: auto;
-            background: #ffffff; /* Container Branco */
-            color: #002233; /* Texto Azul Escuro */
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-            border-top: 6px solid #00DBFF; /* Detalhe superior em Azul Claro */
+        h3 {
+            margin: 60px 0 30px;
+            color: var(--roxo);
+            border-left: 4px solid var(--roxo);
+            padding-left: 10px;
+            font-size: 24px;
         }
 
-        /* --- TIPOGRAFIA --- */
-        h1,h2,h3 {
-            text-transform: uppercase;
-            color: #A44DFF;
+        .link-psa {
+            margin:  0 0 30px 0; 
+            border-left: 4px solid var(--az-claro);
+        }        
+
+        .link-psa h2 {
+            color: var(--az-escuro);
+            font-size: 26px;
+            padding-left: 10px;
+            margin-bottom: 5px;
         }
 
+        .link-psa a {
+            font-weight: 400;
+            font-size: 12px;
+            color: var(--cinza-escuro);
+            padding-left: 10px;
+        }
+
+        /* Formulários */
         label {
             display: block;
             margin-top: 15px;
             font-weight: 600;
-            color: #002233;
+            color: var(--az-escuro);
             font-size: 0.95em;
         }
 
-        /* --- INPUTS E SELECTS --- */
         input[type="text"], select {
             width: 100%;
             padding: 12px;
@@ -49,99 +62,87 @@
             border-radius: 4px;
             box-sizing: border-box;
             font-size: 14px;
-            color: #002233;
+            color: var(--az-escuro);
             background-color: #f9f9f9;
             transition: border-color 0.3s, box-shadow 0.3s;
         }
 
         input[type="text"]:focus, select:focus {
-            border-color: #00DBFF; /* Foco Azul Claro */
+            border-color: var(--az-claro);
             outline: none;
             box-shadow: 0 0 0 3px rgba(0, 219, 255, 0.2);
-            background-color: #fff;
+            background-color: var(--branco);
         }
 
-        ::placeholder {
-            color: #999;
-            opacity: 1;
+        .input-group {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 0;
         }
 
-        /* --- BOTÕES --- */
+        .input-item {
+            flex: 1;
+            min-width: 45%;
+        }
+
         button {
-            background-color: #A44DFF; /* Botão Roxo */
-            color: white;
-            padding: 12px 20px;
+            background-color: var(--roxo);
+            color: var(--branco);
+            padding: 5px 20px;
             border: none;
-            border-radius: 4px;
+            border-radius: 10px;
             cursor: pointer;
-            margin-top: 15px;
-            font-size: 16px;
+            font-size: 14px;
             font-weight: bold;
             transition: background-color 0.3s ease, transform 0.1s;
-            width: 100%; /* Botões full width para mobile e destaque */
+            width: 100%;
+            max-width: 70px; 
+            display: flex;
+            flex-wrap: nowrap;
+            justify-content: center;
         }
 
         button:hover {
-            background-color: #00DBFF; /* Hover Azul Claro */
+            background-color: var(--roxo-escuro);
         }
 
         button:active {
             transform: scale(0.98);
         }
 
-        /* --- RESULTADOS --- */
+        /* Resultados */
         .resultado {
-            margin-top: 30px;
-            padding: 20px;
-            border: 0px solid #00DBFF; /* Borda Azul Claro */
-            background-color: #F2F4F5; /* Fundo Cinza muito claro */
+            padding: 10px 20px 30px;
+            background-color: var(--cinza-claro);
             border-radius: 6px;
-            position: relative;
+            border: 1px solid var(--cinza);
+            margin: 20px 0;
         }
 
-        .resultado h3 {
-            margin-top: 0;
-            color: #A44DFF; /* Título Roxo */
-            font-size: 1.1em;
-            margin-bottom: 10px;
-            text-transform: uppercase;
+        .copiar {
+            display: flex;
+            width: 100%;
+            justify-content: space-between;
+            flex-direction: row;
+            align-items: flex-end;
+        }
+
+        .copiar label {
+            font-size: 20px;
         }
 
         pre {
             white-space: pre-wrap;
             word-break: break-all;
             padding: 15px;
-            background-color: #ffffff;
+            background-color: var(--branco);
             border: 1px solid #e0e0e0;
-            border-left: 4px solid #00DBFF; /* Detalhe lateral */
             border-radius: 4px;
             min-height: 20px;
-            font-family: Consolas, 'Courier New', monospace;
-            color: #333;
         }
 
-        /* Flexbox Responsivo */
-        .input-group {
-            display: flex;
-            gap: 20px;
-            margin-bottom: 0;
-        }
-        .input-item {
-            flex: 1;
-            min-width: 45%; 
-        }
-
-        @media (max-width:800px) {
-            body {
-                background-color: #ffffff;
-                padding: 0px;
-            }
-            .container {
-                padding: 20px;
-                border-radius: 0px;
-                box-shadow: 0 4px 20px rgba(0, 0, 0, 0);
-                border-top: 0px;
-            }
+        .justificativa-manual {
+            display: none;
         }
 
         @media (max-width: 600px) {
@@ -153,20 +154,21 @@
                 min-width: 100%;
             }
         }
-        
-        .justificativa-manual {
-            display: none;
-        }
+
+
     </style>
 </head>
 <body>
+        <h1>Gestão de Portfólio</h1>
 
-    <div class="container">
-        <h2 style="margin-bottom: 0;">Gestão de Portfólio - Faturamentos
-        </h2>
-            <a style="color: #ccc;" href="https://psaproducaototvs.crm2.dynamics.com/main.aspx?appid=ad972b31-8851-eb11-a812-000d3a8852cb&forceUCI=1&pagetype=entitylist&etn=msdyn_project&viewid=ead1f7f9-6dd0-f011-bbd3-00224836edf2&viewType=4230" target="_blank">
-               <h6 style="margin: 0.5rem 0 1.5rem 0;"> https://psaproducaototvs.crm2.dynamics.com/main.aspx?appid=ad972b31-8...</h6>
+    <div class="container container-azul" style="max-width: 700px;">
+
+        <div class="link-psa">
+        <h2>Faturamentos</h2>
+            <a href="https://psaproducaototvs.crm2.dynamics.com/main.aspx?appid=ad972b31-8851-eb11-a812-000d3a8852cb&forceUCI=1&pagetype=entitylist&etn=msdyn_project&viewid=ead1f7f9-6dd0-f011-bbd3-00224836edf2&viewType=4230" target="_blank">
+               Ver no PSA
             </a>
+        </div>
         
         <div class="input-group">
             <div class="input-item">
@@ -210,38 +212,45 @@
             <input type="text" id="justificativa" placeholder="Descreva a justificativa aqui..." oninput="gerarEmail()">
         </div>
 
+            <h3>E-mail gerado</h3>
+
         <div class="resultado">
-            <h3>Assunto do Email</h3>
-            <pre id="resultadoAssunto"></pre>
-            <button onclick="copiarTexto('resultadoAssunto')">Copiar assunto</button>
+
+            <div class="copiar">
+                <label style="width: 200px;">Assunto</label>
+                <button onclick="copiarTexto('resultadoAssunto')">Copiar</button>
+            </div>
+            <pre id="resultadoAssunto"></pre>   
+
         </div>
 
         <div class="resultado">
-            <h3>Corpo do Email</h3>
+
+            <div class="copiar">
+                <label>Corpo</label>
+                <button onclick="copiarTexto('resultadoCorpo')">Copiar</button>
+            </div>
             <pre id="resultadoCorpo"></pre>
-            <button onclick="copiarTexto('resultadoCorpo')">Copiar texto</button>
+
         </div>
+
     </div>
+
+    
 
     <script>
         const JUSTIFICATIVA_PADRAO = "Termo de conclusão assinado no repositório do projeto.";
 
         function obterSaudacao() {
-            // HORÁRIO DE BRASÍLIA
             const hora = parseInt(new Date().toLocaleString("pt-BR", {
                 timeZone: "America/Sao_Paulo",
                 hour: "numeric",
                 hour12: false
             }));
 
-            // Bom dia: 05h às 11:59h | Boa tarde: 12h às 17:59h
-            if (hora >= 5 && hora < 12) {
-                return "bom dia";
-            } else if (hora >= 12 && hora < 18) {
-                return "boa tarde";
-            } else {
-                return "bom dia/boa tarde";
-            }
+            if (hora >= 5 && hora < 12) return "bom dia";
+            else if (hora >= 12 && hora < 18) return "boa tarde";
+            else return "bom dia/boa tarde";
         }
 
         function preencherContrato() {
@@ -278,10 +287,7 @@
             const codContratoPSA = document.getElementById('codContratoPSA').value;
             const codCliente = document.getElementById('codCliente').value;
             
-            // Pega o valor e remove espaços extras
             let valorLiquido = document.getElementById('valorLiquido').value.trim();
-            
-            // Se o usuário digitou algo e NÃO começa com R$, adiciona o R$
             if (valorLiquido && !valorLiquido.toUpperCase().startsWith("R$")) {
                 valorLiquido = `R$${valorLiquido}`;
             }
