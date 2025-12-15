@@ -153,7 +153,7 @@
     </div>
 
     <div id="container-barrafunda" class="hidden">
-        <div class="container container-azul" style="max-width: 450px;">
+        <div class="container container-azul" style="max-width: 600px;">
             <button class="btn-close" onclick="fecharTodos()">X</button>
 
             <h1>BARRA FUNDA</h1>
@@ -228,7 +228,7 @@
     </div>
 
     <div id="container-santana" class="hidden">
-        <div class="container container-azul" style="max-width: 450px;">
+        <div class="container container-azul" style="max-width: 600px;"> 
             <button class="btn-close" onclick="fecharTodos()">X</button>
 
             <H1>SANTANA</H1>
@@ -322,13 +322,14 @@
             barra.classList.add('hidden');
             santana.classList.add('hidden');
 
-            // 4. Mostra o escolhido e rola suavemente até ele
+            // 4. Mostra o escolhido e rola para o TOPO da página
+            // Isso respeita o padding do body no PC
             if (tipo === 'barra') {
                 barra.classList.remove('hidden');
-                barra.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                window.scrollTo({ top: 0, behavior: 'smooth' });
             } else if (tipo === 'santana') {
                 santana.classList.remove('hidden');
-                santana.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                window.scrollTo({ top: 0, behavior: 'smooth' });
             }
         }
 
