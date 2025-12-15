@@ -96,6 +96,30 @@ h1, h2, h3 {
     font-weight: bold;
 }
 
+.azul {
+    color: var(--az-escuro);
+}
+
+.azul-claro {
+    color: var(--az-claro);
+}
+
+.roxo {
+    color: var(--roxo);
+}
+
+.laranja {
+    color: var(--laranja);
+}
+
+.rosa {
+    color: var(--rosa);
+}
+
+.verde {
+    color: var(--verde);
+}
+
 .destaque-azul {
     background-color: var(--az-claro);
     color: var(--az-escuro);
