@@ -1,0 +1,182 @@
+/* =========================================
+   1. VARIÁVEIS E FONTES
+   ========================================= */
+:root {
+    --az-escuro: #002233;
+    --az-claro: #00DBFF;    
+    --az-claro2: #00bcd8;
+    --az-bg: #e4fbff;
+    --roxo: #A44DFF;
+    --roxo2: #833ad1;
+    --roxo-bg: #f3e9ff;
+    --branco: #ffffff;
+    --cinza-claro: #F2F4F5;
+    --cinza:#c9c9c9;
+    --cinza-escuro: #666666;
+    --bg-fundo: #002233;
+    --verde: #00FFD4;
+    --verde-escuro: #00ceab;
+    --limao: #d9ff65;
+    --laranja: #ff8900;
+    --laranja2: #dd7700;
+    --rosa: #ff009e;
+}
+
+@font-face {
+    font-family: 'TOTVS';
+    src: url('https://raw.githubusercontent.com/danignvs/totvs/main/fontes/TOTVS-Bold.ttf') format('truetype');
+    font-weight: bold;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'TOTVS';
+    src: url('https://raw.githubusercontent.com/danignvs/totvs/main/fontes/TOTVS-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'TOTVS';
+    src: url('https://raw.githubusercontent.com/danignvs/totvs/main/fontes/TOTVS-Light.ttf') format('truetype');
+    font-weight: 300;
+    font-style: normal;
+}
+
+
+body {
+    font-family: 'TOTVS', 'Segoe UI', Arial, sans-serif;
+    margin: 0;
+    padding: 40px 20px;
+    background-color: var(--bg-fundo);
+    color: var(--az-escuro);
+    /* Substitua 'background.png' pelo caminho correto da sua imagem se necessário */
+    background: url('background.png') no-repeat center center fixed; 
+    background-size: cover;
+    min-height: 100vh;
+}
+
+strong {
+    font-weight: bold;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.center {
+    text-align: center;
+}
+
+.container {
+    margin: auto;
+    background: var(--branco);
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    /* Animação suave ao abrir */
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+.container-roxo {
+    border-top: 6px solid var(--roxo);
+}
+
+.container-azul {
+    border-top: 6px solid var(--az-claro);
+}
+
+.separator {
+    border: 1px solid var(--cinza);
+    margin: 30px 0;
+}
+
+h1, h2, h3 {
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+.destaque-azul {
+    background-color: var(--az-claro);
+    color: var(--az-escuro);
+    padding: 10px;
+    border-radius: 10px;
+}
+
+.destaque-roxo {
+    background-color: var(--roxo);
+    color: var(--branco);
+    padding: 10px;
+    border-radius: 10px;
+}
+
+.destaque-verde {
+    background-color: var(--verde);
+    color: var(--az-escuro);
+    padding: 10px;
+    border-radius: 10px;
+}
+
+.destaque-rosa {
+    background-color: var(--rosa);
+    color: var(--branco);
+    padding: 10px;
+    border-radius: 10px;
+}
+
+.destaque-laranja {
+    background-color: var(--laranja);
+    color: var(--branco);
+    padding: 10px;
+    border-radius: 10px;
+}
+
+/* Botão Fechar */
+.btn-close {
+    background: var(--az-claro);
+    color: var(--branco);
+    padding: 7px 13px;
+    font-size: 14px;
+    width: auto;
+    margin-top: 0;
+    float: right;
+    cursor: pointer;
+    border-radius: 4px;
+    border: 0;
+    font-weight: bold;
+    margin: -20px;
+}
+.btn-close:hover {
+    background: var(--az-claro2); 
+}
+
+.link-maps {
+    /*
+   */background-color: var(--limao); padding: 3px;  
+    color: var(--az-escuro); 
+    text-decoration: none; 
+    font-weight: bold; 
+}
+
+/* Animação */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+
+
+@media (max-width: 800px) {
+    body {
+        /* Em telas menores, remove padding do body se desejar fundo branco total */
+        padding: 0; 
+    }
+    .container {
+        padding: 20px;
+        border-radius: 0;
+        box-shadow: none;
+        border-top: none; /* Remove a borda colorida topo em mobile */
+        max-width: 100% !important; /* Força largura total */
+        min-height: 100vh;
+    }
+}
