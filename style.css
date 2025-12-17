@@ -174,9 +174,8 @@ h1, h2, h3 {
     background: var(--az-claro2); 
 }
 
-.link-maps {
-    /*
-   */background-color: var(--limao); padding: 3px;  
+.link-limao {
+    background-color: var(--limao); padding: 3px;  
     color: var(--az-escuro); 
     text-decoration: none; 
     font-weight: bold; 
