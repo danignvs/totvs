@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -8,18 +9,45 @@
     <link rel="stylesheet" href="style.css">
 
     <style>
-        /* CSS ESPECÍFICO DESTA PÁGINA (Formulários) */
-        
+        /* CSS ESPECÍFICO DESTA PÁGINA */
+        :root {
+            --branco: #ffffff;
+            --roxo: #7e22ce; 
+            --roxo-escuro: #581c87;
+            --az-claro: #0ea5e9;
+            --az-escuro: #0f172a;
+            --cinza-escuro: #334155;
+            --cinza-claro: #f1f5f9;
+            --cinza: #cbd5e1;
+            --vermelho: #d32f2f; /* Cor para o botão de limpar */
+        }
+
+        body {
+            font-family: sans-serif;
+            background-color: var(--az-escuro); /* Fundo escuro para destacar o container */
+            margin: 0;
+            padding: 20px;
+        }
+
         h1 {
             color: var(--branco);
             max-width: 700px; 
             margin: 0 auto;
             padding-bottom: 30px;
             font-size: 30px;
+            text-align: center;
+        }
+
+        .container {
+            background-color: var(--branco);
+            padding: 30px;
+            border-radius: 10px;
+            margin: 0 auto;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
 
         h3 {
-            margin: 60px 0 30px;
+            margin: 40px 0 20px;
             color: var(--roxo);
             border-left: 4px solid var(--roxo);
             padding-left: 10px;
@@ -29,20 +57,26 @@
         .link-psa {
             margin:  0 0 30px 0; 
             border-left: 4px solid var(--az-claro);
+            padding: 5px 0;
         }        
 
         .link-psa h2 {
             color: var(--az-escuro);
             font-size: 26px;
             padding-left: 10px;
-            margin-bottom: 5px;
+            margin: 0 0 5px 0;
         }
 
         .link-psa a {
             font-weight: bold;
-            font-size: 12px;
+            font-size: 14px;
             color: var(--cinza-escuro);
             margin-left: 10px;
+            text-decoration: none;
+        }
+        
+        .link-psa a:hover {
+            text-decoration: underline;
         }
 
         /* Formulários */
@@ -88,18 +122,17 @@
         button {
             background-color: var(--roxo);
             color: var(--branco);
-            padding: 5px 20px;
+            padding: 8px 20px;
             border: none;
-            border-radius: 10px;
+            border-radius: 6px;
             cursor: pointer;
             font-size: 14px;
             font-weight: bold;
             transition: background-color 0.3s ease, transform 0.1s;
             width: 100%;
-            max-width: 70px; 
             display: flex;
-            flex-wrap: nowrap;
             justify-content: center;
+            align-items: center;
         }
 
         button:hover {
@@ -108,6 +141,22 @@
 
         button:active {
             transform: scale(0.98);
+        }
+
+        /* Botão específico para limpar */
+        .btn-limpar {
+            background-color: transparent;
+            color: var(--vermelho);
+            border: 1px solid var(--vermelho);
+            margin-top: 30px;
+            margin-bottom: 10px;
+            width: 100%;
+            max-width: 100%; /* Ocupa largura total */
+        }
+
+        .btn-limpar:hover {
+            background-color: var(--vermelho);
+            color: var(--branco);
         }
 
         /* Resultados */
@@ -125,10 +174,17 @@
             justify-content: space-between;
             flex-direction: row;
             align-items: flex-end;
+            margin-bottom: 10px;
         }
 
         .copiar label {
-            font-size: 20px;
+            font-size: 18px;
+            margin: 0;
+        }
+
+        .copiar button {
+            width: auto; /* Botão de copiar fica pequeno */
+            padding: 5px 15px;
         }
 
         pre {
@@ -139,10 +195,39 @@
             border: 1px solid #e0e0e0;
             border-radius: 4px;
             min-height: 20px;
+            font-family: monospace;
+            margin: 0;
         }
 
         .justificativa-manual {
             display: none;
+        }
+
+        /* ESTILO DA NOTIFICAÇÃO (TOAST) */
+        #toast {
+            visibility: hidden;
+            min-width: 250px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 4px;
+            padding: 16px;
+            position: fixed;
+            z-index: 1000;
+            left: 50%;
+            bottom: 30px;
+            transform: translateX(-50%);
+            font-size: 15px;
+            font-weight: 500;
+            opacity: 0;
+            transition: opacity 0.5s, bottom 0.5s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        #toast.show {
+            visibility: visible;
+            opacity: 1;
+            bottom: 50px;
         }
 
         @media (max-width: 600px) {
@@ -154,18 +239,16 @@
                 min-width: 100%;
             }
         }
-
-
     </style>
 </head>
 <body>
-        <h1>Gestão de Portfólio</h1>
+    <h1>Gestão de Portfólio</h1>
 
     <div class="container container-azul" style="max-width: 700px;">
 
         <div class="link-psa">
         <h2>Faturamentos</h2>
-            <a class="link-limao" target="_blank" href="https://psaproducaototvs.crm2.dynamics.com/main.aspx?appid=ad972b31-8851-eb11-a812-000d3a8852cb&forceUCI=1&pagetype=entitylist&etn=msdyn_project&viewid=ead1f7f9-6dd0-f011-bbd3-00224836edf2&viewType=4230" target="_blank">
+            <a class="link-limao" target="_blank" href="https://psaproducaototvs.crm2.dynamics.com/main.aspx?appid=ad972b31-8851-eb11-a812-000d3a8852cb&forceUCI=1&pagetype=entitylist&etn=msdyn_project&viewid=ead1f7f9-6dd0-f011-bbd3-00224836edf2&viewType=4230">
                Ver no PSA
             </a>
         </div>
@@ -211,32 +294,30 @@
             <label for="justificativa">Digite sua Justificativa:</label>
             <input type="text" id="justificativa" placeholder="Descreva a justificativa aqui..." oninput="gerarEmail()">
         </div>
-
-            <h3><span class="azul">E-mail</span> gerado</h3>
+        <h3><span class="azul">E-mail</span> gerado</h3>
 
         <div class="resultado">
-
             <div class="copiar">
-                <label style="width: 200px;">Assunto</label>
+                <label>Assunto</label>
                 <button onclick="copiarTexto('resultadoAssunto')">Copiar</button>
             </div>
             <pre id="resultadoAssunto"></pre>   
-
         </div>
 
         <div class="resultado">
-
             <div class="copiar">
                 <label>Corpo</label>
                 <button onclick="copiarTexto('resultadoCorpo')">Copiar</button>
             </div>
             <pre id="resultadoCorpo"></pre>
-
         </div>
+
+        <button class="btn-limpar" onclick="limparFormulario()">Limpar Formulário</button>
+
 
     </div>
 
-    
+    <div id="toast">Copiado para a área de transferência!</div>
 
     <script>
         const JUSTIFICATIVA_PADRAO = "Termo de conclusão assinado no repositório do projeto.";
@@ -273,7 +354,10 @@
                 inputJustificativa.value = JUSTIFICATIVA_PADRAO;
             } else { 
                 justificativaDiv.style.display = 'block';
-                inputJustificativa.value = ""; 
+                // Limpa se estiver com o texto padrão para facilitar a digitação
+                if (inputJustificativa.value === JUSTIFICATIVA_PADRAO) {
+                    inputJustificativa.value = ""; 
+                }
                 inputJustificativa.focus(); 
             }
             gerarEmail(); 
@@ -328,18 +412,48 @@ Atenciosamente,`;
             document.getElementById('resultadoCorpo').textContent = corpoEmail;
         }
 
+        // --- FUNÇÕES NOVAS ---
+
+        // Função para exibir a notificação suave
+        function mostrarToast() {
+            var x = document.getElementById("toast");
+            x.className = "show";
+            // Remove a classe após 3 segundos
+            setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
+        }
+
+        // Função modificada para usar o Toast em vez do Alert
         function copiarTexto(idElemento) {
             const texto = document.getElementById(idElemento).textContent;
+            
             if (!texto.trim()) {
-                alert('O campo está vazio! Preencha os dados primeiro.');
+                // Se estiver vazio, não faz nada
                 return;
             }
+
             navigator.clipboard.writeText(texto).then(() => {
-                alert('Conteúdo copiado para a área de transferência!');
+                mostrarToast(); // Chama a notificação
             }).catch(err => {
                 console.error('Erro ao copiar: ', err);
-                alert('Erro ao copiar o texto. Por favor, copie manualmente.');
+                alert('Erro manual ao copiar.'); // Fallback apenas se der erro técnico
             });
+        }
+
+        // Função para Limpar tudo
+        function limparFormulario() {
+            // Seleciona todos os inputs de texto e limpa
+            const inputs = document.querySelectorAll('input[type="text"]');
+            inputs.forEach(input => input.value = '');
+
+            // Reseta os selects para a primeira opção
+            document.getElementById('tipoAssunto').selectedIndex = 0;
+            document.getElementById('tipoJustificativa').selectedIndex = 0;
+
+            // Restaura a visualização da justificativa (esconde o manual)
+            mudarJustificativa();
+
+            // Atualiza o email (vai ficar em branco)
+            gerarEmail();
         }
 
         window.onload = function() {
@@ -350,3 +464,5 @@ Atenciosamente,`;
 
 </body>
 </html>
+
+```
