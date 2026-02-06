@@ -1,6 +1,6 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,254 +9,30 @@
     <link rel="stylesheet" href="style.css">
 
     <style>
-        /* CSS ESPECÍFICO DESTA PÁGINA */
-        :root {
-            --branco: #ffffff;
-            --roxo: #7e22ce; 
-            --roxo-escuro: #581c87;
-            --az-claro: #0ea5e9;
-            --az-escuro: #0f172a;
-            --cinza-escuro: #334155;
-            --cinza-claro: #f1f5f9;
-            --cinza: #cbd5e1;
-            --vermelho: #d32f2f; /* Cor para o botão de limpar */
-        }
 
-        body {
-            font-family: sans-serif;
-            background-color: var(--az-escuro); /* Fundo escuro para destacar o container */
-            margin: 0;
-            padding: 20px;
-        }
-
-        h1 {
-            color: var(--branco);
-            max-width: 700px; 
-            margin: 0 auto;
-            padding-bottom: 30px;
-            font-size: 30px;
-            text-align: center;
-        }
-
-        .container {
-            background-color: var(--branco);
-            padding: 30px;
-            border-radius: 10px;
-            margin: 0 auto;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-
-        h3 {
-            margin: 40px 0 20px;
-            color: var(--roxo);
-            border-left: 4px solid var(--roxo);
-            padding-left: 10px;
-            font-size: 24px;
-        }
-
-        .link-psa {
-            margin:  0 0 30px 0; 
-            border-left: 4px solid var(--az-claro);
-            padding: 5px 0;
-        }        
-
-        .link-psa h2 {
-            color: var(--az-escuro);
-            font-size: 26px;
-            padding-left: 10px;
-            margin: 0 0 5px 0;
-        }
-
-        .link-psa a {
-            font-weight: bold;
-            font-size: 14px;
-            color: var(--cinza-escuro);
-            margin-left: 10px;
-            text-decoration: none;
-        }
-        
-        .link-psa a:hover {
-            text-decoration: underline;
-        }
-
-        /* Formulários */
-        label {
-            display: block;
-            margin-top: 15px;
-            font-weight: 600;
-            color: var(--az-escuro);
-            font-size: 0.95em;
-        }
-
-        input[type="text"], select {
-            width: 100%;
-            padding: 12px;
-            margin-top: 5px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
-            font-size: 14px;
-            color: var(--az-escuro);
-            background-color: #f9f9f9;
-            transition: border-color 0.3s, box-shadow 0.3s;
-        }
-
-        input[type="text"]:focus, select:focus {
-            border-color: var(--az-claro);
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(0, 219, 255, 0.2);
-            background-color: var(--branco);
-        }
-
-        .input-group {
-            display: flex;
-            gap: 20px;
-            margin-bottom: 0;
-        }
-
-        .input-item {
-            flex: 1;
-            min-width: 45%;
-        }
-
-        button {
-            background-color: var(--roxo);
-            color: var(--branco);
-            padding: 8px 20px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: bold;
-            transition: background-color 0.3s ease, transform 0.1s;
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        button:hover {
-            background-color: var(--roxo-escuro);
-        }
-
-        button:active {
-            transform: scale(0.98);
-        }
-
-        /* Botão específico para limpar */
-        .btn-limpar {
-            background-color: transparent;
-            color: var(--vermelho);
-            border: 1px solid var(--vermelho);
-            margin-top: 30px;
-            margin-bottom: 10px;
-            width: 100%;
-            max-width: 100%; /* Ocupa largura total */
-        }
-
-        .btn-limpar:hover {
-            background-color: var(--vermelho);
-            color: var(--branco);
-        }
-
-        /* Resultados */
-        .resultado {
-            padding: 10px 20px 30px;
-            background-color: var(--cinza-claro);
-            border-radius: 6px;
-            border: 1px solid var(--cinza);
-            margin: 20px 0;
-        }
-
-        .copiar {
-            display: flex;
-            width: 100%;
-            justify-content: space-between;
-            flex-direction: row;
-            align-items: flex-end;
-            margin-bottom: 10px;
-        }
-
-        .copiar label {
-            font-size: 18px;
-            margin: 0;
-        }
-
-        .copiar button {
-            width: auto; /* Botão de copiar fica pequeno */
-            padding: 5px 15px;
-        }
-
-        pre {
-            white-space: pre-wrap;
-            word-break: break-all;
-            padding: 15px;
-            background-color: var(--branco);
-            border: 1px solid #e0e0e0;
-            border-radius: 4px;
-            min-height: 20px;
-            font-family: monospace;
-            margin: 0;
-        }
-
-        .justificativa-manual {
-            display: none;
-        }
-
-        /* ESTILO DA NOTIFICAÇÃO (TOAST) */
-        #toast {
-            visibility: hidden;
-            min-width: 250px;
-            background-color: #333;
-            color: #fff;
-            text-align: center;
-            border-radius: 4px;
-            padding: 16px;
-            position: fixed;
-            z-index: 1000;
-            left: 50%;
-            bottom: 30px;
-            transform: translateX(-50%);
-            font-size: 15px;
-            font-weight: 500;
-            opacity: 0;
-            transition: opacity 0.5s, bottom 0.5s;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-        }
-
-        #toast.show {
-            visibility: visible;
-            opacity: 1;
-            bottom: 50px;
-        }
-
-        @media (max-width: 600px) {
-            .input-group {
-                flex-direction: column;
-                gap: 0;
-            }
-            .input-item {
-                min-width: 100%;
-            }
-        }
     </style>
 </head>
+
 <body>
-    <h1>Gestão de Portfólio</h1>
+    <!--h1></h1-->
 
     <div class="container container-azul" style="max-width: 700px;">
 
-        <div class="link-psa">
-        <h2>Faturamentos</h2>
-            <a class="link-limao" target="_blank" href="https://psaproducaototvs.crm2.dynamics.com/main.aspx?appid=ad972b31-8851-eb11-a812-000d3a8852cb&forceUCI=1&pagetype=entitylist&etn=msdyn_project&viewid=ead1f7f9-6dd0-f011-bbd3-00224836edf2&viewType=4230">
-               Ver no PSA
-            </a>
+        <div class="topo">
+            <div class="link-psa">
+                <h2>Faturamentos</h2>
+                <a class="link-limao" target="_blank"
+                    href="https://psaproducaototvs.crm2.dynamics.com/main.aspx?appid=ad972b31-8851-eb11-a812-000d3a8852cb&forceUCI=1&pagetype=entitylist&etn=msdyn_project&viewid=ead1f7f9-6dd0-f011-bbd3-00224836edf2&viewType=4230">
+                    Veja no PSA
+                </a>
+            </div>
         </div>
-        
+
         <div class="input-group">
             <div class="input-item">
                 <label for="codProjeto">Cod. projeto (e assunto):</label>
-                <input type="text" id="codProjeto" placeholder="Ex: D...001" oninput="preencherContrato(); gerarEmail()">
+                <input type="text" id="codProjeto" placeholder="Ex: D...001"
+                    oninput="preencherContrato(); gerarEmail()">
             </div>
             <div class="input-item">
                 <label for="codContratoPSA">Cod. contrato PSA:</label>
@@ -275,15 +51,20 @@
             </div>
         </div>
 
-        <label for="nomeProjeto">Nome do projeto:</label>
-        <input type="text" id="nomeProjeto" placeholder="" oninput="gerarEmail()">
-
+        <div class="input-group">
+            <div class="input-item">
+                <label for="nomeProjeto">Nome do projeto:</label>
+                <input type="text" id="nomeProjeto" placeholder="" oninput="gerarEmail()">
+            </div>
+            <div class="input-item">
         <label for="tipoAssunto">Assunto:</label>
         <select id="tipoAssunto" onchange="gerarEmail()">
             <option value="Faturamento">Solicitação de faturamento</option>
             <option value="Projeto">Nome do projeto</option>
         </select>
-        
+    </div>
+        </div>
+
         <label for="tipoJustificativa">Justificativa:</label>
         <select id="tipoJustificativa" onchange="mudarJustificativa(); gerarEmail()">
             <option value="Padrao">Padrão (Termo de conclusão assinado...)</option>
@@ -294,30 +75,42 @@
             <label for="justificativa">Digite sua Justificativa:</label>
             <input type="text" id="justificativa" placeholder="Descreva a justificativa aqui..." oninput="gerarEmail()">
         </div>
-        <h3><span class="azul">E-mail</span> gerado</h3>
+
+
+            <h3><span class="azul">E-mail</span> gerado</h3>
+
+        
 
         <div class="resultado">
-            <div class="copiar">
-                <label>Assunto</label>
-                <button onclick="copiarTexto('resultadoAssunto')">Copiar</button>
-            </div>
-            <pre id="resultadoAssunto"></pre>   
+            <button class="btn-roxo btn-aux" onclick="copiarTexto('resultadoAssunto')">Copiar</button>
+            <label>Assunto</label>
+            <pre id="resultadoAssunto"></pre>
         </div>
 
         <div class="resultado">
-            <div class="copiar">
-                <label>Corpo</label>
-                <button onclick="copiarTexto('resultadoCorpo')">Copiar</button>
-            </div>
+            <button class="btn-roxo btn-aux" onclick="copiarTexto('resultadoCorpo')">Copiar</button>
+            <label>Mensagem</label>
             <pre id="resultadoCorpo"></pre>
         </div>
 
-        <button class="btn-limpar" onclick="limparFormulario()">Limpar Formulário</button>
+        <div class="botoes-de-acao">
+            <button class="btn-roxo" onclick="copiarString('TERMO ANEXO - Faturamento Solicitado')">Copiar Status PSA</button>
+
+            <button class="btn-verde" onclick="abrirIndicadores()">Indicadores</button>
+
+            <button class="btn-vermelho" onclick="limparFormulario()">Limpar</button>
+        </div>
 
 
     </div>
 
     <div id="toast">Copiado para a área de transferência!</div>
+
+
+
+
+
+
 
     <script>
         const JUSTIFICATIVA_PADRAO = "Termo de conclusão assinado no repositório do projeto.";
@@ -340,10 +133,10 @@
                 const codContratoPSA = codProjeto.slice(0, -3);
                 document.getElementById('codContratoPSA').value = codContratoPSA;
             } else if (codProjeto.length === 0) {
-                 document.getElementById('codContratoPSA').value = "";
+                document.getElementById('codContratoPSA').value = "";
             }
         }
-        
+
         function mudarJustificativa() {
             const tipoJustificativa = document.getElementById('tipoJustificativa').value;
             const inputJustificativa = document.getElementById('justificativa');
@@ -352,15 +145,15 @@
             if (tipoJustificativa === 'Padrao') {
                 justificativaDiv.style.display = 'none';
                 inputJustificativa.value = JUSTIFICATIVA_PADRAO;
-            } else { 
+            } else {
                 justificativaDiv.style.display = 'block';
                 // Limpa se estiver com o texto padrão para facilitar a digitação
                 if (inputJustificativa.value === JUSTIFICATIVA_PADRAO) {
-                    inputJustificativa.value = ""; 
+                    inputJustificativa.value = "";
                 }
-                inputJustificativa.focus(); 
+                inputJustificativa.focus();
             }
-            gerarEmail(); 
+            gerarEmail();
         }
 
         function gerarEmail() {
@@ -370,12 +163,12 @@
             const tipoJustificativa = document.getElementById('tipoJustificativa').value;
             const codContratoPSA = document.getElementById('codContratoPSA').value;
             const codCliente = document.getElementById('codCliente').value;
-            
+
             let valorLiquido = document.getElementById('valorLiquido').value.trim();
             if (valorLiquido && !valorLiquido.toUpperCase().startsWith("R$")) {
                 valorLiquido = `R$${valorLiquido}`;
             }
-            
+
             let justificativa;
             if (tipoJustificativa === 'Padrao') {
                 justificativa = JUSTIFICATIVA_PADRAO;
@@ -386,12 +179,12 @@
             let assunto = '';
             if (tipoAssunto === 'Faturamento') {
                 assunto = codProjeto ? `${codProjeto} - Solicitação de Faturamento` : '';
-            } else { 
+            } else {
                 assunto = (codProjeto && nomeProjeto) ? `${codProjeto} - ${nomeProjeto}` : '';
             }
 
             const saudacao = obterSaudacao();
-            
+
             const corpoEmail = `Olá, ${saudacao}!
 
 Favor proceder com o faturamento abaixo:
@@ -414,28 +207,32 @@ Atenciosamente,`;
 
         // --- FUNÇÕES NOVAS ---
 
-        // Função para exibir a notificação suave
-        function mostrarToast() {
+        function mostrarToast(texto) {
             var x = document.getElementById("toast");
-            x.className = "show";
-            // Remove a classe após 3 segundos
-            setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
-        }
-
-        // Função modificada para usar o Toast em vez do Alert
-        function copiarTexto(idElemento) {
-            const texto = document.getElementById(idElemento).textContent;
             
-            if (!texto.trim()) {
-                // Se estiver vazio, não faz nada
-                return;
+            // Se o texto for muito longo (ex: corpo do email), cortamos para não quebrar o layout
+            let textoExibido = texto;
+            if (textoExibido.length > 40) {
+                textoExibido = textoExibido.substring(0, 40) + "...";
             }
 
+            // Define a mensagem dinâmica
+            x.textContent = `"${textoExibido}" copiado!`;
+            
+            x.className = "show";
+            setTimeout(function () { x.className = x.className.replace("show", ""); }, 4000);
+        }
+
+        function copiarTexto(idElemento) {
+            const texto = document.getElementById(idElemento).textContent;
+
+            if (!texto.trim()) return;
+
             navigator.clipboard.writeText(texto).then(() => {
-                mostrarToast(); // Chama a notificação
+                mostrarToast(texto); // Passa o texto para a notificação
             }).catch(err => {
                 console.error('Erro ao copiar: ', err);
-                alert('Erro manual ao copiar.'); // Fallback apenas se der erro técnico
+                alert('Erro manual ao copiar.');
             });
         }
 
@@ -456,13 +253,38 @@ Atenciosamente,`;
             gerarEmail();
         }
 
-        window.onload = function() {
-            mudarJustificativa(); 
+        function copiarString(texto) {
+            navigator.clipboard.writeText(texto).then(() => {
+                mostrarToast(texto); // Passa o texto para a notificação
+            }).catch(err => {
+                console.error('Erro ao copiar: ', err);
+            });
+        }
+
+        function abrirIndicadores() {
+            const codProjeto = document.getElementById('codProjeto').value;
+            // COLOQUE O LINK DA SUA PLANILHA AQUI EMBAIXO:
+            const linkPlanilha = "https://docs.google.com/spreadsheets/d/19b-F8VDW_tJeJ2h4lM_owYeUDWt0upNsK_OR_bVe0aw/edit"; 
+
+            navigator.clipboard.writeText(codProjeto).then(() => {
+                // Se tiver código, mostra ele. Se estiver vazio, mostra mensagem genérica.
+                if(codProjeto) {
+                    mostrarToast(codProjeto); 
+                } else {
+                    mostrarToast("Vazio");
+                }
+                window.open(linkPlanilha, '_blank'); 
+            }).catch(err => {
+                window.open(linkPlanilha, '_blank');
+            });
+        }
+
+        window.onload = function () {
+            mudarJustificativa();
             gerarEmail();
         };
     </script>
 
 </body>
-</html>
 
-```
+</html>
