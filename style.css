@@ -1,205 +1,476 @@
-/* =========================================
-   1. VARIÁVEIS E FONTES
-   ========================================= */
-:root {
-    --az-escuro: #002233;
-    --az-claro: #00DBFF;    
-    --az-claro2: #00bcd8;
-    --az-bg: #e4fbff;
-    --roxo: #A44DFF;
-    --roxo2: #833ad1;
-    --roxo-bg: #f3e9ff;
-    --branco: #ffffff;
-    --cinza-claro: #F2F4F5;
-    --cinza:#c9c9c9;
-    --cinza-escuro: #666666;
-    --bg-fundo: #002233;
-    --verde: #00FFD4;
-    --verde-escuro: #00ceab;
-    --limao: #d9ff65;
-    --laranja: #ff8900;
-    --laranja2: #dd7700;
-    --rosa: #ff009e;
-}
+        :root {
+            --az-escuro: #002233;
+            --az-claro: #00DBFF;
+            --az-claro2: #00bcd8;
+            --az-bg: #e4fbff;
+            --roxo: #A44DFF;
+            --roxo2: #833ad1;
+            --roxo-bg: #f3e9ff;
+            --branco: #ffffff;
+            --cinza-claro: #F2F4F5;
+            --cinza: #c9c9c9;
+            --cinza-escuro: #666666;
+            --bg-fundo: #002233;
+            --verde: #01cdab;
+            --verde2: #00b99a;
+            --limao: #d9ff65;
+            --laranja: #ff8900;
+            --laranja2: #dd7700;
+            --rosa: #ff009e;
+            --vermelho: #ff4400;
+            --vermelho2: #dc3c02;
+        }
 
-@font-face {
-    font-family: 'TOTVS';
-    src: url('https://raw.githubusercontent.com/danignvs/totvs/main/fontes/TOTVS-Bold.ttf') format('truetype');
-    font-weight: bold;
-    font-style: normal;
-}
+        @font-face {
+            font-family: 'TOTVS';
+            src: url('https://raw.githubusercontent.com/danignvs/totvs/main/fontes/TOTVS-Bold.ttf') format('truetype');
+            font-weight: bold;
+            font-style: normal;
+        }
 
-@font-face {
-    font-family: 'TOTVS';
-    src: url('https://raw.githubusercontent.com/danignvs/totvs/main/fontes/TOTVS-Regular.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-}
+        @font-face {
+            font-family: 'TOTVS';
+            src: url('https://raw.githubusercontent.com/danignvs/totvs/main/fontes/TOTVS-Regular.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
 
-@font-face {
-    font-family: 'TOTVS';
-    src: url('https://raw.githubusercontent.com/danignvs/totvs/main/fontes/TOTVS-Light.ttf') format('truetype');
-    font-weight: 300;
-    font-style: normal;
-}
-
-
-body {
-    font-family: 'TOTVS', 'Segoe UI', Arial, sans-serif;
-    margin: 0;
-    padding: 40px 20px;
-    background-color: var(--bg-fundo);
-    color: var(--az-escuro);
-    /* Substitua 'background.png' pelo caminho correto da sua imagem se necessário */
-    background: url('background.png') no-repeat center center fixed; 
-    background-size: cover;
-    min-height: 100vh;
-}
-
-strong {
-    font-weight: bold;
-}
-
-.hidden {
-    display: none !important;
-}
-
-.center {
-    text-align: center;
-}
-
-.container {
-    margin: auto;
-    background: var(--branco);
-    padding: 30px;
-    border-radius: 8px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-    /* Animação suave ao abrir */
-    animation: fadeIn 0.5s ease-in-out;
-}
-
-.container-roxo {
-    border-top: 6px solid var(--roxo);
-}
-
-.container-azul {
-    border-top: 6px solid var(--az-claro);
-}
-
-.separator {
-    border: 1px solid var(--cinza);
-    margin: 30px 0;
-}
-
-h1, h2, h3 {
-    text-transform: uppercase;
-    font-weight: bold;
-}
-
-.azul {
-    color: var(--az-escuro);
-}
-
-.azul-claro {
-    color: var(--az-claro);
-}
-
-.roxo {
-    color: var(--roxo);
-}
-
-.laranja {
-    color: var(--laranja);
-}
-
-.rosa {
-    color: var(--rosa);
-}
-
-.verde {
-    color: var(--verde);
-}
-
-.destaque-azul {
-    background-color: var(--az-claro);
-    color: var(--az-escuro);
-    padding: 10px;
-    border-radius: 10px;
-}
-
-.destaque-roxo {
-    background-color: var(--roxo);
-    color: var(--branco);
-    padding: 10px;
-    border-radius: 10px;
-}
-
-.destaque-verde {
-    background-color: var(--verde);
-    color: var(--az-escuro);
-    padding: 10px;
-    border-radius: 10px;
-}
-
-.destaque-rosa {
-    background-color: var(--rosa);
-    color: var(--branco);
-    padding: 10px;
-    border-radius: 10px;
-}
-
-.destaque-laranja {
-    background-color: var(--laranja);
-    color: var(--branco);
-    padding: 10px;
-    border-radius: 10px;
-}
-
-/* Botão Fechar */
-.btn-close {
-    background: var(--az-claro);
-    color: var(--branco);
-    padding: 7px 13px;
-    font-size: 14px;
-    width: auto;
-    margin-top: 0;
-    float: right;
-    cursor: pointer;
-    border-radius: 4px;
-    border: 0;
-    font-weight: bold;
-    margin: -20px;
-}
-.btn-close:hover {
-    background: var(--az-claro2); 
-}
-
-.link-limao {
-    background-color: var(--limao); padding: 3px;  
-    color: var(--az-escuro); 
-    text-decoration: none; 
-    font-weight: bold; 
-}
-
-/* Animação */
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
+        @font-face {
+            font-family: 'TOTVS';
+            src: url('https://raw.githubusercontent.com/danignvs/totvs/main/fontes/TOTVS-Light.ttf') format('truetype');
+            font-weight: 300;
+            font-style: normal;
+        }
 
 
+        body {
+            font-family: 'TOTVS', 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+            padding: 40px 20px;
+            background-color: var(--bg-fundo);
+            color: var(--az-escuro);
+            /* Substitua 'background.png' pelo caminho correto da sua imagem se necessário */
+            background: url('background.png') no-repeat center center fixed;
+            background-size: cover;
+            min-height: 100vh;
+        }
 
-@media (max-width: 800px) {
-    body {
-        /* Em telas menores, remove padding do body se desejar fundo branco total */
-        padding: 0; 
-    }
-    .container {
-        padding: 20px;
-        border-radius: 0;
-        box-shadow: none;
-        border-top: none; /* Remove a borda colorida topo em mobile */
-        max-width: 100% !important; /* Força largura total */
-        min-height: 100vh;
-    }
-}
+        strong {
+            font-weight: bold;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .center {
+            text-align: center;
+        }
+
+        .container {
+            margin: auto;
+            background: var(--branco);
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            /* Animação suave ao abrir */
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .container-roxo {
+            border-top: 6px solid var(--roxo);
+        }
+
+        .container-azul {
+            border-top: 6px solid var(--az-claro);
+        }
+
+        .separator {
+            border: 1px solid var(--cinza);
+            margin: 30px 0;
+        }
+
+        h1,
+        h2,
+        h3 {
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        h1 {
+            color: var(--branco);
+            max-width: 700px;
+            margin: 0 auto;
+            padding-bottom: 30px;
+            font-size: 1.7em;
+            text-align: center;
+        }
+
+        h2 {
+            font-size: 1.5em;
+        }        
+
+        h3 {
+            margin: 40px 0 20px;
+            color: var(--roxo);
+            border-left: 4px solid var(--roxo);
+            padding-left: 10px;
+            font-size: 1.3em;
+        }
+
+        .azul {
+            color: var(--az-escuro);
+        }
+
+        .azul-claro {
+            color: var(--az-claro);
+        }
+
+        .roxo {
+            color: var(--roxo);
+        }
+
+        .laranja {
+            color: var(--laranja);
+        }
+
+        .rosa {
+            color: var(--rosa);
+        }
+
+        .verde {
+            color: var(--verde);
+        }
+
+        .destaque-azul {
+            background-color: var(--az-claro);
+            color: var(--az-escuro);
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+        .destaque-roxo {
+            background-color: var(--roxo);
+            color: var(--branco);
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+        .destaque-verde {
+            background-color: var(--verde);
+            color: var(--az-escuro);
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+        .destaque-rosa {
+            background-color: var(--rosa);
+            color: var(--branco);
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+        .destaque-laranja {
+            background-color: var(--laranja);
+            color: var(--branco);
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+        /* Botão Fechar */
+        .btn-close {
+            background: var(--az-claro);
+            color: var(--branco);
+            padding: 7px 13px;
+            font-size: 14px;
+            width: auto;
+            margin-top: 0;
+            float: right;
+            cursor: pointer;
+            border-radius: 4px;
+            border: 0;
+            font-weight: bold;
+            margin: -20px;
+        }
+
+        .btn-close:hover {
+            background: var(--az-claro2);
+        }
+
+        .link-limao {
+            background-color: var(--limao);
+            padding: 3px;
+            color: var(--az-escuro);
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .link-limao:hover {
+            color: var(--cinza-escuro);
+
+        }
+
+
+        /* Formulários */
+        label {
+            display: block;
+            font-weight: 600;
+            color: var(--az-escuro);
+            font-size: 1em;
+        }
+
+        .container label {
+            margin: 10px 0 0 0;
+        }
+
+        .resultado label {
+            margin: 5px 0 10px;
+        }
+
+        input[type="text"],
+        select {
+            width: 100%;
+            padding: 5px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 14px;
+            color: var(--az-escuro);
+            background-color: #f9f9f9;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        input[type="text"]:focus,
+        select:focus {
+            border-color: var(--az-claro);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0, 219, 255, 0.2);
+            background-color: var(--branco);
+        }
+
+        .input-group {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 0;
+        }
+
+        .input-item {
+            flex: 1;
+            min-width: 45%;
+        }
+
+        button {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s ease, transform 0.1s;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .btn-aux {
+            width: auto;
+            padding: 5px 10px;
+            font-size: 0.7em;
+            float: right;
+        }
+
+        .btn-aux button {
+            width: auto;
+            font-size: 12px;
+        }
+
+        .btn-aux button { 
+            width: auto; /* O segredo para ficarem pequenos */
+            padding: 5px 15px;
+            margin: 0; /* Garante que não tenha margem externa atrapalhando */
+        }
+
+        .botoes-de-acao {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            width: 100%;
+        }
+        
+        .botoes-de-acao button {
+            font-size: 0.8em;
+        }
+
+        .btn-roxo {
+            background-color: var(--roxo);
+            color: var(--branco);
+        }
+
+        .btn-roxo:hover {
+            background-color: var(--roxo2);
+        }
+
+
+        .btn-verde {
+            background-color: var(--verde);
+            color: var(--branco);
+        }
+
+        .btn-verde:hover {
+            background-color: var(--verde2);
+        }
+
+
+        /* Botão específico para limpar (ajustado para o novo layout) */
+        .btn-vermelho {
+            background-color: var(--vermelho);
+            color: var(--branco);
+        }
+
+        .btn-vermelho:hover {
+            background-color: var(--vermelho2);
+            color: var(--branco);
+        }
+
+        .topo {            
+            display: flex; 
+            justify-content: space-between;
+            align-items: flex-start; 
+        }
+
+        .container {
+            background-color: var(--branco);
+            padding: 30px;
+            border-radius: 10px;
+            margin: 0 auto;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .link-psa {
+            margin: 0 0 20px 0;
+            border-left: 4px solid var(--az-claro);
+            padding: 5px 0 0 10px;
+        }
+
+        .link-psa h2 {
+            margin: 0 0 5px 0;
+        }
+
+        .link-psa .link-limao {
+            font-size: 0.8em;
+        }
+
+        /* Resultados */
+        .resultado {
+            padding: 10px;
+            background-color: var(--cinza-claro);
+            border-radius: 6px;
+            border: 1px solid var(--cinza);
+            margin: 20px 0;
+        }
+
+        pre {
+            white-space: pre-wrap;
+            word-break: break-all;
+            padding: 5px;
+            background-color: var(--branco);
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            min-height: 20px;
+            font-family: monospace;
+            margin: 0;
+        }
+
+        .justificativa-manual {
+            display: none;
+        }
+
+        /* ESTILO DA NOTIFICAÇÃO (TOAST) */
+        #toast {
+            visibility: hidden;
+            min-width: 250px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 4px;
+            padding: 16px;
+            position: fixed;
+            z-index: 1000;
+            left: 50%;
+            bottom: 30px;
+            transform: translateX(-50%);
+            font-size: 15px;
+            font-weight: 500;
+            opacity: 0;
+            transition: opacity 0.5s, bottom 0.5s;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        #toast.show {
+            visibility: visible;
+            opacity: 1;
+            bottom: 50px;
+        }
+
+
+        /* Animação */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+
+        @media (max-width: 800px) {
+            body {
+                /* Em telas menores, remove padding do body se desejar fundo branco total */
+                padding: 0;
+            }
+
+            .container {
+                padding: 20px;
+                border-radius: 0;
+                box-shadow: none;
+                border-top: none;
+                /* Remove a borda colorida topo em mobile */
+                max-width: 100% !important;
+                /* Força largura total */
+                min-height: 100vh;
+            }
+        
+            .botoes-de-acao button {
+                font-size: 0.7em;
+            }
+        }
+
+
+        @media (max-width: 600px) {
+            .input-group {
+                flex-direction: column;
+                gap: 0;
+            }
+
+            .input-item {
+                min-width: 100%;
+            }
+
+            /* Nova regra para empilhar botões no mobile */
+            .botoes-de-acao {
+                flex-direction: column;
+                gap: 10px;
+            }
+        
+            .botoes-de-acao button {
+                font-size: 0.8em;
+            }
+
+        }
