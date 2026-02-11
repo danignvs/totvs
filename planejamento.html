@@ -15,85 +15,19 @@
         }
 
         .tarefa-wrapper {
-            background-color: #fff;
-            border: 1px solid #e0e0e0;
-            border-radius: 4px;
-            padding: 15px;
-            margin-bottom: 15px;
+            padding: 10px;
+            background-color: var(--cinza-claro);
+            border-radius: 6px;
+            border: 1px solid var(--cinza);
+            margin: 0 0 20px 0;
             position: relative;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
             transition: background-color 0.2s;
         }
 
         .sortable-ghost {
             opacity: 0.4;
-            background-color: #f0f9ff;
+            background-color: var(--cinza-claro);
             border: 2px dashed var(--az-claro);
-        }
-
-        .drag-handle {
-            cursor: grab;
-            font-size: 18px;
-            color: var(--cinza-escuro);
-            padding: 0 10px 0 0;
-            user-select: none;
-        }
-
-        .drag-handle:active {
-            cursor: grabbing;
-        }
-
-        .btn-remove-tarefa {
-            background: transparent;
-            color: var(--vermelho);
-            border: none;
-            font-size: 11px;
-            width: auto;
-            padding: 0;
-            margin-top: 0;
-            cursor: pointer;
-            text-decoration: underline;
-        }
-
-        /* --- DATA HÍBRIDA (Texto + Picker) --- */
-        .custom-date-wrapper {
-            position: relative;
-            width: 100%;
-        }
-
-        .inp-date-text {
-            padding-right: 35px !important;
-        }
-
-        .calendar-icon {
-            position: absolute;
-            right: 8px;
-            top: 50%;
-            transform: translateY(-40%);
-            font-size: 16px;
-            pointer-events: none;
-            color: #666;
-            margin-top: 2px;
-        }
-
-        .inp-date-picker {
-            position: absolute;
-            right: 0;
-            top: 5px;
-            width: 40px;
-            height: 36px;
-            opacity: 0;
-            cursor: pointer;
-            z-index: 10;
-        }
-
-        .inp-date-picker::-webkit-calendar-picker-indicator {
-            position: absolute;
-            right: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            cursor: pointer;
         }
 
         /* --- TABELA E RESULTADOS --- */
@@ -122,7 +56,7 @@
             color: white;
             font-weight: bold;
             padding: 10px;
-            border: 1px solid #1e5bb0;
+            border: 1px solid var(--az-claro);
             text-align: center;
             vertical-align: middle;
         }
@@ -323,9 +257,9 @@
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
                     <div style="display:flex; align-items:center;">
                         <span class="drag-handle" title="Clique e arraste para mover">☰</span>
-                        <label style="margin:0;">Detalhes da Tarefa</label>
+                        <label style="margin:0;">Tarefa</label>
                     </div>
-                    <button class="btn-remove-tarefa" onclick="removerTarefa('${idUnico}')">Remover</button>
+                    <button class="btn-vermelho btn-aux" onclick="removerTarefa('${idUnico}')">X</button>
                 </div>
                 
                 <input type="text" class="inp-tarefa" placeholder="Descrição da tarefa..." oninput="gerarTabela()">
