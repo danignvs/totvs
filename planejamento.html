@@ -176,9 +176,14 @@
                 hour12: false
             }));
 
-            if (hora >= 5 && hora < 12) return "Bom dia";
-            else if (hora >= 12 && hora < 18) return "Boa tarde";
-            else return "Bom dia/Boa tarde";
+            // Das 00h às 11:59h -> Bom dia
+            if (hora >= 0 && hora < 12) return "Bom dia";
+            
+            // Das 12h às 17:59h -> Boa tarde
+            if (hora >= 12 && hora < 18) return "Boa tarde";
+            
+            // Das 18h às 23:59h -> Boa noite
+            return "Boa noite";
         }
 
         // --- MÁSCARA DE DATA ---
