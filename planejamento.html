@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Gerador de Cronograma</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        .container {
+            grid-template-columns: 1fr 1.5fr;
+        }
+
+        .tarefa-wrapper {
+            background-color: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            padding: 15px;
+            margin-bottom: 15px;
+            position: relative;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            transition: background-color 0.2s;
+        }
+
+        .sortable-ghost {
+            opacity: 0.4;
+            background-color: #f0f9ff;
+            border: 2px dashed var(--az-claro);
+        }
+
+        .drag-handle {
+            cursor: grab;
+            font-size: 18px;
+            color: var(--cinza-escuro);
+            padding: 0 10px 0 0;
+            user-select: none;
+        }
+
+        .drag-handle:active {
+            cursor: grabbing;
+        }
+
+        .btn-remove-tarefa {
+            background: transparent;
+            color: var(--vermelho);
+            border: none;
+            font-size: 11px;
+            width: auto;
+            padding: 0;
+            margin-top: 0;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        /* --- DATA HÍBRIDA (Texto + Picker) --- */
+        .custom-date-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        .inp-date-text {
+            padding-right: 35px !important;
+        }
+
+        .calendar-icon {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-40%);
+            font-size: 16px;
+            pointer-events: none;
+            color: #666;
+            margin-top: 2px;
+        }
+
+        .inp-date-picker {
+            position: absolute;
+            right: 0;
+            top: 5px;
+            width: 40px;
+            height: 36px;
+            opacity: 0;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        .inp-date-picker::-webkit-calendar-picker-indicator {
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        /* --- TABELA E RESULTADOS --- */
+        .tabela-container {
+            overflow-x: auto;
+            background: #fff;
+            padding: 10px;
+            border: 1px solid var(--cinza);
+            border-radius: 6px;
+        }
+
+
+
+        table.custom-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+            color: #333;
+        }
+
+        table.custom-table th {
+            background-color: var(--az-escuro);
+            color: white;
+            font-weight: bold;
+            padding: 10px;
+            border: 1px solid #1e5bb0;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        table.custom-table td {
+            padding: 8px;
+            border: 1px solid #ccc;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        table.custom-table td.col-tarefa {
+            text-align: left;
+            font-weight: 500;
+        }
+
+        table.custom-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container container-azul">
+
+        <datalist id="lista-analistas">
+            <option value="ANDERSON GUILHERME">
+            <option value="ANDRE FERREIRA">
+            <option value="BRUNO SILVA">
+            <option value="CASSIO MORAES">
+            <option value="DALY TEIXEIRA">
+            <option value="DOUGLAS EDUARDO">
+            <option value="DOUGLAS RAFAEL">
+            <option value="EDUARDO CRUZ">
+            <option value="FELIPE OLIVEIRA">
+            <option value="FILIPPE VALLE">
+            <option value="GUSTAVO MIZERANI">
+            <option value="JAIRO DA SILVA">
+            <option value="KARLO GUILHERME">
+            <option value="KLEVERSON NASCIMENTO">
+            <option value="LEONARDO VENTURA">
+            <option value="MAGNO TELLES">
+            <option value="MARCELO VEIGA">
+            <option value="MARCIO AVILA">
+            <option value="MARIO FLAVIO">
+            <option value="MOACYR CAMPOS">
+            <option value="PABLO BARBERO">
+            <option value="PAULO ROBERTO">
+            <option value="PEDRO HENRIQUE">
+            <option value="RICARDO MENDES">
+            <option value="TALLES DA SILVA">
+            <option value="WASHINGTON DA SILVA">
+            <option value="YURE JONATHAN">
+        </datalist>
+
+        <section class="container-formulario">
+
+            <div class="topo">
+                <div class="link-psa">
+                    <h2>Planejamento</h2>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <div class="input-item">
+                    <label for="txtCodProjeto">Código do Projeto:</label>
+                    <input type="text" id="txtCodProjeto" placeholder="Ex: D...001" oninput="gerarTabela()">
+                </div>
+                <div class="input-item">
+                    <label for="txtNomeProjeto">Nome do Projeto:</label>
+                    <input type="text" id="txtNomeProjeto" placeholder="Nome do projeto" oninput="gerarTabela()">
+                </div>
+            </div>
+
+            <label for="txtMarco">Nome do Marco (Título da Coluna):</label>
+            <input type="text" id="txtMarco" placeholder="Ex: Execução (MARCO)" oninput="gerarTabela()">
+
+            <br><br>
+
+            <div id="listaTarefas">
+            </div>
+
+            <button class="btn-verde" style="margin-top: 10px; width: auto;" onclick="adicionarNovaTarefa()">+ Adicionar
+                Tarefa</button>
+
+        </section>
+
+
+        <section class="container-resultado">
+            <h3><span class="azul">Resultado</span></h3>
+
+            <div class="resultado">
+                <button class="btn-roxo btn-aux" onclick="copiarTexto('resultadoAssunto')">Copiar</button>
+                <label>Assunto:</label>
+                <pre id="resultadoAssunto"></pre>
+            </div>
+
+            <div class="resultado">
+                <button class="btn-roxo btn-aux" onclick="copiarTabela()">Copiar</button>
+                <label>Mensagem:</label>
+
+                <pre id="areaTabela" class="tabela-container"></pre>
+            </div>
+        </section>
+
+
+        <div id="toast">Copiado!</div>
+    </div>
+
+    <script>
+        // --- FUNÇÃO DE SAUDAÇÃO AUTOMÁTICA ---
+        function obterSaudacao() {
+            const hora = parseInt(new Date().toLocaleString("pt-BR", {
+                timeZone: "America/Sao_Paulo",
+                hour: "numeric",
+                hour12: false
+            }));
+
+            if (hora >= 5 && hora < 12) return "Bom dia";
+            else if (hora >= 12 && hora < 18) return "Boa tarde";
+            else return "Bom dia/Boa tarde";
+        }
+        
+        // --- MÁSCARA DE DATA ---
+        function mascaraData(input) {
+            let v = input.value;
+            v = v.replace(/\D/g, "");
+            if (v.length > 2) v = v.substring(0, 2) + "/" + v.substring(2);
+            if (v.length > 5) v = v.substring(0, 5) + "/" + v.substring(5, 9);
+            if (v.length > 10) v = v.substring(0, 10);
+            input.value = v;
+            gerarTabela();
+        }
+
+        // --- ATUALIZAR DATA PELO CALENDÁRIO ---
+        function atualizarDataPeloPicker(pickerInput) {
+            const valorISO = pickerInput.value;
+            if (!valorISO) return;
+            const [ano, mes, dia] = valorISO.split('-');
+            const dataFormatada = `${dia}/${mes}/${ano}`;
+            const wrapper = pickerInput.parentElement;
+            const textInput = wrapper.querySelector('.inp-date-text');
+            if (textInput) {
+                textInput.value = dataFormatada;
+                gerarTabela();
+            }
+        }
+
+        function formatarDataFinal(valor) {
+            if (!valor) return "";
+            if (valor.length === 10 && valor.includes('/')) {
+                return valor.substring(0, 6) + valor.substring(8, 10);
+            }
+            return valor;
+        }
+
+        function adicionarNovaTarefa() {
+            const container = document.getElementById('listaTarefas');
+            const idUnico = Date.now();
+            const div = document.createElement('div');
+            div.className = 'tarefa-wrapper';
+            div.id = 'task-' + idUnico;
+
+            div.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
+                    <div style="display:flex; align-items:center;">
+                        <span class="drag-handle" title="Clique e arraste para mover">☰</span>
+                        <label style="margin:0;">Detalhes da Tarefa</label>
+                    </div>
+                    <button class="btn-remove-tarefa" onclick="removerTarefa('${idUnico}')">Remover</button>
+                </div>
+                
+                <input type="text" class="inp-tarefa" placeholder="Descrição da tarefa..." oninput="gerarTabela()">
+
+                <div class="input-group">
+                    <div class="input-item">
+                        <label>Início:</label>
+                        <div class="custom-date-wrapper">
+                            <input type="text" class="inp-date-text inp-inicio" placeholder="DD/MM/AAAA" maxlength="10" oninput="mascaraData(this)">
+                            <span class="calendar-icon">📅</span>
+                            <input type="date" class="inp-date-picker" onchange="atualizarDataPeloPicker(this)">
+                        </div>
+                    </div>
+                    <div class="input-item">
+                        <label>Fim:</label>
+                        <div class="custom-date-wrapper">
+                            <input type="text" class="inp-date-text inp-fim" placeholder="DD/MM/AAAA" maxlength="10" oninput="mascaraData(this)">
+                            <span class="calendar-icon">📅</span>
+                            <input type="date" class="inp-date-picker" onchange="atualizarDataPeloPicker(this)">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <div class="input-item">
+                        <label>Horas:</label>
+                        <input type="text" class="inp-horas" placeholder="0,00" oninput="gerarTabela()">
+                    </div>
+                    <div class="input-item">
+                        <label>Analista:</label>
+                        <input type="text" class="inp-analista" list="lista-analistas" placeholder="Nome" oninput="gerarTabela()">
+                    </div>
+                </div>
+            `;
+            container.appendChild(div);
+            gerarTabela();
+        }
+
+        function removerTarefa(id) {
+            const el = document.getElementById('task-' + id);
+            if (el) {
+                el.remove();
+                gerarTabela();
+            }
+        }
+
+        function gerarTabela() {
+            // Campos de Cabeçalho
+            const codProjeto = document.getElementById('txtCodProjeto').value;
+            const nomeProjeto = document.getElementById('txtNomeProjeto').value;
+            const marcoTitulo = document.getElementById('txtMarco').value || "Marco";
+
+            // GERA O ASSUNTO
+            // Formato: Liberação para Planejamento - (codigo do projeto) - (nome do projeto)
+            let assunto = "Liberação para Planejamento";
+            if (codProjeto) assunto += ` - ${codProjeto}`;
+            if (nomeProjeto) assunto += ` - ${nomeProjeto}`;
+
+            document.getElementById('resultadoAssunto').textContent = assunto;
+
+            // GERA A TABELA
+            const tarefasElements = document.querySelectorAll('.tarefa-wrapper');
+            let linhasHTML = '';
+            let totalHoras = 0;
+
+            tarefasElements.forEach(div => {
+                const desc = div.querySelector('.inp-tarefa').value;
+                const inicioRaw = div.querySelector('.inp-inicio').value;
+                const fimRaw = div.querySelector('.inp-fim').value;
+                let horasStr = div.querySelector('.inp-horas').value.replace(',', '.');
+                const analista = div.querySelector('.inp-analista').value;
+
+                const horasFloat = parseFloat(horasStr);
+                if (!isNaN(horasFloat)) {
+                    totalHoras += horasFloat;
+                }
+
+                const dtInicioFmt = formatarDataFinal(inicioRaw);
+                const dtFimFmt = formatarDataFinal(fimRaw);
+                const horasExibicao = horasStr.replace('.', ',');
+
+                if (desc || inicioRaw || fimRaw || horasStr || analista) {
+                    linhasHTML += `
+                        <tr>
+                            <td class="col-tarefa">${desc}</td>
+                            <td>${dtInicioFmt}</td>
+                            <td>${dtFimFmt}</td>
+                            <td>${horasExibicao}</td>
+                            <td>${analista}</td>
+                        </tr>
+                    `;
+                }
+            });
+
+            const totalFormatado = totalHoras.toFixed(2).replace('.', ',');
+
+            const htmlTabela = `
+                <table class="custom-table" id="tabelaParaCopiar">
+                    <thead>
+                        <tr>
+                            <th style="width: 40%; text-transform: uppercase;">${marcoTitulo}</th>
+                            <th style="width: 15%;">Data<br>Início</th>
+                            <th style="width: 15%;">Data<br>Fim</th>
+                            <th style="width: 10%;">Qtde<br>Horas</th>
+                            <th style="width: 20%;">Analista</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${linhasHTML}
+                         <tr style="background-color: #fff; font-weight: bold; border-top: 2px solid #ccc;">
+                            <td style="text-align: right;">Total de Horas</td>
+                            <td></td>
+                            <td></td>
+                            <td>${totalFormatado}</td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+            `;
+
+            document.getElementById('areaTabela').innerHTML = htmlTabela;
+        }
+
+        function mostrarToast(texto) {
+            var x = document.getElementById("toast");
+            x.textContent = texto;
+            x.className = "show";
+            setTimeout(function () { x.className = x.className.replace("show", ""); }, 3000);
+        }
+
+        function copiarTabela() {
+            const el = document.getElementById('tabelaParaCopiar');
+            if (!el) return;
+            const range = document.createRange();
+            range.selectNode(el);
+            window.getSelection().removeAllRanges();
+            window.getSelection().addRange(range);
+            try {
+                document.execCommand('copy');
+                mostrarToast("Tabela copiada!");
+            } catch (err) {
+                mostrarToast("Erro ao copiar.");
+            }
+            window.getSelection().removeAllRanges();
+        }
+
+        function copiarTexto(idElemento) {
+            const texto = document.getElementById(idElemento).textContent;
+            if (!texto.trim()) return;
+            navigator.clipboard.writeText(texto).then(() => mostrarToast("Assunto copiado!"));
+        }
+
+        function limparTudo() {
+            document.getElementById('txtCodProjeto').value = '';
+            document.getElementById('txtNomeProjeto').value = '';
+            document.getElementById('txtMarco').value = '';
+            document.getElementById('listaTarefas').innerHTML = '';
+            adicionarNovaTarefa();
+            gerarTabela();
+        }
+
+        // Inicializa Sortable e 1ª Tarefa
+        window.onload = function () {
+            adicionarNovaTarefa();
+
+            var el = document.getElementById('listaTarefas');
+            var sortable = Sortable.create(el, {
+                handle: '.drag-handle',
+                animation: 150,
+                ghostClass: 'sortable-ghost',
+                onEnd: function (evt) {
+                    gerarTabela();
+                },
+            });
+        };
+    </script>
+</body>
+
+</html>
