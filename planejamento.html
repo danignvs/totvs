@@ -222,7 +222,7 @@
                 <button class="btn-roxo btn-aux" onclick="copiarTabela()">Copiar</button>
                 <label>Mensagem:</label>
 
-                <pre id="areaTabela" class="tabela-container"></pre>
+                <div id="areaTabela" class="tabela-container"></pre>
             </div>
         </section>
 
@@ -243,7 +243,7 @@
             else if (hora >= 12 && hora < 18) return "Boa tarde";
             else return "Bom dia/Boa tarde";
         }
-        
+
         // --- MÁSCARA DE DATA ---
         function mascaraData(input) {
             let v = input.value;
@@ -252,7 +252,37 @@
             if (v.length > 5) v = v.substring(0, 5) + "/" + v.substring(5, 9);
             if (v.length > 10) v = v.substring(0, 10);
             input.value = v;
+            
+            validarDatas(input); // <-- Executa a validação
             gerarTabela();
+        }
+
+        // --- VALIDAÇÃO DE DATAS ---
+        function validarDatas(input) {
+            const wrapper = input.closest('.tarefa-wrapper');
+            if (!wrapper) return;
+
+            const inpInicio = wrapper.querySelector('.inp-inicio');
+            const inpFim = wrapper.querySelector('.inp-fim');
+
+            // Só faz a checagem se ambas as datas estiverem preenchidas por completo (10 caracteres)
+            if (inpInicio.value.length === 10 && inpFim.value.length === 10) {
+                const partsInicio = inpInicio.value.split('/');
+                const partsFim = inpFim.value.split('/');
+                
+                // Formato: Ano, Mês (0-11), Dia
+                const dateInicio = new Date(partsInicio[2], partsInicio[1] - 1, partsInicio[0]);
+                const dateFim = new Date(partsFim[2], partsFim[1] - 1, partsFim[0]);
+
+                if (dateFim < dateInicio) {
+                    mostrarToast("A data de conclusão não pode ser anterior ao início!");
+                    inpFim.value = ""; // Limpa o campo de texto
+                    
+                    // Limpa também o valor do calendário (picker) invisível
+                    const pickers = wrapper.querySelectorAll('.inp-date-picker');
+                    if(pickers[1]) pickers[1].value = ""; 
+                }
+            }
         }
 
         // --- ATUALIZAR DATA PELO CALENDÁRIO ---
@@ -265,6 +295,8 @@
             const textInput = wrapper.querySelector('.inp-date-text');
             if (textInput) {
                 textInput.value = dataFormatada;
+                
+                validarDatas(textInput); // <-- Executa a validação
                 gerarTabela();
             }
         }
@@ -344,14 +376,12 @@
             const marcoTitulo = document.getElementById('txtMarco').value || "Marco";
 
             // GERA O ASSUNTO
-            // Formato: Liberação para Planejamento - (codigo do projeto) - (nome do projeto)
             let assunto = "Liberação para Planejamento";
             if (codProjeto) assunto += ` - ${codProjeto}`;
             if (nomeProjeto) assunto += ` - ${nomeProjeto}`;
-
             document.getElementById('resultadoAssunto').textContent = assunto;
 
-            // GERA A TABELA
+            // GERA AS LINHAS DA TABELA
             const tarefasElements = document.querySelectorAll('.tarefa-wrapper');
             let linhasHTML = '';
             let totalHoras = 0;
@@ -386,29 +416,43 @@
             });
 
             const totalFormatado = totalHoras.toFixed(2).replace('.', ',');
+            const saudacao = obterSaudacao();
 
+            // MENSAGEM DO E-MAIL (Antes e depois da tabela)
             const htmlTabela = `
-                <table class="custom-table" id="tabelaParaCopiar">
-                    <thead>
-                        <tr>
-                            <th style="width: 40%; text-transform: uppercase;">${marcoTitulo}</th>
-                            <th style="width: 15%;">Data<br>Início</th>
-                            <th style="width: 15%;">Data<br>Fim</th>
-                            <th style="width: 10%;">Qtde<br>Horas</th>
-                            <th style="width: 20%;">Analista</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${linhasHTML}
-                         <tr style="background-color: #fff; font-weight: bold; border-top: 2px solid #ccc;">
-                            <td style="text-align: right;">Total de Horas</td>
-                            <td></td>
-                            <td></td>
-                            <td>${totalFormatado}</td>
-                            <td></td>
-                        </tr>
-                    </tbody>
-                </table>
+                <div id="tabelaParaCopiar" style="font-family: Arial, sans-serif; font-size: 14px; color: #333;">
+                    <p>${saudacao},</p>
+                    
+                    <p>Segue abaixo o planejamento atualizado para o projeto <strong>${codProjeto} - ${nomeProjeto}</strong>:</p>
+
+                    <br>
+
+                    <table class="custom-table" style="width: 100%; max-width: 500px; border-collapse: collapse; font-family: 'Segoe UI', sans-serif; font-size: 14px; color: #333;">
+                        <thead>
+                            <tr>
+                                <th style="width: 40%; text-transform: uppercase; background-color: #002233; color: white; font-weight: bold; padding: 10px; border: 1px solid #1e5bb0; text-align: center;">${marcoTitulo}</th>
+                                <th style="width: 15%; background-color: #002233; color: white; font-weight: bold; padding: 10px; border: 1px solid #1e5bb0; text-align: center;">Data<br>Início</th>
+                                <th style="width: 15%; background-color: #002233; color: white; font-weight: bold; padding: 10px; border: 1px solid #1e5bb0; text-align: center;">Data<br>Fim</th>
+                                <th style="width: 10%; background-color: #002233; color: white; font-weight: bold; padding: 10px; border: 1px solid #1e5bb0; text-align: center;">Qtde<br>Horas</th>
+                                <th style="width: 20%; background-color: #002233; color: white; font-weight: bold; padding: 10px; border: 1px solid #1e5bb0; text-align: center;">Analista</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${linhasHTML}
+                            <tr style="background-color: #fff; font-weight: bold; border-top: 2px solid #ccc;">
+                                <td style="text-align: right; padding: 8px; border: 1px solid #ccc;">Total de Horas</td>
+                                <td style="padding: 8px; border: 1px solid #ccc;"></td>
+                                <td style="padding: 8px; border: 1px solid #ccc;"></td>
+                                <td style="text-align: center; padding: 8px; border: 1px solid #ccc;">${totalFormatado}</td>
+                                <td style="padding: 8px; border: 1px solid #ccc;"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <br>
+                    <p>Fico à disposição para qualquer dúvida.</p>
+                    <p>Atenciosamente,</p>
+                </div>
             `;
 
             document.getElementById('areaTabela').innerHTML = htmlTabela;

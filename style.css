@@ -433,6 +433,7 @@
             transform: translateX(-50%);
             font-size: 15px;
             font-weight: 500;
+            letter-spacing: 0.03em;
             opacity: 0;
             transition: opacity 0.5s, bottom 0.5s;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
