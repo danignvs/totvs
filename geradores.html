@@ -9,107 +9,102 @@
     <link rel="stylesheet" href="style.css">
 
     <style>
-
     </style>
 </head>
 
 <body>
     <!--h1></h1-->
 
-    <div class="container container-azul" style="max-width: 700px;">
+    <div class="container container-azul">
 
-        <div class="topo">
-            <div class="link-psa">
-                <h2>Faturamentos</h2>
-                <a class="link-limao" target="_blank"
-                    href="https://psaproducaototvs.crm2.dynamics.com/main.aspx?appid=ad972b31-8851-eb11-a812-000d3a8852cb&forceUCI=1&pagetype=entitylist&etn=msdyn_project&viewid=ead1f7f9-6dd0-f011-bbd3-00224836edf2&viewType=4230">
-                    Veja no PSA
-                </a>
+        <section class="container-formulario">
+        
+            <div class="topo">
+                <div class="link-psa">
+                    <h2>Faturamento</h2>
+                    <a class="link-limao" target="_blank"
+                        href="https://psaproducaototvs.crm2.dynamics.com/main.aspx?appid=ad972b31-8851-eb11-a812-000d3a8852cb&forceUCI=1&pagetype=entitylist&etn=msdyn_project&viewid=ead1f7f9-6dd0-f011-bbd3-00224836edf2&viewType=4230">
+                        Veja no PSA
+                    </a>
+                </div>
             </div>
-        </div>
-
-        <div class="input-group">
-            <div class="input-item">
-                <label for="codProjeto">Cod. projeto (e assunto):</label>
-                <input type="text" id="codProjeto" placeholder="Ex: D...001"
-                    oninput="preencherContrato(); gerarEmail()">
+        
+            <div class="input-group">
+                <div class="input-item">
+                    <label for="codProjeto">Cod. projeto (e assunto):</label>
+                    <input type="text" id="codProjeto" placeholder="Ex: D...001" oninput="preencherContrato(); gerarEmail()">
+                </div>
+                <div class="input-item">
+                    <label for="codContratoPSA">Cod. contrato PSA:</label>
+                    <input type="text" id="codContratoPSA" placeholder="Ex: D..." oninput="gerarEmail()">
+                </div>
             </div>
-            <div class="input-item">
-                <label for="codContratoPSA">Cod. contrato PSA:</label>
-                <input type="text" id="codContratoPSA" placeholder="Ex: D..." oninput="gerarEmail()">
+        
+            <div class="input-group">
+                <div class="input-item">
+                    <label for="codCliente">Cod. cliente:</label>
+                    <input type="text" id="codCliente" placeholder="Ex: T..." oninput="gerarEmail()">
+                </div>
+                <div class="input-item">
+                    <label for="valorLiquido">Valor líquido:</label>
+                    <input type="text" id="valorLiquido" placeholder="Ex: R$..." oninput="gerarEmail()">
+                </div>
             </div>
-        </div>
-
-        <div class="input-group">
-            <div class="input-item">
-                <label for="codCliente">Cod. cliente:</label>
-                <input type="text" id="codCliente" placeholder="Ex: T..." oninput="gerarEmail()">
+        
+            <div class="input-group">
+                <div class="input-item">
+                    <label for="nomeProjeto">Nome do projeto:</label>
+                    <input type="text" id="nomeProjeto" placeholder="" oninput="gerarEmail()">
+                </div>
+                <div class="input-item">
+                    <label for="tipoAssunto">Assunto:</label>
+                    <select id="tipoAssunto" onchange="gerarEmail()">
+                        <option value="Faturamento">Solicitação de faturamento</option>
+                        <option value="Projeto">Nome do projeto</option>
+                    </select>
+                </div>
             </div>
-            <div class="input-item">
-                <label for="valorLiquido">Valor líquido:</label>
-                <input type="text" id="valorLiquido" placeholder="Ex: R$..." oninput="gerarEmail()">
+        
+            <label for="tipoJustificativa">Justificativa:</label>
+            <select id="tipoJustificativa" onchange="mudarJustificativa(); gerarEmail()">
+                <option value="Padrao">Padrão (Termo de conclusão assinado...)</option>
+                <option value="Outras">Outras (digitar abaixo)</option>
+            </select>
+        
+            <div id="justificativaManualDiv" class="justificativa-manual">
+                <label for="justificativa">Digite sua Justificativa:</label>
+                <input type="text" id="justificativa" placeholder="Descreva a justificativa aqui..." oninput="gerarEmail()">
             </div>
-        </div>
+        </section>
 
-        <div class="input-group">
-            <div class="input-item">
-                <label for="nomeProjeto">Nome do projeto:</label>
-                <input type="text" id="nomeProjeto" placeholder="" oninput="gerarEmail()">
-            </div>
-            <div class="input-item">
-        <label for="tipoAssunto">Assunto:</label>
-        <select id="tipoAssunto" onchange="gerarEmail()">
-            <option value="Faturamento">Solicitação de faturamento</option>
-            <option value="Projeto">Nome do projeto</option>
-        </select>
-    </div>
-        </div>
-
-        <label for="tipoJustificativa">Justificativa:</label>
-        <select id="tipoJustificativa" onchange="mudarJustificativa(); gerarEmail()">
-            <option value="Padrao">Padrão (Termo de conclusão assinado...)</option>
-            <option value="Outras">Outras (digitar abaixo)</option>
-        </select>
-
-        <div id="justificativaManualDiv" class="justificativa-manual">
-            <label for="justificativa">Digite sua Justificativa:</label>
-            <input type="text" id="justificativa" placeholder="Descreva a justificativa aqui..." oninput="gerarEmail()">
-        </div>
-
-
+        <section class="container-resultado">
             <h3><span class="azul">E-mail</span> gerado</h3>
 
-        
 
-        <div class="resultado">
-            <button class="btn-roxo btn-aux" onclick="copiarTexto('resultadoAssunto')">Copiar</button>
-            <label>Assunto</label>
-            <pre id="resultadoAssunto"></pre>
-        </div>
 
-        <div class="resultado">
-            <button class="btn-roxo btn-aux" onclick="copiarTexto('resultadoCorpo')">Copiar</button>
-            <label>Mensagem</label>
-            <pre id="resultadoCorpo"></pre>
-        </div>
+            <div class="resultado">
+                <button class="btn-roxo btn-aux" onclick="copiarTexto('resultadoAssunto')">Copiar</button>
+                <label>Assunto</label>
+                <pre id="resultadoAssunto"></pre>
+            </div>
 
-        <div class="botoes-de-acao">
+            <div class="resultado">
+                <button class="btn-roxo btn-aux" onclick="copiarTexto('resultadoCorpo')">Copiar</button>
+                <label>Mensagem</label>
+                <pre id="resultadoCorpo"></pre>
+            </div>
+        </section>
+
+        <section class="botoes-de-acao">
             <button class="btn-roxo" onclick="copiarString('TERMO ANEXO - Faturamento Solicitado')">Copiar Status PSA</button>
 
             <button class="btn-verde" onclick="abrirIndicadores()">Indicadores</button>
 
             <button class="btn-vermelho" onclick="limparFormulario()">Limpar</button>
-        </div>
 
-
-    </div>
-
-    <div id="toast">Copiado para a área de transferência!</div>
-
-
-
-
-
+            <div id="toast">Copiado para a área de transferência!</div>
+        </section>
+    </div>  
 
 
     <script>
@@ -209,7 +204,7 @@ Atenciosamente,`;
 
         function mostrarToast(texto) {
             var x = document.getElementById("toast");
-            
+
             // Se o texto for muito longo (ex: corpo do email), cortamos para não quebrar o layout
             let textoExibido = texto;
             if (textoExibido.length > 40) {
@@ -218,7 +213,7 @@ Atenciosamente,`;
 
             // Define a mensagem dinâmica
             x.textContent = `"${textoExibido}" copiado!`;
-            
+
             x.className = "show";
             setTimeout(function () { x.className = x.className.replace("show", ""); }, 4000);
         }
@@ -264,16 +259,16 @@ Atenciosamente,`;
         function abrirIndicadores() {
             const codProjeto = document.getElementById('codProjeto').value;
             // COLOQUE O LINK DA SUA PLANILHA AQUI EMBAIXO:
-            const linkPlanilha = "https://docs.google.com/spreadsheets/d/19b-F8VDW_tJeJ2h4lM_owYeUDWt0upNsK_OR_bVe0aw/edit"; 
+            const linkPlanilha = "https://docs.google.com/spreadsheets/d/19b-F8VDW_tJeJ2h4lM_owYeUDWt0upNsK_OR_bVe0aw/edit";
 
             navigator.clipboard.writeText(codProjeto).then(() => {
                 // Se tiver código, mostra ele. Se estiver vazio, mostra mensagem genérica.
-                if(codProjeto) {
-                    mostrarToast(codProjeto); 
+                if (codProjeto) {
+                    mostrarToast(codProjeto);
                 } else {
                     mostrarToast("Vazio");
                 }
-                window.open(linkPlanilha, '_blank'); 
+                window.open(linkPlanilha, '_blank');
             }).catch(err => {
                 window.open(linkPlanilha, '_blank');
             });

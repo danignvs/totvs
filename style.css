@@ -1,3 +1,4 @@
+
         :root {
             --az-escuro: #002233;
             --az-claro: #00DBFF;
@@ -68,6 +69,8 @@
         }
 
         .container {
+            max-width: 1200px;
+            width: 95%;
             margin: auto;
             background: var(--branco);
             padding: 30px;
@@ -75,6 +78,28 @@
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
             /* Animação suave ao abrir */
             animation: fadeIn 0.5s ease-in-out;
+            display: grid;
+            grid-template-columns: 1.5fr 1fr; /* Esquerda (1.5 partes) e Direita (1 parte) */
+            gap: 40px; /* Espaço entre as colunas */
+            grid-template-areas: 
+                "form result"
+                "buttons result"; /* Botões ficam embaixo do form, Resultado ocupa a lateral toda */
+            align-items: start;
+        }
+
+        .container-formulario{
+            grid-area: form;
+            min-width: 400px; /* Garante que não fique muito espremido no desktop */
+        }
+
+        .container-resultado {
+            grid-area: result; /* Encaixa na área "result" do grid */
+            margin-top: 0 !important; /* Remove margem superior no desktop */
+        }
+
+        /* Ajuste opcional para o título alinhar com o topo */
+        .container-resultado h3 {
+            margin-top: 0; 
         }
 
         .container-roxo {
@@ -108,7 +133,7 @@
 
         h2 {
             font-size: 1.5em;
-        }        
+        }
 
         h3 {
             margin: 40px 0 20px;
@@ -286,20 +311,24 @@
             font-size: 12px;
         }
 
-        .btn-aux button { 
-            width: auto; /* O segredo para ficarem pequenos */
+        .btn-aux button {
+            width: auto;
+            /* O segredo para ficarem pequenos */
             padding: 5px 15px;
-            margin: 0; /* Garante que não tenha margem externa atrapalhando */
+            margin: 0;
+            /* Garante que não tenha margem externa atrapalhando */
         }
 
         .botoes-de-acao {
+            grid-area: buttons; /* Encaixa na área "buttons" do grid */
+            margin-top: 20px;
             display: flex;
             gap: 15px;
+            width: 100%;
             margin-top: 20px;
             margin-bottom: 10px;
-            width: 100%;
         }
-        
+
         .botoes-de-acao button {
             font-size: 0.8em;
         }
@@ -335,10 +364,10 @@
             color: var(--branco);
         }
 
-        .topo {            
-            display: flex; 
+        .topo {
+            display: flex;
             justify-content: space-between;
-            align-items: flex-start; 
+            align-items: flex-start;
         }
 
         .container {
@@ -429,6 +458,28 @@
             }
         }
 
+        /* --- VOLTAR AO NORMAL EM TELAS MENORES (< 1100px) --- */
+        @media (max-width: 1100px) {
+            .container {
+                max-width: 700px;
+                display: flex;
+                flex-direction: column; /* Empilha um embaixo do outro */
+            }
+
+            .container-formulario, .container-resultado {
+                min-width: 100%;
+            }
+
+            .container-resultado h3 {
+                margin-top: 40px; /* Devolve o espaço do título no mobile */
+            }
+            
+            /* Garante a ordem correta no mobile: Form -> Resultado -> Botões */
+            .botoes-de-acao {
+                order: 3; 
+            }
+        }
+
 
         @media (max-width: 800px) {
             body {
@@ -446,7 +497,7 @@
                 /* Força largura total */
                 min-height: 100vh;
             }
-        
+
             .botoes-de-acao button {
                 font-size: 0.7em;
             }
@@ -468,7 +519,7 @@
                 flex-direction: column;
                 gap: 10px;
             }
-        
+
             .botoes-de-acao button {
                 font-size: 0.8em;
             }
