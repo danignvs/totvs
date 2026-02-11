@@ -105,7 +105,10 @@
             border-radius: 6px;
         }
 
-
+        pre, .tabela-container {
+            font-family: Verdana, Geneva, Tahoma, sans-serif;
+            font-size: 0.8rem;
+        }
 
         table.custom-table {
             width: 100%;
@@ -420,7 +423,7 @@
 
             // MENSAGEM DO E-MAIL (Antes e depois da tabela)
             const htmlTabela = `
-                <div id="tabelaParaCopiar" style="font-family: Arial, sans-serif; font-size: 14px; color: #333;">
+                <div id="resultadoCorpo" ">
                     <p>${saudacao},</p>
                     
                     <p>Segue abaixo o planejamento atualizado para o projeto:</p>
@@ -429,13 +432,13 @@
                     <strong>${codProjeto} | ${nomeProjeto}</strong>
                     <br><br>
 
-                    <table class="custom-table" style="width: 100%; max-width: 500px; border-collapse: collapse; font-family: 'Segoe UI', sans-serif; font-size: 14px; color: #333;">
+                    <table class="custom-table" style="width: 100%; max-width: 600px; border-collapse: collapse;">
                         <thead>
                             <tr>
                                 <th style="width: 40%; text-transform: uppercase; background-color: #002233; color: white; font-weight: bold; padding: 10px; border: 1px solid #1e5bb0; text-align: center;">${marcoTitulo}</th>
-                                <th style="width: 15%; background-color: #002233; color: white; font-weight: bold; padding: 10px; border: 1px solid #1e5bb0; text-align: center;">Data<br>Início</th>
-                                <th style="width: 15%; background-color: #002233; color: white; font-weight: bold; padding: 10px; border: 1px solid #1e5bb0; text-align: center;">Data<br>Fim</th>
-                                <th style="width: 10%; background-color: #002233; color: white; font-weight: bold; padding: 10px; border: 1px solid #1e5bb0; text-align: center;">Qtde<br>Horas</th>
+                                <th style="width: 15%; background-color: #002233; color: white; font-weight: bold; padding: 10px; border: 1px solid #1e5bb0; text-align: center;">Início</th>
+                                <th style="width: 15%; background-color: #002233; color: white; font-weight: bold; padding: 10px; border: 1px solid #1e5bb0; text-align: center;">Conclusão</th>
+                                <th style="width: 10%; background-color: #002233; color: white; font-weight: bold; padding: 10px; border: 1px solid #1e5bb0; text-align: center;">Horas</th>
                                 <th style="width: 20%; background-color: #002233; color: white; font-weight: bold; padding: 10px; border: 1px solid #1e5bb0; text-align: center;">Analista</th>
                             </tr>
                         </thead>
@@ -468,7 +471,7 @@
         }
 
         function copiarTabela() {
-            const el = document.getElementById('tabelaParaCopiar');
+            const el = document.getElementById('resultadoCorpo');
             if (!el) return;
             const range = document.createRange();
             range.selectNode(el);
