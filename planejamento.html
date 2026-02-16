@@ -220,6 +220,12 @@
     </div>
 
     <script>
+        // --- FORÇAR A PÁGINA A IR PARA O TOPO AO ATUALIZAR ---
+        if (history.scrollRestoration) {
+            history.scrollRestoration = 'manual';
+        }
+        window.scrollTo(0, 0);
+        
         // --- FUNÇÃO DE SAUDAÇÃO AUTOMÁTICA CORRIGIDA ---
         function obterSaudacao() {
             const hora = parseInt(new Date().toLocaleString("pt-BR", {
