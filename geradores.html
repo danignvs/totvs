@@ -20,22 +20,16 @@
         <section class="container-formulario">
         
             <div class="topo">
-                <div class="link-psa">
-                    <h2>Faturamento</h2>
-                    <a class="link-limao" target="_blank"
-                        href="https://psaproducaototvs.crm2.dynamics.com/main.aspx?appid=ad972b31-8851-eb11-a812-000d3a8852cb&forceUCI=1&pagetype=entitylist&etn=msdyn_project&viewid=ead1f7f9-6dd0-f011-bbd3-00224836edf2&viewType=4230">
-                        Veja no PSA
-                    </a>
-                </div>
+                <h2>Faturamento</h2>                
             </div>
         
             <div class="input-group">
                 <div class="input-item">
-                    <label for="codProjeto">Cod. projeto (e assunto):</label>
+                    <label for="codProjeto">Cód. projeto:</label>
                     <input type="text" id="codProjeto" placeholder="Ex: D...001" oninput="preencherContrato(); gerarEmail()">
                 </div>
                 <div class="input-item">
-                    <label for="codContratoPSA">Cod. contrato PSA:</label>
+                    <label for="codContratoPSA">Cód. contrato PSA:</label>
                     <input type="text" id="codContratoPSA" placeholder="Ex: D..." oninput="gerarEmail()">
                 </div>
             </div>
@@ -78,7 +72,7 @@
         </section>
 
         <section class="container-resultado">
-            <h3><span class="azul">E-mail</span> gerado</h3>
+            <h3 class="roxo"><span class="azul">E-mail</span> gerado</h3>
 
 
 
@@ -96,11 +90,11 @@
         </section>
 
         <section class="botoes-de-acao">
-            <button class="btn-roxo" onclick="copiarString('TERMO ANEXO - Faturamento Solicitado')">Copiar Status PSA</button>
+            <button class="btn-roxo" onclick="copiarString('TERMO ANEXO - Faturamento Solicitado')">Copiar Status</button>
 
             <button class="btn-verde" onclick="abrirIndicadores()">Indicadores</button>
 
-            <button class="btn-vermelho" onclick="limparFormulario()">Limpar</button>
+            <button class="btn-laranja" onclick="limparFormulario()">Limpar</button>
 
             <div id="toast">Copiado para a área de transferência!</div>
         </section>
@@ -184,11 +178,11 @@
 
 Favor proceder com o faturamento abaixo:
 
-Cod. contrato PSA: ${codContratoPSA}
-Cod. cliente: ${codCliente}
+Código do contrato PSA: ${codContratoPSA}
+Código do cliente: ${codCliente}
 Valor líquido: ${valorLiquido}
 
-Cod. projeto: ${codProjeto}
+Código do projeto: ${codProjeto}
 Nome do projeto: ${nomeProjeto}
 
 Justificativa: ${justificativa}

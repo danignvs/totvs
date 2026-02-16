@@ -1,22 +1,23 @@
 
         :root {
             --az-escuro: #002233;
+            --preto: #000;
             --az-claro: #00DBFF;
-            --az-claro2: #00bcd8;
+            --az-claro2: #00cceb;
             --az-bg: #e4fbff;
             --roxo: #A44DFF;
             --roxo2: #833ad1;
             --roxo-bg: #f3e9ff;
             --branco: #ffffff;
-            --cinza-claro: #F2F4F5;
-            --cinza: #c9c9c9;
+            --cinza-claro: #eeeeee;
+            --cinza: #c5c5c5;
             --cinza-escuro: #666666;
             --bg-fundo: #002233;
             --verde: #01cdab;
             --verde2: #00b99a;
             --limao: #d9ff65;
             --laranja: #ff8900;
-            --laranja2: #dd7700;
+            --laranja2: #ea7d00;
             --rosa: #ff009e;
             --vermelho: #ff4400;
             --vermelho2: #dc3c02;
@@ -80,7 +81,7 @@
             animation: fadeIn 0.5s ease-in-out;
             display: grid;
             grid-template-columns: 1.5fr 1fr; /* Esquerda (1.5 partes) e Direita (1 parte) */
-            gap: 40px; /* Espaço entre as colunas */
+            gap: 30px; /* Espaço entre as colunas */
             grid-template-areas: 
                 "form result"
                 "buttons result"; /* Botões ficam embaixo do form, Resultado ocupa a lateral toda */
@@ -95,11 +96,6 @@
         .container-resultado {
             grid-area: result; /* Encaixa na área "result" do grid */
             margin-top: 0 !important; /* Remove margem superior no desktop */
-        }
-
-        /* Ajuste opcional para o título alinhar com o topo */
-        .container-resultado h3 {
-            margin-top: 0; 
         }
 
         .container-roxo {
@@ -131,16 +127,25 @@
             text-align: center;
         }
 
+        h2, h3 {
+            margin-top: 0; 
+        }
+
         h2 {
             font-size: 1.5em;
         }
 
         h3 {
-            margin: 40px 0 20px;
-            color: var(--roxo);
+            font-size: 1.3em;
+        }
+
+        h3 .roxo {            
             border-left: 4px solid var(--roxo);
             padding-left: 10px;
-            font-size: 1.3em;
+        }
+
+        .roxo {
+            color: var(--roxo);
         }
 
         .azul {
@@ -212,7 +217,7 @@
             margin-top: 0;
             float: right;
             cursor: pointer;
-            border-radius: 4px;
+            border-radius: 3px;
             border: 0;
             font-weight: bold;
             margin: -20px;
@@ -257,13 +262,13 @@
         select {
             width: 100%;
             padding: 5px;
-            margin-top: 5px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
+            margin: 5px 0;
+            border: 1px solid var(--cinza);
+            border-radius: 3px;
             box-sizing: border-box;
             font-size: 14px;
             color: var(--az-escuro);
-            background-color: #f9f9f9;
+            background-color: var(--branco);
             transition: border-color 0.3s, box-shadow 0.3s;
         }
 
@@ -277,13 +282,12 @@
 
         .input-group {
             display: flex;
-            gap: 20px;
+            gap: 10px;
             margin-bottom: 0;
         }
 
         .input-item {
             flex: 1;
-            min-width: 45%;
         }
 
         /* --- DATA HÍBRIDA (Texto + Picker) --- */
@@ -299,12 +303,11 @@
         .calendar-icon {
             position: absolute;
             right: 8px;
-            top: 50%;
+            top: 46%;
             transform: translateY(-40%);
             font-size: 16px;
             pointer-events: none;
             color: #666;
-            margin-top: 2px;
         }
 
         .inp-date-picker {
@@ -331,7 +334,6 @@
             cursor: grab;
             font-size: 20px;
             color: var(--cinza-escuro);
-            padding: 0 10px 0 0;
             user-select: none;
         }
 
@@ -342,34 +344,23 @@
         button {
             padding: 8px 20px;
             border: none;
-            border-radius: 6px;
+            border-radius: 4px;
             cursor: pointer;
-            font-weight: bold;
             transition: background-color 0.3s ease, transform 0.1s;
             width: 100%;
             display: flex;
             justify-content: center;
             align-items: center;
+            font-size: 0.8em;
+            letter-spacing: 0.1px;
+            font-weight: bold;
         }
 
         .btn-aux {
             width: auto;
-            padding: 5px 10px;
+            padding: 5px 7px;
             font-size: 0.7em;
             float: right;
-        }
-
-        .btn-aux button {
-            width: auto;
-            font-size: 12px;
-        }
-
-        .btn-aux button {
-            width: auto;
-            /* O segredo para ficarem pequenos */
-            padding: 5px 15px;
-            margin: 0;
-            /* Garante que não tenha margem externa atrapalhando */
         }
 
         .botoes-de-acao {
@@ -380,6 +371,7 @@
             width: 100%;
             margin-top: 20px;
             margin-bottom: 10px;
+            align-self: center;
         }
 
         .botoes-de-acao button {
@@ -414,7 +406,24 @@
 
         .btn-vermelho:hover {
             background-color: var(--vermelho2);
+        }
+
+        .btn-laranja {
+            background-color: var(--laranja);
             color: var(--branco);
+        }
+
+        .btn-laranja:hover {
+            background-color: var(--laranja2);
+        }
+
+        .btn-azul {
+            background-color: var(--az-claro);
+            color: var(--az-escuro);
+        }
+
+        .btn-azul:hover {
+            background-color: var(--az-claro2);
         }
 
         .topo {
@@ -431,26 +440,10 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
-        .link-psa {
-            margin: 0 0 20px 0;
-            border-left: 4px solid var(--az-claro);
-            padding: 5px 0 0 10px;
-        }
-
-        .link-psa h2 {
-            margin: 0 0 5px 0;
-        }
-
-        .link-psa .link-limao {
-            font-size: 0.8em;
-        }
-
         /* Resultados */
         .resultado {
             padding: 10px;
             background-color: var(--cinza-claro);
-            border-radius: 6px;
-            border: 1px solid var(--cinza);
             margin: 20px 0;
         }
 
@@ -459,11 +452,21 @@
             word-break: break-all;
             padding: 5px;
             background-color: var(--branco);
-            border: 1px solid #e0e0e0;
-            border-radius: 4px;
             min-height: 20px;
-            font-family: monospace;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
+            font-size: 14px;
+        }
+
+        .resultado, pre {
+            border: 1px solid var(--cinza);
+            border-radius: 3px;
+
+        }
+
+        ::placeholder {
+            font-size: .9em;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         .justificativa-manual {
@@ -525,7 +528,7 @@
             }
 
             .container-resultado h3 {
-                margin-top: 40px; /* Devolve o espaço do título no mobile */
+                margin-top: 20px; /* garante espaço do título no mobile */
             }
             
             /* Garante a ordem correta no mobile: Form -> Resultado -> Botões */
@@ -542,7 +545,7 @@
             }
 
             .container {
-                padding: 20px;
+                padding: 3%;
                 border-radius: 0;
                 box-shadow: none;
                 border-top: none;
@@ -552,13 +555,10 @@
                 min-height: 100vh;
             }
 
-            .botoes-de-acao button {
-                font-size: 0.7em;
-            }
         }
 
 
-        @media (max-width: 600px) {
+        @media (max-width: 370px) {
             .input-group {
                 flex-direction: column;
                 gap: 0;
@@ -572,10 +572,6 @@
             .botoes-de-acao {
                 flex-direction: column;
                 gap: 10px;
-            }
-
-            .botoes-de-acao button {
-                font-size: 0.8em;
             }
 
         }
