@@ -102,6 +102,12 @@
 
 
     <script>
+        // --- FORÇAR A PÁGINA A IR PARA O TOPO AO ATUALIZAR ---
+        if (history.scrollRestoration) {
+            history.scrollRestoration = 'manual';
+        }
+        window.scrollTo(0, 0);
+        
         const JUSTIFICATIVA_PADRAO = "Termo de conclusão assinado no repositório do projeto.";
 
         function obterSaudacao() {
