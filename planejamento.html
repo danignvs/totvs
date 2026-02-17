@@ -230,7 +230,10 @@
                 
     
     <div class="menu">
-        <button onclick="document.getElementById('fileInput').click()">Carregar Arquivo</button>
+        
+        <button><a href="planejamento.html" target="_blank" style="text-decoration: none;">Novo</a></button>
+
+        <button onclick="document.getElementById('fileInput').click()">Carregar</button>
         
         <button onclick="baixarBackup()">Salvar</button> 
         
@@ -239,450 +242,626 @@
     </div>
 
     <script>
-        // --- GERENCIAMENTO DE INSTÂNCIA E URL ---
-        // Pega o ID da URL ou gera um aleatório se estiver vazio
-        function obterIdInstancia() {
-            const params = new URLSearchParams(window.location.search);
-            let id = params.get('id');
-            if (!id) {
-                id = Date.now().toString(36);
-                atualizarUrl(id);
-            }
-            return id;
+        // --- UTILITÁRIOS GERAIS ---
+    
+    // Função Debounce: Evita que o salvamento/URL ocorra a cada tecla, aguardando o usuário parar de digitar
+    function debounce(func, wait) {
+        let timeout;
+        return function(...args) {
+            const context = this;
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(context, args), wait);
+        };
+    }
+
+    // --- GERENCIAMENTO DE INSTÂNCIA E URL ---
+    
+    function obterIdInstancia() {
+        const params = new URLSearchParams(window.location.search);
+        let id = params.get('id');
+        // Se não houver ID, não cria um imediatamente para não sujar a URL sem necessidade
+        // Usaremos um temporário interno até o primeiro salvamento
+        if (!id) {
+            id = 'temp_' + Date.now().toString(36);
         }
+        return id;
+    }
 
-        function atualizarUrl(novoId) {
-            // Remove espaços e caracteres especiais para a URL ficar limpa
-            const idLimpo = novoId.trim().replace(/[^a-zA-Z0-9-_]/g, '');
-            if (!idLimpo) return;
+    // Atualiza a URL sem recarregar a página
+    const atualizarUrlDebounced = debounce((novoCodOuId) => {
+        if (!novoCodOuId) return;
 
-            const novaUrl = window.location.pathname + '?id=' + encodeURIComponent(idLimpo);
+        // Limpa o ID: remove espaços e caracteres especiais
+        const idLimpo = novoCodOuId.trim().replace(/[^a-zA-Z0-9-_]/g, '');
+        const idFinal = idLimpo || currentInstanceId; // Mantém o atual se o input estiver vazio
+
+        // Só atualiza se mudou
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('id') !== idFinal && !idFinal.startsWith('temp_')) {
+            const novaUrl = window.location.pathname + '?id=' + encodeURIComponent(idFinal);
             window.history.replaceState({path: novaUrl}, '', novaUrl);
-            
-            // Atualiza a variável global de controle
-            currentInstanceId = idLimpo;
+            currentInstanceId = idFinal;
         }
+    }, 1000); // Espera 1 segundo após parar de digitar para mudar a URL
 
-        let currentInstanceId = obterIdInstancia();
+    let currentInstanceId = obterIdInstancia();
 
-        // --- FORÇAR TOPO ---
-        if (history.scrollRestoration) history.scrollRestoration = 'manual';
-        window.scrollTo(0, 0);
+    // --- INICIALIZAÇÃO ---
+    if (history.scrollRestoration) history.scrollRestoration = 'manual';
+    window.scrollTo(0, 0);
+
+    function obterSaudacao() {
+        const hora = parseInt(new Date().toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo", hour: "numeric", hour12: false }));
+        if (hora >= 5 && hora < 12) return "Bom dia";
+        if (hora >= 12 && hora < 18) return "Boa tarde";
+        return "Boa noite";
+    }
+
+    // --- MÁSCARAS E TRATAMENTO DE DADOS ---
+
+    function mascaraData(input) {
+        let v = input.value.replace(/\D/g, "");
         
-        // --- SAUDAÇÃO ---
-        function obterSaudacao() {
-            const hora = parseInt(new Date().toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo", hour: "numeric", hour12: false }));
-            if (hora >= 0 && hora < 12) return "Bom dia";
-            if (hora >= 12 && hora < 18) return "Boa tarde";
-            return "Boa noite";
-        }
+        // Impede que o usuário digite mais do que o necessário
+        if (v.length > 8) v = v.substring(0, 8);
 
-        // --- MÁSCARAS E VALIDAÇÕES ---
-        function mascaraData(input) {
-            let v = input.value.replace(/\D/g, "");
-            if (v.length > 2) v = v.substring(0, 2) + "/" + v.substring(2);
-            if (v.length > 5) v = v.substring(0, 5) + "/" + v.substring(5, 9);
-            if (v.length > 10) v = v.substring(0, 10);
-            input.value = v;
-            validarDatas(input);
+        if (v.length > 2) v = v.substring(0, 2) + "/" + v.substring(2);
+        if (v.length > 5) v = v.substring(0, 5) + "/" + v.substring(5);
+        
+        input.value = v;
+        
+        // Só valida se tiver a data completa
+        if(v.length === 10) validarDatas(input);
+        
+        gerarTabela();
+    }
+
+    // Parse de string "DD/MM/AAAA" para objeto Date seguro
+    function stringParaData(dataStr) {
+        if (!dataStr || dataStr.length !== 10) return null;
+        const partes = dataStr.split('/');
+        const dia = parseInt(partes[0], 10);
+        const mes = parseInt(partes[1], 10) - 1; // Mes é 0-indexado
+        const ano = parseInt(partes[2], 10);
+        
+        const data = new Date(ano, mes, dia);
+        
+        // Verifica se é uma data válida (ex: não aceita 31/02)
+        if (data.getFullYear() === ano && data.getMonth() === mes && data.getDate() === dia) {
+            return data;
+        }
+        return null;
+    }
+
+    function validarDatas(input) {
+        const wrapper = input.closest('.wrapper');
+        if (!wrapper) return;
+        
+        const inpInicio = wrapper.querySelector('.inp-inicio');
+        const inpFim = wrapper.querySelector('.inp-fim');
+        
+        if (!inpInicio || !inpFim) return;
+
+        const dInicio = stringParaData(inpInicio.value);
+        const dFim = stringParaData(inpFim.value);
+
+        if (dInicio && dFim) {
+            if (dFim < dInicio) {
+                mostrarToast("Atenção: Data final é menor que a inicial!");
+                // Não apagamos automaticamente para não frustrar o usuário, 
+                // mas você pode descomentar a linha abaixo se preferir:
+                // inpFim.value = ""; 
+                inpFim.style.borderColor = "var(--vermelho)";
+            } else {
+                inpFim.style.borderColor = "var(--cinza)";
+            }
+        }
+    }
+
+    function atualizarDataPeloPicker(pickerInput) {
+        const valorISO = pickerInput.value; // Formato yyyy-mm-dd
+        if (!valorISO) return;
+        
+        const [ano, mes, dia] = valorISO.split('-');
+        const wrapper = pickerInput.parentElement;
+        const textInput = wrapper.querySelector('.inp-date-text');
+        
+        if (textInput) {
+            textInput.value = `${dia}/${mes}/${ano}`;
+            validarDatas(textInput);
             gerarTabela();
         }
+    }
 
-        function validarDatas(input) {
-            const wrapper = input.closest('.wrapper');
-            if (!wrapper) return;
-            const inpInicio = wrapper.querySelector('.inp-inicio');
-            if (!inpInicio) return; 
-            const inpFim = wrapper.querySelector('.inp-fim');
-            
-            if (inpInicio.value.length === 10 && inpFim.value.length === 10) {
-                const i = inpInicio.value.split('/');
-                const f = inpFim.value.split('/');
-                const dInicio = new Date(i[2], i[1]-1, i[0]);
-                const dFim = new Date(f[2], f[1]-1, f[0]);
-                if (dFim < dInicio) {
-                    mostrarToast("Data final menor que inicial!");
-                    inpFim.value = "";
-                    wrapper.querySelectorAll('.inp-date-picker')[1].value = "";
-                }
-            }
+    function formatarDataFinal(valor) {
+        if (!valor) return "";
+        // Remove o ano se estiver no formato DD/MM/AAAA para economizar espaço na tabela, se desejar.
+        // O código original fazia substring(0, 6) + substring(8, 10).
+        // Vamos manter o padrão DD/MM para visualização limpa.
+        if (valor.length === 10 && valor.includes('/')) {
+            return valor.substring(0, 5); // Retorna DD/MM
         }
+        return valor;
+    }
 
-        function atualizarDataPeloPicker(pickerInput) {
-            const valorISO = pickerInput.value;
-            if (!valorISO) return;
-            const [ano, mes, dia] = valorISO.split('-');
-            const wrapper = pickerInput.parentElement;
-            const textInput = wrapper.querySelector('.inp-date-text');
-            if (textInput) {
-                textInput.value = `${dia}/${mes}/${ano}`;
-                validarDatas(textInput);
-                gerarTabela();
-            }
+    function parseHoras(valor) {
+        if (!valor) return 0;
+        // Substitui vírgula por ponto e remove tudo que não for número ou ponto
+        let limpo = valor.replace(',', '.').replace(/[^0-9.]/g, '');
+        // Garante apenas um ponto decimal
+        const partes = limpo.split('.');
+        if (partes.length > 2) {
+            limpo = partes[0] + '.' + partes.slice(1).join('');
         }
+        const floatVal = parseFloat(limpo);
+        return isNaN(floatVal) ? 0 : floatVal;
+    }
 
-        function formatarDataFinal(valor) {
-            if (!valor) return "";
-            if (valor.length === 10 && valor.includes('/')) return valor.substring(0, 6) + valor.substring(8, 10);
-            return valor;
-        }
+    // --- MANIPULAÇÃO DO DOM ---
+    
+    let historicoExclusoes = [];
 
-        // --- MANIPULAÇÃO DO DOM (ITENS) ---
-        let historicoExclusoes = [];
+    function adicionarNovaTarefa() {
+        criarElemento('tarefa');
+    }
 
-        function adicionarNovaTarefa() {
-            criarElemento('tarefa');
-        }
+    function adicionarMarcoItem() {
+        criarElemento('marco');
+    }
 
-        function adicionarMarcoItem() {
-            criarElemento('marco');
-        }
-
-        function criarElemento(tipo, dados = null) {
-            const container = document.getElementById('listaItens');
-            const idUnico = Date.now() + Math.random().toString(16).slice(2);
-            const div = document.createElement('div');
-            
-            div.id = 'item-' + idUnico;
-            div.dataset.type = tipo;
-            
-            if (tipo === 'tarefa') {
-                div.className = 'wrapper item-lista tarefa';
-                div.innerHTML = `
-                    <div style="display:flex; justify-content:space-between; align-items:center; gap: 7px; ">
-                        <div style="display:flex; align-items:center; flex:1; gap: 7px;">
-                            <span class="drag-handle" title="Mover">☰</span>
-                            <input type="text" class="inp-tarefa" placeholder="Descrição da tarefa..." oninput="gerarTabela()" style="margin:0; width:100%; margin: 5px 0;">
-                        </div>
-                        <button class="excluir" style="margin:0;" onclick="removerItem('${idUnico}')">X</button>
+    function criarElemento(tipo, dados = null) {
+        const container = document.getElementById('listaItens');
+        const idUnico = Date.now().toString(36) + Math.random().toString(36).substring(2);
+        const div = document.createElement('div');
+        
+        div.id = 'item-' + idUnico;
+        div.dataset.type = tipo;
+        
+        // HTML interno (Mantido idêntico ao original para não quebrar estilos)
+        if (tipo === 'tarefa') {
+            div.className = 'wrapper item-lista tarefa';
+            div.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center; gap: 7px; ">
+                    <div style="display:flex; align-items:center; flex:1; gap: 7px;">
+                        <span class="drag-handle" title="Mover">☰</span>
+                        <input type="text" class="inp-tarefa" placeholder="Descrição da tarefa..." oninput="gerarTabela()" style="margin:0; width:100%; margin: 5px 0;">
                     </div>
-                    <div class="input-group">
-                        <div class="input-item">
-                            <div class="custom-date-wrapper">
-                                <input type="text" class="inp-date-text inp-inicio" placeholder="Data Início" maxlength="10" oninput="mascaraData(this)">
-                                <span class="calendar-icon">📅</span>
-                                <input type="date" class="inp-date-picker" onchange="atualizarDataPeloPicker(this)">
-                            </div>
-                        </div>
-                        <div class="input-item">
-                            <div class="custom-date-wrapper">
-                                <input type="text" class="inp-date-text inp-fim" placeholder="Data Conclusão" maxlength="10" oninput="mascaraData(this)">
-                                <span class="calendar-icon">📅</span>
-                                <input type="date" class="inp-date-picker" onchange="atualizarDataPeloPicker(this)">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="input-group" style="margin-bottom:0;">
-                        <div class="input-item">
-                            <input type="text" class="inp-horas" placeholder="Horas (0,00)" oninput="gerarTabela()">
-                        </div>
-                        <div class="input-item">
-                            <input type="text" class="inp-analista" list="lista-analistas" placeholder="Nome do Analista" oninput="gerarTabela()">
-                        </div>
-                    </div>
-                `;
-            } else {
-                div.className = 'wrapper item-lista marco';
-                div.innerHTML = `
-                    <span class="drag-handle" title="Mover">☰</span>
-                    <input type="text" class="inp-marco" placeholder="Marco" oninput="gerarTabela()" style="flex:1;">
                     <button class="excluir" style="margin:0;" onclick="removerItem('${idUnico}')">X</button>
-                `;
-            }
-
-            container.appendChild(div);
-
-            // Se vieram dados (importação ou carregar), preenche os campos
-            if (dados) {
-                if (tipo === 'tarefa') {
-                    div.querySelector('.inp-tarefa').value = dados.tarefa || '';
-                    div.querySelector('.inp-inicio').value = dados.inicio || '';
-                    div.querySelector('.inp-fim').value = dados.fim || '';
-                    div.querySelector('.inp-horas').value = dados.horas || '';
-                    div.querySelector('.inp-analista').value = dados.analista || '';
-                } else {
-                    div.querySelector('.inp-marco').value = dados.valor || '';
-                }
-            }
-
-            gerarTabela();
+                </div>
+                <div class="input-group">
+                    <div class="input-item">
+                        <div class="custom-date-wrapper">
+                            <input type="text" class="inp-date-text inp-inicio" placeholder="Data Início" maxlength="10" oninput="mascaraData(this)">
+                            <span class="calendar-icon">📅</span>
+                            <input type="date" class="inp-date-picker" onchange="atualizarDataPeloPicker(this)">
+                        </div>
+                    </div>
+                    <div class="input-item">
+                        <div class="custom-date-wrapper">
+                            <input type="text" class="inp-date-text inp-fim" placeholder="Data Conclusão" maxlength="10" oninput="mascaraData(this)">
+                            <span class="calendar-icon">📅</span>
+                            <input type="date" class="inp-date-picker" onchange="atualizarDataPeloPicker(this)">
+                        </div>
+                    </div>
+                </div>
+                <div class="input-group" style="margin-bottom:0;">
+                    <div class="input-item">
+                        <input type="text" class="inp-horas" placeholder="Horas (0,00)" oninput="gerarTabela()">
+                    </div>
+                    <div class="input-item">
+                        <input type="text" class="inp-analista" list="lista-analistas" placeholder="Nome do Analista" oninput="gerarTabela()">
+                    </div>
+                </div>
+            `;
+        } else {
+            div.className = 'wrapper item-lista marco';
+            div.innerHTML = `
+                <span class="drag-handle" title="Mover">☰</span>
+                <input type="text" class="inp-marco" placeholder="MARCO DO PROJETO" oninput="gerarTabela()" style="flex:1; font-weight:bold;">
+                <button class="excluir" style="margin:0;" onclick="removerItem('${idUnico}')">X</button>
+            `;
         }
 
-        function removerItem(id) {
-            const el = document.getElementById('item-' + id);
-            if (el) {
-                const tipo = el.dataset.type;
-                let valores = {};
-                if (tipo === 'tarefa') {
-                    valores = {
-                        tarefa: el.querySelector('.inp-tarefa').value,
-                        inicio: el.querySelector('.inp-inicio').value,
-                        fim: el.querySelector('.inp-fim').value,
-                        horas: el.querySelector('.inp-horas').value,
-                        analista: el.querySelector('.inp-analista').value
-                    };
-                } else {
-                    valores = { valor: el.querySelector('.inp-marco').value };
-                }
-                // Adiciona ao histórico com o nome correto das propriedades para o restaurar funcionar
-                historicoExclusoes.push({ id, tipo, valores }); 
-                el.remove();
-                gerarTabela();
-                mostrarToast("Item removido. Ctrl+Z para desfazer.");
-            }
-        }
+        container.appendChild(div);
 
-        function desfazerExclusao() {
-            if (historicoExclusoes.length === 0) return;
-            const item = historicoExclusoes.pop();
-            // Reutiliza a função de criar elemento passando os dados salvos
-            criarElemento(item.tipo, item.valores);
-            mostrarToast("Desfeito!");
-        }
-
-        // --- SISTEMA DE ARQUIVOS E SALVAMENTO ---
-
-        function coletarDadosParaSalvar() {
-            const dados = {
-                codProjeto: document.getElementById('txtCodProjeto').value,
-                nomeProjeto: document.getElementById('txtNomeProjeto').value,
-                itens: []
-            };
-
-            document.querySelectorAll('.item-lista').forEach(el => {
-                if (el.dataset.type === 'marco') {
-                    dados.itens.push({
-                        type: 'marco',
-                        valor: el.querySelector('.inp-marco').value
-                    });
-                } else {
-                    dados.itens.push({
-                        type: 'tarefa',
-                        tarefa: el.querySelector('.inp-tarefa').value,
-                        inicio: el.querySelector('.inp-inicio').value,
-                        fim: el.querySelector('.inp-fim').value,
-                        horas: el.querySelector('.inp-horas').value,
-                        analista: el.querySelector('.inp-analista').value
-                    });
-                }
-            });
-            return dados;
-        }
-
-        function salvarDadosAuto() {
-            const dados = coletarDadosParaSalvar();
-            
-            // Lógica de URL: Se o código do projeto mudar, atualiza a URL
-            if (dados.codProjeto && dados.codProjeto !== currentInstanceId) {
-                atualizarUrl(dados.codProjeto);
-            }
-
-            // Salva no LocalStorage usando o ID atual da URL
-            localStorage.setItem('planejamento_' + currentInstanceId, JSON.stringify(dados));
-        }
-
-        function baixarBackup() {
-            const dados = coletarDadosParaSalvar();
-            const nomeArquivo = `Planejamento_${dados.codProjeto || 'Novo'}.json`;
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dados));
-            
-            const downloadAnchorNode = document.createElement('a');
-            downloadAnchorNode.setAttribute("href", dataStr);
-            downloadAnchorNode.setAttribute("download", nomeArquivo);
-            document.body.appendChild(downloadAnchorNode);
-            downloadAnchorNode.click();
-            downloadAnchorNode.remove();
-        }
-
-        function processarArquivo(input) {
-            const file = input.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const dados = JSON.parse(e.target.result);
-                    restaurarTela(dados);
-                    mostrarToast("Arquivo carregado com sucesso!");
-                } catch (err) {
-                    alert("Erro ao ler o arquivo JSON.");
-                }
-                input.value = ''; // Limpa o input para permitir carregar o mesmo arquivo novamente
-            };
-            reader.readAsText(file);
-        }
-
-        function carregarDadosIniciais() {
-            // Tenta carregar do LocalStorage usando o ID da URL
-            const dadosSalvos = localStorage.getItem('planejamento_' + currentInstanceId);
-            if (dadosSalvos) {
-                restaurarTela(JSON.parse(dadosSalvos));
+        // Preenchimento de dados (se houver)
+        if (dados) {
+            if (tipo === 'tarefa') {
+                div.querySelector('.inp-tarefa').value = dados.tarefa || '';
+                div.querySelector('.inp-inicio').value = dados.inicio || '';
+                div.querySelector('.inp-fim').value = dados.fim || '';
+                div.querySelector('.inp-horas').value = dados.horas || '';
+                div.querySelector('.inp-analista').value = dados.analista || '';
             } else {
-                // Se não tem nada salvo, inicia padrão
-                adicionarMarcoItem();
-                adicionarNovaTarefa();
-                gerarTabela();
+                div.querySelector('.inp-marco').value = dados.valor || '';
             }
         }
 
-        function restaurarTela(dados) {
-            document.getElementById('txtCodProjeto').value = dados.codProjeto || '';
-            document.getElementById('txtNomeProjeto').value = dados.nomeProjeto || '';
+        gerarTabela();
+    }
+
+    function removerItem(id) {
+        const el = document.getElementById('item-' + id);
+        if (el) {
+            const tipo = el.dataset.type;
+            let valores = {};
             
-            // Atualiza URL se for um arquivo carregado
-            if(dados.codProjeto) atualizarUrl(dados.codProjeto);
+            // Salva o estado antes de excluir para o Undo
+            if (tipo === 'tarefa') {
+                valores = {
+                    tarefa: el.querySelector('.inp-tarefa').value,
+                    inicio: el.querySelector('.inp-inicio').value,
+                    fim: el.querySelector('.inp-fim').value,
+                    horas: el.querySelector('.inp-horas').value,
+                    analista: el.querySelector('.inp-analista').value
+                };
+            } else {
+                valores = { valor: el.querySelector('.inp-marco').value };
+            }
+            
+            historicoExclusoes.push({ id, tipo, valores }); 
+            el.remove();
+            gerarTabela();
+            mostrarToast("Item removido. Ctrl+Z para desfazer.");
+        }
+    }
 
-            const container = document.getElementById('listaItens');
-            container.innerHTML = '';
+    function desfazerExclusao() {
+        if (historicoExclusoes.length === 0) return;
+        const item = historicoExclusoes.pop();
+        criarElemento(item.tipo, item.valores);
+        mostrarToast("Ação desfeita!");
+    }
 
-            if (dados.itens && dados.itens.length > 0) {
-                dados.itens.forEach(item => {
-                    criarElemento(item.type, item); // item já tem a estrutura de dados correta
+    // --- SALVAMENTO E CARREGAMENTO ---
+
+    function coletarDadosParaSalvar() {
+        const dados = {
+            codProjeto: document.getElementById('txtCodProjeto').value,
+            nomeProjeto: document.getElementById('txtNomeProjeto').value,
+            itens: []
+        };
+
+        document.querySelectorAll('.item-lista').forEach(el => {
+            if (el.dataset.type === 'marco') {
+                dados.itens.push({
+                    type: 'marco',
+                    valor: el.querySelector('.inp-marco').value
                 });
             } else {
-                adicionarMarcoItem();
-                adicionarNovaTarefa();
+                dados.itens.push({
+                    type: 'tarefa',
+                    tarefa: el.querySelector('.inp-tarefa').value,
+                    inicio: el.querySelector('.inp-inicio').value,
+                    fim: el.querySelector('.inp-fim').value,
+                    horas: el.querySelector('.inp-horas').value,
+                    analista: el.querySelector('.inp-analista').value
+                });
             }
-            gerarTabela();
+        });
+        return dados;
+    }
+
+    // Função debounced para salvar (evita escritas excessivas no disco/storage)
+    const salvarDadosStorage = debounce((dados) => {
+        // Atualiza a URL baseada no código do projeto (se houver)
+        if (dados.codProjeto && dados.codProjeto.trim() !== "") {
+            atualizarUrlDebounced(dados.codProjeto);
+        }
+        
+        // Salva usando o ID da instância (seja o da URL ou o temporário)
+        localStorage.setItem('planejamento_' + currentInstanceId, JSON.stringify(dados));
+        
+        // Log discreto para debug
+        // console.log("Dados salvos automaticamente em: planejamento_" + currentInstanceId);
+    }, 1000);
+
+    function triggerSalvar() {
+        const dados = coletarDadosParaSalvar();
+        salvarDadosStorage(dados);
+    }
+
+    async function baixarBackup() {
+        const dados = coletarDadosParaSalvar();
+        const cod = dados.codProjeto ? dados.codProjeto.trim() : 'Novo';
+        const nomeSugestao = `Planejamento_${cod}.json`;
+        const conteudo = JSON.stringify(dados, null, 2);
+
+        if (window.showSaveFilePicker) {
+            try {
+                const handle = await window.showSaveFilePicker({
+                    suggestedName: nomeSugestao,
+                    types: [{
+                        description: 'Arquivo JSON',
+                        accept: {'application/json': ['.json']},
+                    }],
+                });
+                const writable = await handle.createWritable();
+                await writable.write(conteudo);
+                await writable.close();
+                mostrarToast("Arquivo salvo com sucesso!");
+            } catch (err) {
+                // Usuário cancelou ou erro
+            }
+        } else {
+            // Fallback
+            const blob = new Blob([conteudo], {type: "application/json"});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = nomeSugestao;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            mostrarToast("Download iniciado!");
+        }
+    }
+
+    function processarArquivo(input) {
+        const file = input.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const dados = JSON.parse(e.target.result);
+                if(!dados || (!dados.itens && !dados.codProjeto)) {
+                    throw new Error("Formato inválido");
+                }
+                restaurarTela(dados);
+                mostrarToast("Planejamento carregado!");
+            } catch (err) {
+                alert("Erro ao ler o arquivo JSON. Verifique se é um backup válido.");
+                console.error(err);
+            }
+            // Importante: limpa o input para permitir recarregar o mesmo arquivo se necessário
+            input.value = ''; 
+        };
+        reader.readAsText(file);
+    }
+
+    function carregarDadosIniciais() {
+        const dadosSalvos = localStorage.getItem('planejamento_' + currentInstanceId);
+        
+        // Se a URL tiver um ID mas o storage estiver vazio (link compartilhado sem backend),
+        // aqui seria o lugar de buscar num banco de dados real.
+        // Como é 100% local, apenas carregamos se existir no navegador do usuário.
+        
+        if (dadosSalvos) {
+            try {
+                restaurarTela(JSON.parse(dadosSalvos));
+            } catch(e) {
+                console.error("Erro ao carregar storage", e);
+                iniciarTelaPadrao();
+            }
+        } else {
+            iniciarTelaPadrao();
+        }
+    }
+    
+    function iniciarTelaPadrao() {
+        adicionarMarcoItem();
+        adicionarNovaTarefa();
+        gerarTabela();
+    }
+
+    function restaurarTela(dados) {
+        document.getElementById('txtCodProjeto').value = dados.codProjeto || '';
+        document.getElementById('txtNomeProjeto').value = dados.nomeProjeto || '';
+        
+        // Se carregou um arquivo com código de projeto, atualizamos a URL
+        if(dados.codProjeto) {
+             // Força atualização imediata da variável de ID para sincronizar o salvamento futuro
+             // Mas não muda a URL visualmente até o debounce, ou podemos forçar aqui:
+             // currentInstanceId = dados.codProjeto.trim().replace(/[^a-zA-Z0-9-_]/g, '');
         }
 
-        // --- GERAÇÃO DA TABELA ---
-        function gerarTabela() {
-            const codProjeto = document.getElementById('txtCodProjeto').value;
-            const nomeProjeto = document.getElementById('txtNomeProjeto').value;
+        const container = document.getElementById('listaItens');
+        container.innerHTML = '';
 
-            let assunto = "Liberação para Planejamento";
-            if (codProjeto) assunto += ` - ${codProjeto}`;
-            if (nomeProjeto) assunto += ` - ${nomeProjeto}`;
-            document.getElementById('resultadoAssunto').textContent = assunto;
+        if (dados.itens && dados.itens.length > 0) {
+            dados.itens.forEach(item => criarElemento(item.type, item));
+        } else {
+            iniciarTelaPadrao();
+        }
+        
+        gerarTabela();
+    }
 
-            const itens = document.querySelectorAll('.item-lista');
-            let linhasHTML = '';
-            let totalHoras = 0;
+    // --- GERAÇÃO DA TABELA (CORE) ---
 
-            itens.forEach(el => {
-                if (el.dataset.type === 'marco') {
-                    const titulo = el.querySelector('.inp-marco').value.toUpperCase();
+    function gerarTabela() {
+        // 1. Atualiza Assunto
+        const codProjeto = document.getElementById('txtCodProjeto').value;
+        const nomeProjeto = document.getElementById('txtNomeProjeto').value;
+
+        let assunto = "Liberação para Planejamento";
+        if (codProjeto) assunto += ` - ${codProjeto}`;
+        if (nomeProjeto) assunto += ` - ${nomeProjeto}`;
+        document.getElementById('resultadoAssunto').textContent = assunto;
+
+        // 2. Processa Itens
+        const itens = document.querySelectorAll('.item-lista');
+        let linhasHTML = '';
+        let totalHoras = 0;
+
+        itens.forEach(el => {
+            if (el.dataset.type === 'marco') {
+                const titulo = el.querySelector('.inp-marco').value.toUpperCase();
+                // Só exibe marco se tiver texto
+                if(titulo.trim()) {
                     linhasHTML += `
                         <tr>
                             <td colspan="5" style="background-color: #f0f0f0; font-weight: bold; text-align: left; padding: 10px; border: 1px solid #ccc; color: #002233;">${titulo}</td>
                         </tr>
                     `;
-                } else {
-                    let desc = el.querySelector('.inp-tarefa').value;
-                    if (desc.length > 0) desc = desc.charAt(0).toUpperCase() + desc.slice(1);
-                    
-                    const inicio = el.querySelector('.inp-inicio').value;
-                    const fim = el.querySelector('.inp-fim').value;
-                    let horasStr = el.querySelector('.inp-horas').value.replace(',', '.');
-                    const analista = el.querySelector('.inp-analista').value;
-
-                    const h = parseFloat(horasStr);
-                    if (!isNaN(h)) totalHoras += h;
-
-                    const iniFmt = formatarDataFinal(inicio);
-                    const fimFmt = formatarDataFinal(fim);
-                    const horasExib = horasStr.replace('.', ',');
-
-                    if (desc || inicio || fim || horasStr || analista) {
-                        linhasHTML += `
-                            <tr>
-                                <td style="text-align: left; padding: 8px; border: 1px solid #ccc;">${desc}</td>
-                                <td style="text-align: center; padding: 8px; border: 1px solid #ccc;">${iniFmt}</td>
-                                <td style="text-align: center; padding: 8px; border: 1px solid #ccc;">${fimFmt}</td>
-                                <td style="text-align: center; padding: 8px; border: 1px solid #ccc;">${horasExib}</td>
-                                <td style="text-align: center; padding: 8px; border: 1px solid #ccc;">${analista}</td>
-                            </tr>
-                        `;
-                    }
                 }
-            });
+            } else {
+                let desc = el.querySelector('.inp-tarefa').value;
+                const inicio = el.querySelector('.inp-inicio').value;
+                const fim = el.querySelector('.inp-fim').value;
+                const horasInput = el.querySelector('.inp-horas').value;
+                const analista = el.querySelector('.inp-analista').value;
 
-            const totalFmt = totalHoras.toFixed(2).replace('.', ',');
-            const saudacao = obterSaudacao();
-
-            const htmlTabela = `
-                <div id="resultadoCorpo" style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-size: 13px; color: #333;">
-                    <p>${saudacao},</p>
-                    <p>Segue planejamento para o projeto:</p>
-                    <strong>${codProjeto}  ${nomeProjeto}</strong>
-                    <br><br>
-                    <table style="width: 100%; max-width: 600px; border-collapse: collapse; font-family: 'Segoe UI', sans-serif;">
-                        <thead>
-                            <tr style="background-color: #002233; color: white;">
-                                <th style="padding: 10px; border: 1px solid #000;"></th> 
-                                <th style="padding: 10px; border: 1px solid #000; width: 80px;">INÍCIO</th>
-                                <th style="padding: 10px; border: 1px solid #000; width: 80px;">CONCLUSÃO</th>
-                                <th style="padding: 10px; border: 1px solid #000; width: 60px;">HORAS</th>
-                                <th style="padding: 10px; border: 1px solid #000; width: 100px;">ANALISTA</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${linhasHTML}
-                            <tr>
-                                <td colspan="3" style="text-align: right; font-weight: bold; padding: 10px; border: 1px solid #ccc;">TOTAL</td>
-                                <td style="text-align: center; font-weight: bold; padding: 10px; border: 1px solid #ccc;">${totalFmt}</td>
-                                <td style="border: 1px solid #ccc;"></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <br>
-                    <p>Fico à disposição para qualquer dúvida.</p>
-                    <p>Atenciosamente,</p>
-                </div>
-            `;
-            document.getElementById('areaTabela').innerHTML = htmlTabela;
-            
-            salvarDadosAuto(); // CHAMA O SALVAMENTO A CADA GERAR TABELA
-        }
-
-        // Utils
-        function mostrarToast(txt) {
-            const x = document.getElementById("toast");
-            x.textContent = txt; x.className = "show";
-            setTimeout(() => { x.className = x.className.replace("show", ""); }, 3000);
-        }
-        function copiarTexto(id) {
-            const txt = document.getElementById(id).textContent;
-            if(txt) navigator.clipboard.writeText(txt).then(() => mostrarToast("Copiado!"));
-        }
-        function copiarTabela() {
-            const el = document.getElementById('resultadoCorpo');
-            if(!el) return;
-            const r = document.createRange(); r.selectNode(el);
-            window.getSelection().removeAllRanges(); window.getSelection().addRange(r);
-            document.execCommand('copy');
-            window.getSelection().removeAllRanges();
-            mostrarToast("Tabela copiada!");
-        }
-        function limparTudo() {
-            if (confirm("Deseja limpar tudo?")) {
-                document.getElementById('txtCodProjeto').value='';
-                document.getElementById('txtNomeProjeto').value='';
-                document.getElementById('listaItens').innerHTML='';
-                localStorage.removeItem('planejamento_' + currentInstanceId); // Limpa storage atual
+                // Capitaliza primeira letra
+                if (desc.length > 0) desc = desc.charAt(0).toUpperCase() + desc.slice(1);
                 
-                // Reseta ID para um novo aleatório para evitar conflito se recarregar
-                atualizarUrl(Date.now().toString(36));
-                
-                adicionarMarcoItem();
-                adicionarNovaTarefa(); 
-                gerarTabela();
-            }
-        }
+                // Calcula horas de forma segura
+                const h = parseHoras(horasInput);
+                totalHoras += h;
 
-        document.addEventListener('keydown', e => {
-            if((e.ctrlKey || e.metaKey) && e.key === 'z') {
-                const tag = document.activeElement.tagName.toLowerCase();
-                if(tag !== 'input' && tag !== 'textarea') { e.preventDefault(); desfazerExclusao(); }
+                // Formatações para exibição
+                const iniFmt = formatarDataFinal(inicio); // Agora retorna só DD/MM se tiver ano
+                const fimFmt = formatarDataFinal(fim);
+                
+                // Formata número para BR (2 casas decimais, vírgula)
+                const horasExib = h > 0 ? h.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : "";
+
+                // Só adiciona na tabela se tiver algum dado relevante
+                if (desc || inicio || fim || h > 0 || analista) {
+                    linhasHTML += `
+                        <tr>
+                            <td style="text-align: left; padding: 8px; border: 1px solid #ccc;">${desc}</td>
+                            <td style="text-align: center; padding: 8px; border: 1px solid #ccc;">${iniFmt}</td>
+                            <td style="text-align: center; padding: 8px; border: 1px solid #ccc;">${fimFmt}</td>
+                            <td style="text-align: center; padding: 8px; border: 1px solid #ccc;">${horasExib}</td>
+                            <td style="text-align: center; padding: 8px; border: 1px solid #ccc;">${analista}</td>
+                        </tr>
+                    `;
+                }
             }
         });
 
-        window.onload = function() {
-            carregarDadosIniciais();
-            const el = document.getElementById('listaItens');
-            Sortable.create(el, { handle: '.drag-handle', animation: 150, onEnd: gerarTabela });
-        };
+        const totalFmt = totalHoras.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        const saudacao = obterSaudacao();
+
+        // 3. Monta HTML Final
+        const htmlTabela = `
+            <div id="resultadoCorpo" style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-size: 13px; color: #333;">
+                <p>${saudacao},</p>
+                <p>Segue planejamento para o projeto:</p>
+                <p style="font-size: 14px;"><strong>${codProjeto}  ${nomeProjeto}</strong></p>
+                <br>
+                <table style="width: 100%; max-width: 650px; border-collapse: collapse; font-family: 'Segoe UI', sans-serif;">
+                    <thead>
+                        <tr style="background-color: #002233; color: white;">
+                            <th style="padding: 10px; border: 1px solid #000; text-align:center;">ATIVIDADE</th> 
+                            <th style="padding: 10px; border: 1px solid #000; width: 70px; text-align:center;">INÍCIO</th>
+                            <th style="padding: 10px; border: 1px solid #000; width: 70px; text-align:center;">FIM</th>
+                            <th style="padding: 10px; border: 1px solid #000; width: 60px; text-align:center;">HRS</th>
+                            <th style="padding: 10px; border: 1px solid #000; width: 110px; text-align:center;">ANALISTA</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${linhasHTML}
+                        <tr>
+                            <td colspan="3" style="text-align: right; font-weight: bold; padding: 10px; border: 1px solid #ccc; background-color: #fafafa;">TOTAL</td>
+                            <td style="text-align: center; font-weight: bold; padding: 10px; border: 1px solid #ccc; background-color: #fafafa;">${totalFmt}</td>
+                            <td style="border: 1px solid #ccc; background-color: #fafafa;"></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <br>
+                <p>Fico à disposição para qualquer dúvida.</p>
+                <p>Atenciosamente,</p>
+            </div>
+        `;
+        
+        document.getElementById('areaTabela').innerHTML = htmlTabela;
+        
+        // 4. Dispara salvamento (Debounced)
+        triggerSalvar();
+    }
+
+    // --- UX / TOAST / COPY ---
+
+    function mostrarToast(txt) {
+        const x = document.getElementById("toast");
+        x.textContent = txt; 
+        x.className = "show";
+        // Limpa timeout anterior se houver (para não piscar errático se chamar várias vezes)
+        if(x.dataset.timeoutId) clearTimeout(x.dataset.timeoutId);
+        
+        const tId = setTimeout(() => { x.className = x.className.replace("show", ""); }, 3000);
+        x.dataset.timeoutId = tId;
+    }
+
+    function copiarTexto(id) {
+        const el = document.getElementById(id);
+        if(el && el.textContent) {
+            navigator.clipboard.writeText(el.textContent)
+                .then(() => mostrarToast("Assunto copiado!"))
+                .catch(() => mostrarToast("Erro ao copiar."));
+        }
+    }
+
+    function copiarTabela() {
+        const el = document.getElementById('resultadoCorpo');
+        if(!el) return;
+        
+        // Seleção e cópia precisa para Rich Text (Gmail/Outlook)
+        const range = document.createRange();
+        range.selectNode(el);
+        const selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+        
+        try {
+            document.execCommand('copy');
+            mostrarToast("Tabela copiada (Cole no e-mail)!");
+        } catch (err) {
+            mostrarToast("Erro ao copiar tabela.");
+        }
+        
+        selection.removeAllRanges();
+    }
+
+    function limparTudo() {
+        if (confirm("Tem certeza? Isso apagará o formulário atual.")) {
+            document.getElementById('txtCodProjeto').value='';
+            document.getElementById('txtNomeProjeto').value='';
+            document.getElementById('listaItens').innerHTML='';
+            
+            // Remove do storage o ID atual
+            localStorage.removeItem('planejamento_' + currentInstanceId);
+            
+            // Reseta para um novo ID limpo para evitar conflitos
+            const novoId = 'temp_' + Date.now().toString(36);
+            const novaUrl = window.location.pathname + '?id=' + novoId;
+            window.history.replaceState({path: novaUrl}, '', novaUrl);
+            currentInstanceId = novoId;
+
+            iniciarTelaPadrao();
+        }
+    }
+
+    // --- EVENT LISTENERS GLOBAIS ---
+
+    document.addEventListener('keydown', e => {
+        // Atalho Ctrl+Z
+        if((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
+            const tag = document.activeElement.tagName.toLowerCase();
+            // Evita disparar se estiver digitando num input (comportamento padrão do browser)
+            if(tag !== 'input' && tag !== 'textarea') { 
+                e.preventDefault(); 
+                desfazerExclusao(); 
+            }
+        }
+    });
+
+    window.onload = function() {
+        carregarDadosIniciais();
+        
+        const el = document.getElementById('listaItens');
+        // Inicializa Drag and Drop
+        Sortable.create(el, { 
+            handle: '.drag-handle', 
+            animation: 150, 
+            ghostClass: 'sortable-ghost',
+            onEnd: gerarTabela // Regenera a tabela ao soltar o item
+        });
+    };
     </script>
 </body>
 </html>

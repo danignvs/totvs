@@ -403,7 +403,7 @@
             margin: 0;
         }
 
-        .menu button {
+        .menu button, .menu a {
             width: auto !important; /* OBRIGATÓRIO: Impede que o botão estique */
             background: transparent;
             color: var(--az-claro);
