@@ -48,7 +48,7 @@
         body {
             font-family: 'TOTVS', 'Segoe UI', Arial, sans-serif;
             margin: 0;
-            padding: 40px 20px;
+            padding: 20px;
             background-color: var(--bg-fundo);
             color: var(--az-escuro);
             /* Substitua 'background.png' pelo caminho correto da sua imagem se necessário */
@@ -122,7 +122,7 @@
             color: var(--branco);
             max-width: 700px;
             margin: 0 auto;
-            padding-bottom: 30px;
+            padding: 30px 0;
             font-size: 1.7em;
             text-align: center;
         }
@@ -170,6 +170,19 @@
 
         .verde {
             color: var(--verde);
+        }
+
+        .branco {
+            color: var(--branco);
+        }
+
+        .vermelho {
+            color: var(--vermelho);
+        }
+
+        .link {
+            background-color: transparent;
+            padding: 0;
         }
 
         .destaque-azul {
@@ -284,6 +297,7 @@
             display: flex;
             gap: 10px;
             margin-bottom: 0;
+            align-self: center;
         }
 
         .input-item {
@@ -342,18 +356,19 @@
         }
 
         button {
-            padding: 8px 20px;
+            padding: 10px 20px;
             border: none;
-            border-radius: 4px;
+            border-radius: 5px;
             cursor: pointer;
             transition: background-color 0.3s ease, transform 0.1s;
             width: 100%;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 0.8em;
-            letter-spacing: 0.1px;
+            font-size: 0.7em;
+            letter-spacing: 0.3px;
             font-weight: bold;
+            text-transform: uppercase;
         }
 
         .btn-aux {
@@ -376,6 +391,39 @@
 
         .botoes-de-acao button {
             font-size: 0.8em;
+        }
+
+        .menu {
+            display: flex;
+            justify-content: center; /* Centraliza horizontalmente */
+            align-items: center;     /* Centraliza verticalmente */
+            gap: 20px;
+            width: 100%;
+            padding: 40px 0;
+            margin: 0;
+        }
+
+        .menu button {
+            width: auto !important; /* OBRIGATÓRIO: Impede que o botão estique */
+            background: transparent;
+            color: var(--az-claro);
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            position: relative;
+            padding: 0 5px; /* Pequeno respiro interno */
+            margin: 0;
+        }
+
+        .menu button:not(:last-child)::after {
+            content: "";
+            position: absolute;
+            right: -10px; /* Metade do seu gap de 20px (para ficar no meio) */
+            top: 50%; /* Posiciona no meio verticalmente */
+            transform: translateY(-50%); /* Ajuste fino de centralização */
+            height: 20px; /* Altura da linha divisora */
+            width: 1px; /* Espessura da linha */
+            background-color: var(--az-claro); /* Cor da linha (pode mudar para var(--cinza)) */
         }
 
         .btn-roxo {
@@ -419,7 +467,7 @@
 
         .btn-azul {
             background-color: var(--az-claro);
-            color: var(--az-escuro);
+            color: var(--branco);
         }
 
         .btn-azul:hover {
@@ -429,7 +477,15 @@
         .topo {
             display: flex;
             justify-content: space-between;
-            align-items: flex-start;
+            align-items: center;
+        }
+
+        .topo h3, .topo h2 {
+            margin: 0;
+        }
+
+        .topo .input-group {
+            align-self: flex-end;
         }
 
         .container {
@@ -527,7 +583,7 @@
                 min-width: 100%;
             }
 
-            .container-resultado h3 {
+            .container-resultado {
                 margin-top: 20px; /* garante espaço do título no mobile */
             }
             
@@ -551,8 +607,8 @@
                 border-top: none;
                 /* Remove a borda colorida topo em mobile */
                 max-width: 100% !important;
-                /* Força largura total */
-                min-height: 100vh;
+                /* Força largura total 
+                min-height: 100vh;*/
             }
 
         }
@@ -572,6 +628,15 @@
             .botoes-de-acao {
                 flex-direction: column;
                 gap: 10px;
+            }
+
+            .menu {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .menu button:not(:last-child)::after {
+                display: none;
             }
 
         }

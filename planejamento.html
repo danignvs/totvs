@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
-    <title>Gerador de Cronograma</title>
+    <title>Planejamento</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
     <link rel="stylesheet" href="style.css">
 
@@ -40,10 +40,12 @@
         
         .marco .drag-handle, .marco .excluir {
             color: var(--roxo);
+            font-weight: bold;
         }
 
         .tarefa .drag-handle, .tarefa .excluir {
             color: var(--laranja);
+            font-weight: bold;
         }
 
         .excluir {
@@ -138,6 +140,8 @@
 
 <body>
 
+    <h1>Planejamento de Projetos</h1>
+
     <div class="container container-azul">
 
         <datalist id="lista-analistas">
@@ -170,10 +174,11 @@
             <option value="Yure Jonathan">
         </datalist>
 
+
         <section class="container-formulario">
 
             <div class="topo">
-                <h2>Planejamento</h2>
+                <h2></h2>
             </div>
 
             <div class="input-group">
@@ -191,16 +196,20 @@
             <div id="listaItens">
             </div>
 
-            <div style="display: flex; gap: 10px; margin-top: 15px;">
-                <button class="btn-roxo" style="width: auto;" onclick="adicionarMarcoItem()">Adicionar Marco</button>
-                <button class="btn-laranja" style="width: auto;" onclick="adicionarNovaTarefa()">Adicionar Tarefa</button>
+            <input type="file" id="fileInput" accept=".json" style="display: none;" onchange="processarArquivo(this)">
+
+            <div style="display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap;">
+                <button class="btn-roxo" style="flex: 1;" onclick="adicionarMarcoItem()">Adicionar Marco</button>
+                <button class="btn-laranja" style="flex: 1;" onclick="adicionarNovaTarefa()">Adicionar Tarefa</button>
             </div>
 
         </section>
 
 
         <section class="container-resultado">
-            <h3>Resultado</h3>
+            <div class="topo">
+                <h3></h3>
+            </div>
 
             <div class="resultado">
                 <button class="btn-azul btn-aux" onclick="copiarTexto('resultadoAssunto')">Copiar</button>
@@ -218,69 +227,83 @@
 
         <div id="toast">Copiado!</div>
     </div>
+                
+    
+    <div class="menu">
+        <button onclick="document.getElementById('fileInput').click()">Carregar Arquivo</button>
+        
+        <button onclick="baixarBackup()">Salvar</button> 
+        
+        <button onclick="limparTudo()">Limpar</button>
+
+    </div>
 
     <script>
-        // --- FORÇAR A PÁGINA A IR PARA O TOPO AO ATUALIZAR ---
-        if (history.scrollRestoration) {
-            history.scrollRestoration = 'manual';
+        // --- GERENCIAMENTO DE INSTÂNCIA E URL ---
+        // Pega o ID da URL ou gera um aleatório se estiver vazio
+        function obterIdInstancia() {
+            const params = new URLSearchParams(window.location.search);
+            let id = params.get('id');
+            if (!id) {
+                id = Date.now().toString(36);
+                atualizarUrl(id);
+            }
+            return id;
         }
+
+        function atualizarUrl(novoId) {
+            // Remove espaços e caracteres especiais para a URL ficar limpa
+            const idLimpo = novoId.trim().replace(/[^a-zA-Z0-9-_]/g, '');
+            if (!idLimpo) return;
+
+            const novaUrl = window.location.pathname + '?id=' + encodeURIComponent(idLimpo);
+            window.history.replaceState({path: novaUrl}, '', novaUrl);
+            
+            // Atualiza a variável global de controle
+            currentInstanceId = idLimpo;
+        }
+
+        let currentInstanceId = obterIdInstancia();
+
+        // --- FORÇAR TOPO ---
+        if (history.scrollRestoration) history.scrollRestoration = 'manual';
         window.scrollTo(0, 0);
         
-        // --- FUNÇÃO DE SAUDAÇÃO AUTOMÁTICA CORRIGIDA ---
+        // --- SAUDAÇÃO ---
         function obterSaudacao() {
-            const hora = parseInt(new Date().toLocaleString("pt-BR", {
-                timeZone: "America/Sao_Paulo",
-                hour: "numeric",
-                hour12: false
-            }));
-
-            // Das 00h às 11:59h -> Bom dia
+            const hora = parseInt(new Date().toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo", hour: "numeric", hour12: false }));
             if (hora >= 0 && hora < 12) return "Bom dia";
-            
-            // Das 12h às 17:59h -> Boa tarde
             if (hora >= 12 && hora < 18) return "Boa tarde";
-            
-            // Das 18h às 23:59h -> Boa noite
             return "Boa noite";
         }
 
-        // --- MÁSCARA DE DATA ---
+        // --- MÁSCARAS E VALIDAÇÕES ---
         function mascaraData(input) {
-            let v = input.value;
-            v = v.replace(/\D/g, "");
+            let v = input.value.replace(/\D/g, "");
             if (v.length > 2) v = v.substring(0, 2) + "/" + v.substring(2);
             if (v.length > 5) v = v.substring(0, 5) + "/" + v.substring(5, 9);
             if (v.length > 10) v = v.substring(0, 10);
             input.value = v;
-            
-            validarDatas(input); // <-- Executa a validação
+            validarDatas(input);
             gerarTabela();
         }
 
-        // --- VALIDAÇÃO DE DATAS ---
         function validarDatas(input) {
-            const wrapper = input.closest('.tarefa-wrapper');
+            const wrapper = input.closest('.wrapper');
             if (!wrapper) return;
-
             const inpInicio = wrapper.querySelector('.inp-inicio');
+            if (!inpInicio) return; 
             const inpFim = wrapper.querySelector('.inp-fim');
-
-            // Só faz a checagem se ambas as datas estiverem preenchidas por completo (10 caracteres)
+            
             if (inpInicio.value.length === 10 && inpFim.value.length === 10) {
-                const partsInicio = inpInicio.value.split('/');
-                const partsFim = inpFim.value.split('/');
-                
-                // Formato: Ano, Mês (0-11), Dia
-                const dateInicio = new Date(partsInicio[2], partsInicio[1] - 1, partsInicio[0]);
-                const dateFim = new Date(partsFim[2], partsFim[1] - 1, partsFim[0]);
-
-                if (dateFim < dateInicio) {
-                    mostrarToast("A data de conclusão não pode ser anterior ao início!");
-                    inpFim.value = ""; // Limpa o campo de texto
-                    
-                    // Limpa também o valor do calendário (picker) invisível
-                    const pickers = wrapper.querySelectorAll('.inp-date-picker');
-                    if(pickers[1]) pickers[1].value = ""; 
+                const i = inpInicio.value.split('/');
+                const f = inpFim.value.split('/');
+                const dInicio = new Date(i[2], i[1]-1, i[0]);
+                const dFim = new Date(f[2], f[1]-1, f[0]);
+                if (dFim < dInicio) {
+                    mostrarToast("Data final menor que inicial!");
+                    inpFim.value = "";
+                    wrapper.querySelectorAll('.inp-date-picker')[1].value = "";
                 }
             }
         }
@@ -298,100 +321,90 @@
             }
         }
 
-        function validarDatas(input) {
-            const wrapper = input.closest('.wrapper');
-            if (!wrapper) return;
-            // Apenas valida se for tarefa (tem data de inicio)
-            const inpInicio = wrapper.querySelector('.inp-inicio');
-            if (!inpInicio) return; 
-
-            const inpFim = wrapper.querySelector('.inp-fim');
-            if (inpInicio.value.length === 10 && inpFim.value.length === 10) {
-                const i = inpInicio.value.split('/');
-                const f = inpFim.value.split('/');
-                const dInicio = new Date(i[2], i[1]-1, i[0]);
-                const dFim = new Date(f[2], f[1]-1, f[0]);
-                if (dFim < dInicio) {
-                    mostrarToast("A data de conclusão não pode ser anterior ao início!");
-                    inpFim.value = "";
-                    wrapper.querySelectorAll('.inp-date-picker')[1].value = "";
-                }
-            }
-        }
-
         function formatarDataFinal(valor) {
             if (!valor) return "";
             if (valor.length === 10 && valor.includes('/')) return valor.substring(0, 6) + valor.substring(8, 10);
             return valor;
         }
 
-        // --- GERENCIAMENTO DE ITENS ---
+        // --- MANIPULAÇÃO DO DOM (ITENS) ---
         let historicoExclusoes = [];
 
         function adicionarNovaTarefa() {
-            const container = document.getElementById('listaItens');
-            const idUnico = Date.now();
-            const div = document.createElement('div');
-            // Adiciona classes 'wrapper' (caixa cinza) e 'tarefa' (layout coluna)
-            div.className = 'wrapper item-lista tarefa';
-            div.dataset.type = 'tarefa';
-            div.id = 'item-' + idUnico;
-
-            div.innerHTML = `
-                <div style="display:flex; justify-content:space-between; align-items:center; gap: 7px; ">
-                    <div style="display:flex; align-items:center; flex:1; gap: 7px;">
-                        <span class="drag-handle" title="Mover">☰</span>
-                        <input type="text" class="inp-tarefa" placeholder="Descrição da tarefa..." oninput="gerarTabela()" style="margin:0; width:100%; margin: 5px 0;">
-                    </div>
-                    <button class="excluir" style="margin:0;" onclick="removerItem('${idUnico}')">X</button>
-                </div>
-                
-
-                <div class="input-group">
-                    <div class="input-item">
-                        <div class="custom-date-wrapper">
-                            <input type="text" class="inp-date-text inp-inicio" placeholder="Data Início" maxlength="10" oninput="mascaraData(this)">
-                            <span class="calendar-icon">📅</span>
-                            <input type="date" class="inp-date-picker" onchange="atualizarDataPeloPicker(this)">
-                        </div>
-                    </div>
-                    <div class="input-item">
-                        <div class="custom-date-wrapper">
-                            <input type="text" class="inp-date-text inp-fim" placeholder="Data Conclusão" maxlength="10" oninput="mascaraData(this)">
-                            <span class="calendar-icon">📅</span>
-                            <input type="date" class="inp-date-picker" onchange="atualizarDataPeloPicker(this)">
-                        </div>
-                    </div>
-                </div>
-
-                <div class="input-group" style="margin-bottom:0;">
-                    <div class="input-item">
-                        <input type="text" class="inp-horas" placeholder="Horas (0,00)" oninput="gerarTabela()">
-                    </div>
-                    <div class="input-item">
-                        <input type="text" class="inp-analista" list="lista-analistas" placeholder="Nome do Analista" oninput="gerarTabela()">
-                    </div>
-                </div>
-            `;
-            container.appendChild(div);
-            gerarTabela();
+            criarElemento('tarefa');
         }
 
         function adicionarMarcoItem() {
-            const container = document.getElementById('listaItens');
-            const idUnico = Date.now();
-            const div = document.createElement('div');
-            // Adiciona classes 'wrapper' (caixa cinza) e 'marco' (layout linha)
-            div.className = 'wrapper item-lista marco';
-            div.dataset.type = 'marco';
-            div.id = 'item-' + idUnico;
+            criarElemento('marco');
+        }
 
-            div.innerHTML = `
-                <span class="drag-handle" title="Mover">☰</span>
-                <input type="text" class="inp-marco" placeholder="Marco" oninput="gerarTabela()" style="flex:1;">
-                <button class="excluir" style="margin:0;" onclick="removerItem('${idUnico}')">X</button>
-            `;
+        function criarElemento(tipo, dados = null) {
+            const container = document.getElementById('listaItens');
+            const idUnico = Date.now() + Math.random().toString(16).slice(2);
+            const div = document.createElement('div');
+            
+            div.id = 'item-' + idUnico;
+            div.dataset.type = tipo;
+            
+            if (tipo === 'tarefa') {
+                div.className = 'wrapper item-lista tarefa';
+                div.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; align-items:center; gap: 7px; ">
+                        <div style="display:flex; align-items:center; flex:1; gap: 7px;">
+                            <span class="drag-handle" title="Mover">☰</span>
+                            <input type="text" class="inp-tarefa" placeholder="Descrição da tarefa..." oninput="gerarTabela()" style="margin:0; width:100%; margin: 5px 0;">
+                        </div>
+                        <button class="excluir" style="margin:0;" onclick="removerItem('${idUnico}')">X</button>
+                    </div>
+                    <div class="input-group">
+                        <div class="input-item">
+                            <div class="custom-date-wrapper">
+                                <input type="text" class="inp-date-text inp-inicio" placeholder="Data Início" maxlength="10" oninput="mascaraData(this)">
+                                <span class="calendar-icon">📅</span>
+                                <input type="date" class="inp-date-picker" onchange="atualizarDataPeloPicker(this)">
+                            </div>
+                        </div>
+                        <div class="input-item">
+                            <div class="custom-date-wrapper">
+                                <input type="text" class="inp-date-text inp-fim" placeholder="Data Conclusão" maxlength="10" oninput="mascaraData(this)">
+                                <span class="calendar-icon">📅</span>
+                                <input type="date" class="inp-date-picker" onchange="atualizarDataPeloPicker(this)">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="input-group" style="margin-bottom:0;">
+                        <div class="input-item">
+                            <input type="text" class="inp-horas" placeholder="Horas (0,00)" oninput="gerarTabela()">
+                        </div>
+                        <div class="input-item">
+                            <input type="text" class="inp-analista" list="lista-analistas" placeholder="Nome do Analista" oninput="gerarTabela()">
+                        </div>
+                    </div>
+                `;
+            } else {
+                div.className = 'wrapper item-lista marco';
+                div.innerHTML = `
+                    <span class="drag-handle" title="Mover">☰</span>
+                    <input type="text" class="inp-marco" placeholder="Marco" oninput="gerarTabela()" style="flex:1;">
+                    <button class="excluir" style="margin:0;" onclick="removerItem('${idUnico}')">X</button>
+                `;
+            }
+
             container.appendChild(div);
+
+            // Se vieram dados (importação ou carregar), preenche os campos
+            if (dados) {
+                if (tipo === 'tarefa') {
+                    div.querySelector('.inp-tarefa').value = dados.tarefa || '';
+                    div.querySelector('.inp-inicio').value = dados.inicio || '';
+                    div.querySelector('.inp-fim').value = dados.fim || '';
+                    div.querySelector('.inp-horas').value = dados.horas || '';
+                    div.querySelector('.inp-analista').value = dados.analista || '';
+                } else {
+                    div.querySelector('.inp-marco').value = dados.valor || '';
+                }
+            }
+
             gerarTabela();
         }
 
@@ -400,7 +413,6 @@
             if (el) {
                 const tipo = el.dataset.type;
                 let valores = {};
-                
                 if (tipo === 'tarefa') {
                     valores = {
                         tarefa: el.querySelector('.inp-tarefa').value,
@@ -410,17 +422,10 @@
                         analista: el.querySelector('.inp-analista').value
                     };
                 } else {
-                    // Aqui pegamos o valor do input com classe .inp-marco
-                    valores = { marco: el.querySelector('.inp-marco').value };
+                    valores = { valor: el.querySelector('.inp-marco').value };
                 }
-
-                historicoExclusoes.push({
-                    id: id,
-                    tipo: tipo,
-                    html: el.innerHTML,
-                    valores: valores
-                });
-
+                // Adiciona ao histórico com o nome correto das propriedades para o restaurar funcionar
+                historicoExclusoes.push({ id, tipo, valores }); 
                 el.remove();
                 gerarTabela();
                 mostrarToast("Item removido. Ctrl+Z para desfazer.");
@@ -430,36 +435,115 @@
         function desfazerExclusao() {
             if (historicoExclusoes.length === 0) return;
             const item = historicoExclusoes.pop();
-            const container = document.getElementById('listaItens');
-            
-            const div = document.createElement('div');
-            div.id = 'item-' + item.id;
-            
-            // CORREÇÃO: Restaura a classe correta (marco ou tarefa)
-            if(item.tipo === 'tarefa') {
-                div.className = 'wrapper item-lista tarefa';
-            } else {
-                div.className = 'wrapper item-lista marco';
-            }
-            
-            div.dataset.type = item.tipo;
-            div.innerHTML = item.html;
-            container.appendChild(div);
-
-            // Restaura valores
-            if (item.tipo === 'tarefa') {
-                div.querySelector('.inp-tarefa').value = item.valores.tarefa;
-                div.querySelector('.inp-inicio').value = item.valores.inicio;
-                div.querySelector('.inp-fim').value = item.valores.fim;
-                div.querySelector('.inp-horas').value = item.valores.horas;
-                div.querySelector('.inp-analista').value = item.valores.analista;
-            } else {
-                // CORREÇÃO: Restaura o valor no input correto
-                div.querySelector('.inp-marco').value = item.valores.marco;
-            }
-
-            gerarTabela();
+            // Reutiliza a função de criar elemento passando os dados salvos
+            criarElemento(item.tipo, item.valores);
             mostrarToast("Desfeito!");
+        }
+
+        // --- SISTEMA DE ARQUIVOS E SALVAMENTO ---
+
+        function coletarDadosParaSalvar() {
+            const dados = {
+                codProjeto: document.getElementById('txtCodProjeto').value,
+                nomeProjeto: document.getElementById('txtNomeProjeto').value,
+                itens: []
+            };
+
+            document.querySelectorAll('.item-lista').forEach(el => {
+                if (el.dataset.type === 'marco') {
+                    dados.itens.push({
+                        type: 'marco',
+                        valor: el.querySelector('.inp-marco').value
+                    });
+                } else {
+                    dados.itens.push({
+                        type: 'tarefa',
+                        tarefa: el.querySelector('.inp-tarefa').value,
+                        inicio: el.querySelector('.inp-inicio').value,
+                        fim: el.querySelector('.inp-fim').value,
+                        horas: el.querySelector('.inp-horas').value,
+                        analista: el.querySelector('.inp-analista').value
+                    });
+                }
+            });
+            return dados;
+        }
+
+        function salvarDadosAuto() {
+            const dados = coletarDadosParaSalvar();
+            
+            // Lógica de URL: Se o código do projeto mudar, atualiza a URL
+            if (dados.codProjeto && dados.codProjeto !== currentInstanceId) {
+                atualizarUrl(dados.codProjeto);
+            }
+
+            // Salva no LocalStorage usando o ID atual da URL
+            localStorage.setItem('planejamento_' + currentInstanceId, JSON.stringify(dados));
+        }
+
+        function baixarBackup() {
+            const dados = coletarDadosParaSalvar();
+            const nomeArquivo = `Planejamento_${dados.codProjeto || 'Novo'}.json`;
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dados));
+            
+            const downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute("href", dataStr);
+            downloadAnchorNode.setAttribute("download", nomeArquivo);
+            document.body.appendChild(downloadAnchorNode);
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
+        }
+
+        function processarArquivo(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const dados = JSON.parse(e.target.result);
+                    restaurarTela(dados);
+                    mostrarToast("Arquivo carregado com sucesso!");
+                } catch (err) {
+                    alert("Erro ao ler o arquivo JSON.");
+                }
+                input.value = ''; // Limpa o input para permitir carregar o mesmo arquivo novamente
+            };
+            reader.readAsText(file);
+        }
+
+        function carregarDadosIniciais() {
+            // Tenta carregar do LocalStorage usando o ID da URL
+            const dadosSalvos = localStorage.getItem('planejamento_' + currentInstanceId);
+            if (dadosSalvos) {
+                restaurarTela(JSON.parse(dadosSalvos));
+            } else {
+                // Se não tem nada salvo, inicia padrão
+                adicionarMarcoItem();
+                adicionarNovaTarefa();
+                gerarTabela();
+            }
+        }
+
+        function restaurarTela(dados) {
+            document.getElementById('txtCodProjeto').value = dados.codProjeto || '';
+            document.getElementById('txtNomeProjeto').value = dados.nomeProjeto || '';
+            
+            // Atualiza URL se for um arquivo carregado
+            if(dados.codProjeto) atualizarUrl(dados.codProjeto);
+
+            const container = document.getElementById('listaItens');
+            container.innerHTML = '';
+
+            if (dados.itens && dados.itens.length > 0) {
+                dados.itens.forEach(item => {
+                    criarElemento(item.type, item); // item já tem a estrutura de dados correta
+                });
+            } else {
+                adicionarMarcoItem();
+                adicionarNovaTarefa();
+            }
+            gerarTabela();
         }
 
         // --- GERAÇÃO DA TABELA ---
@@ -467,35 +551,27 @@
             const codProjeto = document.getElementById('txtCodProjeto').value;
             const nomeProjeto = document.getElementById('txtNomeProjeto').value;
 
-            // Assunto
             let assunto = "Liberação para Planejamento";
             if (codProjeto) assunto += ` - ${codProjeto}`;
             if (nomeProjeto) assunto += ` - ${nomeProjeto}`;
             document.getElementById('resultadoAssunto').textContent = assunto;
 
-            // Percorre a lista
             const itens = document.querySelectorAll('.item-lista');
             let linhasHTML = '';
             let totalHoras = 0;
 
             itens.forEach(el => {
                 if (el.dataset.type === 'marco') {
-                    // Renderiza linha de MARCO
                     const titulo = el.querySelector('.inp-marco').value.toUpperCase();
                     linhasHTML += `
                         <tr>
-                            <td colspan="5" style="background-color: #f0f0f0; font-weight: bold; text-align: left; padding: 10px; border: 1px solid #ccc; color: #002233;">
-                                ${titulo}
-                            </td>
+                            <td colspan="5" style="background-color: #f0f0f0; font-weight: bold; text-align: left; padding: 10px; border: 1px solid #ccc; color: #002233;">${titulo}</td>
                         </tr>
                     `;
                 } else {
-                    // Renderiza linha de TAREFA
                     let desc = el.querySelector('.inp-tarefa').value;
-                    // Capitaliza a primeira letra (Ex: "teste" -> "Teste")
-                    if (desc.length > 0) {
-                        desc = desc.charAt(0).toUpperCase() + desc.slice(1);
-                    }
+                    if (desc.length > 0) desc = desc.charAt(0).toUpperCase() + desc.slice(1);
+                    
                     const inicio = el.querySelector('.inp-inicio').value;
                     const fim = el.querySelector('.inp-fim').value;
                     let horasStr = el.querySelector('.inp-horas').value.replace(',', '.');
@@ -531,7 +607,6 @@
                     <p>Segue planejamento para o projeto:</p>
                     <strong>${codProjeto}  ${nomeProjeto}</strong>
                     <br><br>
-
                     <table style="width: 100%; max-width: 600px; border-collapse: collapse; font-family: 'Segoe UI', sans-serif;">
                         <thead>
                             <tr style="background-color: #002233; color: white;">
@@ -557,6 +632,8 @@
                 </div>
             `;
             document.getElementById('areaTabela').innerHTML = htmlTabela;
+            
+            salvarDadosAuto(); // CHAMA O SALVAMENTO A CADA GERAR TABELA
         }
 
         // Utils
@@ -579,12 +656,19 @@
             mostrarToast("Tabela copiada!");
         }
         function limparTudo() {
-            document.getElementById('txtCodProjeto').value='';
-            document.getElementById('txtNomeProjeto').value='';
-            document.getElementById('listaItens').innerHTML='';
-            adicionarMarcoItem();
-            adicionarNovaTarefa(); 
-            gerarTabela();
+            if (confirm("Deseja limpar tudo?")) {
+                document.getElementById('txtCodProjeto').value='';
+                document.getElementById('txtNomeProjeto').value='';
+                document.getElementById('listaItens').innerHTML='';
+                localStorage.removeItem('planejamento_' + currentInstanceId); // Limpa storage atual
+                
+                // Reseta ID para um novo aleatório para evitar conflito se recarregar
+                atualizarUrl(Date.now().toString(36));
+                
+                adicionarMarcoItem();
+                adicionarNovaTarefa(); 
+                gerarTabela();
+            }
         }
 
         document.addEventListener('keydown', e => {
@@ -595,8 +679,7 @@
         });
 
         window.onload = function() {
-            adicionarMarcoItem(); 
-            adicionarNovaTarefa();
+            carregarDadosIniciais();
             const el = document.getElementById('listaItens');
             Sortable.create(el, { handle: '.drag-handle', animation: 150, onEnd: gerarTabela });
         };
