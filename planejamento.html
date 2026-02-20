@@ -184,11 +184,11 @@
             <div class="input-group">
                 <div class="input-item">
                     <label for="txtCodProjeto">Código do Projeto:</label>
-                    <input type="text" id="txtCodProjeto" placeholder="Ex: D...001" oninput="gerarTabela()">
+                    <input type="text" id="txtCodProjeto" placeholder="" oninput="gerarTabela()">
                 </div>
                 <div class="input-item">
                     <label for="txtNomeProjeto">Nome do Projeto:</label>
-                    <input type="text" id="txtNomeProjeto" placeholder="Nome do projeto" oninput="gerarTabela()">
+                    <input type="text" id="txtNomeProjeto" placeholder="" oninput="gerarTabela()">
                 </div>
             </div>
 
@@ -201,6 +201,12 @@
             <div style="display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap;">
                 <button class="btn-roxo" style="flex: 1;" onclick="adicionarMarcoItem()">Adicionar Marco</button>
                 <button class="btn-laranja" style="flex: 1;" onclick="adicionarNovaTarefa()">Adicionar Tarefa</button>
+            </div>
+
+            <br>
+            <div class="input-item">
+                <label for="txtObservacao">Observação:</label>
+                <input type="text" id="txtObservacao" placeholder="" oninput="gerarTabela()">
             </div>
 
         </section>
@@ -424,7 +430,7 @@
                 <div style="display:flex; justify-content:space-between; align-items:center; gap: 7px; ">
                     <div style="display:flex; align-items:center; flex:1; gap: 7px;">
                         <span class="drag-handle" title="Mover">☰</span>
-                        <input type="text" class="inp-tarefa" placeholder="Descrição da tarefa..." oninput="gerarTabela()" style="margin:0; width:100%; margin: 5px 0;">
+                        <input type="text" class="inp-tarefa" placeholder="Tarefa" oninput="gerarTabela()" style="margin:0; width:100%; margin: 5px 0;">
                     </div>
                     <button class="excluir" style="margin:0;" onclick="removerItem('${idUnico}')">X</button>
                 </div>
@@ -457,7 +463,7 @@
             div.className = 'wrapper item-lista marco';
             div.innerHTML = `
                 <span class="drag-handle" title="Mover">☰</span>
-                <input type="text" class="inp-marco" placeholder="MARCO DO PROJETO" oninput="gerarTabela()" style="flex:1; font-weight:bold;">
+                <input type="text" class="inp-marco" placeholder="MARCO" oninput="gerarTabela()" style="flex:1;">
                 <button class="excluir" style="margin:0;" onclick="removerItem('${idUnico}')">X</button>
             `;
         }
@@ -519,6 +525,7 @@
         const dados = {
             codProjeto: document.getElementById('txtCodProjeto').value,
             nomeProjeto: document.getElementById('txtNomeProjeto').value,
+            observacao: document.getElementById('txtObservacao').value,
             itens: []
         };
 
@@ -649,6 +656,7 @@
     function restaurarTela(dados) {
         document.getElementById('txtCodProjeto').value = dados.codProjeto || '';
         document.getElementById('txtNomeProjeto').value = dados.nomeProjeto || '';
+        document.getElementById('txtObservacao').value = dados.observacao || '';
         
         // Se carregou um arquivo com código de projeto, atualizamos a URL
         if(dados.codProjeto) {
@@ -672,9 +680,9 @@
     // --- GERAÇÃO DA TABELA (CORE) ---
 
     function gerarTabela() {
-        // 1. Atualiza Assunto
         const codProjeto = document.getElementById('txtCodProjeto').value;
         const nomeProjeto = document.getElementById('txtNomeProjeto').value;
+        const observacao = document.getElementById('txtObservacao').value.trim();
 
         let assunto = "Liberação para Planejamento";
         if (codProjeto) assunto += ` - ${codProjeto}`;
@@ -736,6 +744,8 @@
         const totalFmt = totalHoras.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
         const saudacao = obterSaudacao();
 
+        const blocoObservacao = observacao ? `<br><p><strong>Observação:</strong> ${observacao}</p>` : '';
+
         // 3. Monta HTML Final
         const htmlTabela = `
             <div id="resultadoCorpo" style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-size: 13px; color: #333;">
@@ -749,7 +759,7 @@
                             <th style="padding: 10px; border: 1px solid #000; text-align:center;">ATIVIDADE</th> 
                             <th style="padding: 10px; border: 1px solid #000; width: 70px; text-align:center;">INÍCIO</th>
                             <th style="padding: 10px; border: 1px solid #000; width: 70px; text-align:center;">FIM</th>
-                            <th style="padding: 10px; border: 1px solid #000; width: 60px; text-align:center;">HRS</th>
+                            <th style="padding: 10px; border: 1px solid #000; width: 60px; text-align:center;">HORAS</th>
                             <th style="padding: 10px; border: 1px solid #000; width: 110px; text-align:center;">ANALISTA</th>
                         </tr>
                     </thead>
@@ -762,7 +772,7 @@
                         </tr>
                     </tbody>
                 </table>
-                <br>
+                ${blocoObservacao}  <br>
                 <p>Fico à disposição para qualquer dúvida.</p>
                 <p>Atenciosamente,</p>
             </div>
@@ -821,6 +831,7 @@
         if (confirm("Tem certeza? Isso apagará o formulário atual.")) {
             document.getElementById('txtCodProjeto').value='';
             document.getElementById('txtNomeProjeto').value='';
+            document.getElementById('txtObservacao').value='';
             document.getElementById('listaItens').innerHTML='';
             
             // Remove do storage o ID atual
