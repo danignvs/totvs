@@ -156,6 +156,7 @@
             <option value="Felipe Oliveira">
             <option value="Filippe Valle">
             <option value="Gustavo Mizerani">
+            <option value="Gustavo Cipriano">
             <option value="Jairo Da Silva">
             <option value="Karlo Guilherme">
             <option value="Kleverson Nascimento">
@@ -239,7 +240,7 @@
         
         <button><a href="planejamento.html" target="_blank" style="text-decoration: none;">Novo</a></button>
 
-        <button onclick="document.getElementById('fileInput').click()">Carregar</button>
+        <button onclick="document.getElementById('fileInput').click()">Abrir</button>
         
         <button onclick="baixarBackup()">Salvar</button> 
         
@@ -683,6 +684,14 @@
         const codProjeto = document.getElementById('txtCodProjeto').value;
         const nomeProjeto = document.getElementById('txtNomeProjeto').value;
         const observacao = document.getElementById('txtObservacao').value.trim();
+
+        let tituloAba = "Planejamento de Projetos";
+        if (codProjeto && nomeProjeto) {
+            tituloAba = `${codProjeto} - ${nomeProjeto}`;
+        } else if (codProjeto || nomeProjeto) {
+            tituloAba = codProjeto || nomeProjeto;
+        }
+        document.title = tituloAba;
 
         let assunto = "Liberação para Planejamento";
         if (codProjeto) assunto += ` - ${codProjeto}`;
