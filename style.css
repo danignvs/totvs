@@ -240,16 +240,15 @@
             background: var(--az-claro2);
         }
 
-        .link-limao {
+        .link-limao, .destaque-limao {
             background-color: var(--limao);
             padding: 3px;
             color: var(--az-escuro);
             text-decoration: none;
             font-weight: bold;
-            font-size: 14px;
         }
 
-        .link-limao:hover {
+        .link-limao:hover, .destaque-limao:hover {
             color: var(--cinza-escuro);
 
         }
@@ -399,7 +398,7 @@
             align-items: center;     /* Centraliza verticalmente */
             gap: 20px;
             width: 100%;
-            padding: 40px 0;
+            padding: 40px 0 10px 0;
             margin: 0;
         }
 
