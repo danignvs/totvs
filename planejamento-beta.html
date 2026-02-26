@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Planejamento</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+
+        .container {
+            grid-template-columns: 1fr 1.5fr;
+        }
+
+        .wrapper {
+            padding: 7px;
+            background-color: var(--cinza-claro);
+            border-radius: 3px;
+            border: 1px solid var(--cinza);
+            position: relative;
+            transition: background-color 0.2s;
+        }
+
+        .item-lista {
+            margin: 10px 0;
+        }
+
+        .inp-tarefa {
+            width: 100%;
+        }
+
+        .marco, .inp-tarefa {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+        
+        .marco .drag-handle, .marco .excluir {
+            color: var(--roxo);
+            font-weight: bold;
+        }
+
+        .tarefa .drag-handle, .tarefa .excluir {
+            color: var(--laranja);
+            font-weight: bold;
+        }
+
+        .excluir {
+            font-size: 1em;
+            font-weight: bold;
+            width: auto;
+            padding: 0 5px 0 0px;
+            float: right;
+        }
+
+        .sortable-ghost {
+            opacity: 0.4;
+            background-color: var(--cinza-claro);
+            border: 2px dashed var(--az-claro);
+        }
+
+        /* --- CORREÇÃO DA TABELA --- */
+        .container-resultado {
+            max-width: 100%;
+        }
+
+        .tabela-container {
+            width: 100%;
+            overflow-x: auto; 
+            background: #fff;
+            padding: 10px;
+            border: 1px solid var(--cinza);
+            border-radius: 3px;
+            box-sizing: border-box; 
+        }
+
+        pre, .tabela-container {
+            font-family: Verdana, Geneva, Tahoma, sans-serif;
+            font-size: 0.8rem;
+        }
+
+        table.custom-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+            color: #333;
+        }
+
+        table.custom-table th {
+            background-color: var(--az-escuro);
+            color: white;
+            font-weight: bold;
+            padding: 10px;
+            border: 1px solid var(--az-claro);
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        table.custom-table td {
+            padding: 8px;
+            border: 1px solid #ccc;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        table.custom-table td.col-tarefa {
+            text-align: left;
+            font-weight: 500;
+        }
+
+        table.custom-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+            
+        /* Inputs de data (Início e Fim) na mesma linha */
+        .tarefa .input-group:nth-child(2) { 
+            display: flex;
+        }
+        
+        /* Inputs de Horas e Analista na mesma linha */
+        .tarefa .input-group:nth-child(3) { 
+            display: flex;
+        }
+
+        /* Define larguras específicas para ficar proporcional */
+        .tarefa .input-group:nth-child(3) .input-item:first-child {
+            flex: 1; /* Horas ocupa menos espaço */
+        }
+        
+        .tarefa .input-group:nth-child(3) .input-item:last-child {
+            flex: 3; /* Analista ocupa mais espaço */
+        }
+
+        /* Remove a seta nativa de campos com Datalist (Autocompletar do Analista) */
+        input[list]::-webkit-calendar-picker-indicator {
+            display: none !important;
+        }
+
+        .msgReplanejamento {
+            margin: 20px 0 0 0; 
+            text-align: left; 
+            padding: 10px; 
+            border-radius: 5px;
+            font-size: 0.8em;
+            background-color: var(--cinza-claro);
+        }
+
+        .msgReplanejamento ul {
+            margin: 5px 0 0 20px; 
+            padding: 0;
+        }
+
+        .tutorial {
+            color: var(--branco);
+        }
+
+        .tutorial ul {
+            line-height: 2.5;
+            padding-left: 20px; 
+            margin: 0;
+        }
+
+        /* --- MODAL DA PRIMEIRA VISITA --- */
+        .modal-overlay {
+            display: none;  /*Inicia oculto */
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(2px);
+        }
+
+        .modal-box {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            max-width: 300px;
+            width: 75%;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border-top: 6px solid var(--roxo);
+            animation: fadeIn 0.3s ease-in-out;
+            margin: 0 auto;
+            margin-top: 200px;
+        }
+
+        .modal-box .btn-fechar-modal {
+            position: absolute;
+            top: 0px; 
+            right: -5px;
+            background: transparent; border: none;
+            font-size: 18px; font-weight: bold; cursor: pointer; color: var(--cinza-escuro);
+            width: 50px;
+        }
+
+        .modal-box .btn-fechar-modal:hover {
+            color: var(--vermelho);
+        }
+
+    </style>
+</head>
+
+<body>
+
+    <div id="modalBoasVindas" class="modal-overlay">
+        <div class="modal-box">
+            <button class="btn-fechar-modal" onclick="fecharModalBoasVindas()" title="Fechar">X</button>
+            <h3 style="color: var(--roxo); margin-top: 0;">Primeira vez aqui? 👋</h3>
+            <p style="font-size: 15px; color: var(--az-escuro); margin-bottom: 25px;">
+                Para evitar erros no preenchimento, separamos algumas <strong>dicas rápidas</strong>.</p>
+            <button class="btn-roxo" style="width: 100%; padding: 12px; font-size: 1em;" onclick="irParaTutorial()">Ver Dicas</button>
+        </div>
+    </div>
+
+    <h1><strong class="azul-claro">Planejamento</strong> de Projetos</h1>
+
+    <div class="container container-azul">
+
+        <datalist id="lista-analistas">
+            <option value="Anderson Guilherme">
+            <option value="Andre Ferreira">
+            <option value="Bruno Silva">
+            <option value="Cassio Moraes">
+            <option value="Daly Teixeira">
+            <option value="Douglas Eduardo">
+            <option value="Douglas Rafael">
+            <option value="Eduardo Cruz">
+            <option value="Felipe Oliveira">
+            <option value="Filippe Valle">
+            <option value="Gustavo Cipriano">
+            <option value="Gustavo Mizerani">
+            <option value="Jairo Da Silva">
+            <option value="Karlo Guilherme">
+            <option value="Kleverson Nascimento">
+            <option value="Leonardo Ventura">
+            <option value="Magno Telles">
+            <option value="Marcelo Veiga">
+            <option value="Marcio Avila">
+            <option value="Mario Flavio">
+            <option value="Moacyr Campos">
+            <option value="Pablo Barbero">
+            <option value="Paulo Roberto">
+            <option value="Pedro Henrique">
+            <option value="Ricardo Mendes">
+            <option value="Talles Da Silva">
+            <option value="Washington Da Silva">
+            <option value="Yure Jonathan">
+        </datalist>
+
+
+        <section class="container-formulario">
+
+            <div class="topo">
+                <h2></h2>
+            </div>
+
+            <div class="input-group" style="margin-bottom: 10px;">
+                <div class="input-item">
+                    <label for="selTipoAcao">Tipo de Ação:</label>
+                    <select id="selTipoAcao" onchange="alternarTipoAcao()">
+                        <option value="Planejamento" selected>Planejamento</option>
+                        <option value="Replanejamento">Replanejamento</option>
+                    </select>
+                </div>
+                <div class="input-item replanejamento-fields hidden" id="boxStatusDatas">
+                    <label for="selStatusDatasGlobal">Outras tarefas:</label>
+                    <select id="selStatusDatasGlobal" onchange="forcarErroAcao = false; gerarTabela()">
+                        <option value=""></option>
+                        <option value="Manter demais tarefas">Manter demais tarefas</option>
+                        <option value="Excluir demais tarefas">Excluir demais tarefas</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <div class="input-item">
+                    <label for="txtCodProjeto">Código do Projeto:</label>
+                    <input type="text" id="txtCodProjeto" placeholder="" oninput="gerarTabela()">
+                </div>
+                <div class="input-item">
+                    <label for="txtNomeProjeto">Nome do Projeto:</label>
+                    <input type="text" id="txtNomeProjeto" placeholder="" oninput="gerarTabela()">
+                </div>
+            </div>
+
+            <label style="margin-bottom: -7px;">Marcos e Tarefas:</label>
+            <div id="listaItens">
+            </div>
+
+            <input type="file" id="fileInput" accept=".json" style="display: none;" onchange="processarArquivo(this)">
+
+            <div style="display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap;">
+                <button class="btn-roxo" style="flex: 1;" onclick="adicionarMarcoItem()">+ Marco</button>
+                <button class="btn-laranja" style="flex: 1;" onclick="adicionarNovaTarefa()">+ Tarefa</button>
+            </div>
+
+            <br>
+            <div class="input-item">
+                <label for="txtObservacao">Observação:</label>
+                <input type="text" id="txtObservacao" placeholder="" oninput="gerarTabela()">
+            </div>
+
+            <div id="msgReplanejamento" class="hidden msgReplanejamento" style="display: none;">
+                <p><strong>⚠️ IMPORTANTE</strong></p>
+                
+                <p>Para <strong>evitar erros</strong> no replanejamento, certifique-se de:</p>
+                <ul>
+                    <li>Selecionar acima a ação para as outras datas do projeto.</li>
+                    <li>Se possível, envie um print com a visão geral do cronograma final no e-mail.</li>
+                </ul>
+            </div>
+
+        </section>
+
+
+        <section class="container-resultado">
+            <div class="topo">
+                <h3></h3>
+            </div>
+
+            <div class="resultado">
+                <button class="btn-azul btn-aux" onclick="copiarTexto('resultadoAssunto')">Copiar</button>
+                <label>Assunto:</label>
+                <pre id="resultadoAssunto"></pre>
+            </div>
+
+            <div class="resultado">
+                <button class="btn-azul btn-aux" onclick="copiarTabela()">Copiar</button>
+                <label>Mensagem:</label>
+                <div id="areaTabela" class="tabela-container"></div>
+            </div>
+        </section>
+
+
+        <div id="toast">Copiado!</div>
+    </div>
+                
+    
+    <div class="menu">
+        <button><a href="planejamento.html" target="_blank" style="text-decoration: none;">Novo</a></button>
+        <button onclick="document.getElementById('fileInput').click()">Abrir</button>
+        <button onclick="baixarBackup()">Salvar</button> 
+        <button onclick="limparTudo()">Limpar</button>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 8px; justify-content: center; margin:20px 0;">
+        <input type="checkbox" id="chkAutoSave" onchange="toggleAutoSave()" style="cursor: pointer; width: 18px; height: 18px; accent-color: var(--az-claro);">
+        <div for="chkAutoSave" style="margin: 0; color: var(--branco); cursor: pointer;font-size: 0.9em;">Salvar Automático</div>
+    </div>
+
+    <div id="secaoTutorial" class="container tutorial" style="max-width: 800px; margin-top: 40px; margin-bottom: 60px; display: block; border-top: none; background: transparent; box-shadow: none;">
+        <h2 style="color: var(--az-claro); border-bottom: 2px solid var(--az-claro); padding-bottom: 10px; margin-bottom: 15px;">💡 Dicas Rápidas</h2>
+        <ul>
+            <li><strong class="destaque-limao">Segure e arraste</strong> pelo ícone <strong class="azul-claro">☰</strong> para alterar a ordem.</li> 
+            <li>Os nomes dos analistas são apenas sugestões, você também pode digitar livremente.</li>
+            <li>Em caso de replanejamento, <strong class="destaque-limao">informe se outras tarefas devem ser mantidas ou excluídas</strong> no campo 
+                "Outras tarefas" e preencha a caixinha "Nº nível" com o <strong>número de nível hierárquico</strong> correspondente do PSA.</li>
+            <li><strong>Terminou?</strong> Clique no botão azul <strong>"Copiar"</strong> e cole direto no seu e-mail.</li>
+            <li><strong class="destaque-limao">Para evitar erros</strong>, se possível, envie um print com a visão geral das tarefas no e-mail, do jeito que etiver.</li>
+            <li>Se a caixinha "Salvar automático" estiver selecionada, o progresso do trabalho será sempre salvo no seu navegador. 
+                Fechou a guia sem querer? É só voltar e os dados estarão lá.</li>
+            <li>Também é possível salvar seu planejamento em um arquivo <code>.json</code> no seu PC para abrir depois.</li>
+        </ul>
+    </div>
+
+    <script>
+        // --- UTILITÁRIOS GERAIS ---
+    
+    function debounce(func, wait) {
+        let timeout;
+        return function(...args) {
+            const context = this;
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(context, args), wait);
+        };
+    }
+
+    // --- GERENCIAMENTO DE INSTÂNCIA E URL ---
+    
+    function obterIdInstancia() {
+        const params = new URLSearchParams(window.location.search);
+        let id = params.get('id');
+        if (!id) {
+            id = 'temp_' + Date.now().toString(36);
+        }
+        return id;
+    }
+
+    const atualizarUrlDebounced = debounce((novoCodOuId) => {
+        if (!novoCodOuId) return;
+
+        const idLimpo = novoCodOuId.trim().replace(/[^a-zA-Z0-9-_]/g, '');
+        const idFinal = idLimpo || currentInstanceId; 
+
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('id') !== idFinal && !idFinal.startsWith('temp_')) {
+            const novaUrl = window.location.pathname + '?id=' + encodeURIComponent(idFinal);
+            window.history.replaceState({path: novaUrl}, '', novaUrl);
+            currentInstanceId = idFinal;
+        }
+    }, 1000); 
+
+    let currentInstanceId = obterIdInstancia();
+    
+    // Variável para controlar quando mostrar o erro vermelho da ação
+    let forcarErroAcao = false;
+
+    // --- INICIALIZAÇÃO E PRIMEIRA VISITA ---
+    if (history.scrollRestoration) history.scrollRestoration = 'manual';
+    window.scrollTo(0, 0);
+
+    function obterSaudacao() {
+        const hora = parseInt(new Date().toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo", hour: "numeric", hour12: false }));
+        if (hora >= 5 && hora < 12) return "Bom dia";
+        if (hora >= 12 && hora < 18) return "Boa tarde";
+        return "Boa noite";
+    }
+
+    function verificarPrimeiraVisita() {
+        if (!localStorage.getItem('visitou_planejamento_antes')) {
+            document.getElementById('modalBoasVindas').style.display = 'flex'; // flex para centralizar
+        }
+    }
+
+    function fecharModalBoasVindas() {
+        document.getElementById('modalBoasVindas').style.display = 'none';
+        localStorage.setItem('visitou_planejamento_antes', 'sim');
+    }
+
+    function irParaTutorial() {
+        fecharModalBoasVindas();
+        document.getElementById('secaoTutorial').scrollIntoView({behavior: 'smooth'});
+    }
+
+    function inicializarAutoSave() {
+        const chk = document.getElementById('chkAutoSave');
+        const prefSalva = localStorage.getItem('preferencia_autosave');
+        
+        if (prefSalva !== null) {
+            chk.checked = (prefSalva === 'true');
+        } else {
+            chk.checked = true;
+            localStorage.setItem('preferencia_autosave', 'true');
+        }
+    }
+
+    // --- MÁSCARAS E TRATAMENTO DE DADOS ---
+
+    function mascaraData(input) {
+        let v = input.value.replace(/\D/g, "");
+        
+        if (v.length > 8) v = v.substring(0, 8);
+
+        if (v.length > 2) v = v.substring(0, 2) + "/" + v.substring(2);
+        if (v.length > 5) v = v.substring(0, 5) + "/" + v.substring(5);
+        
+        input.value = v;
+        
+        if(v.length === 10) validarDatas(input);
+        
+        gerarTabela();
+    }
+
+    function stringParaData(dataStr) {
+        if (!dataStr || dataStr.length !== 10) return null;
+        const partes = dataStr.split('/');
+        const dia = parseInt(partes[0], 10);
+        const mes = parseInt(partes[1], 10) - 1; 
+        const ano = parseInt(partes[2], 10);
+        
+        const data = new Date(ano, mes, dia);
+        
+        if (data.getFullYear() === ano && data.getMonth() === mes && data.getDate() === dia) {
+            return data;
+        }
+        return null;
+    }
+
+    function validarDatas(input) {
+        const wrapper = input.closest('.wrapper');
+        if (!wrapper) return;
+        
+        const inpInicio = wrapper.querySelector('.inp-inicio');
+        const inpFim = wrapper.querySelector('.inp-fim');
+        
+        if (!inpInicio || !inpFim) return;
+
+        const dInicio = stringParaData(inpInicio.value);
+        const dFim = stringParaData(inpFim.value);
+
+        if (dInicio && dFim) {
+            if (dFim < dInicio) {
+                mostrarToast("Atenção: Data final é menor que a inicial!");
+                inpFim.style.borderColor = "var(--vermelho)";
+            } else {
+                inpFim.style.borderColor = "var(--cinza)";
+            }
+        }
+    }
+
+    function atualizarDataPeloPicker(pickerInput) {
+        const valorISO = pickerInput.value; 
+        if (!valorISO) return;
+        
+        const [ano, mes, dia] = valorISO.split('-');
+        const wrapper = pickerInput.parentElement;
+        const textInput = wrapper.querySelector('.inp-date-text');
+        
+        if (textInput) {
+            textInput.value = `${dia}/${mes}/${ano}`;
+            validarDatas(textInput);
+            gerarTabela();
+        }
+    }
+
+    function formatarDataFinal(valor) {
+        if (!valor) return "";
+        if (valor.length === 10 && valor.includes('/')) {
+            return valor.substring(0, 5); // Retorna DD/MM
+        }
+        return valor;
+    }
+
+    function parseHoras(valor) {
+        if (!valor) return 0;
+        let limpo = valor.replace(',', '.').replace(/[^0-9.]/g, '');
+        const partes = limpo.split('.');
+        if (partes.length > 2) {
+            limpo = partes[0] + '.' + partes.slice(1).join('');
+        }
+        const floatVal = parseFloat(limpo);
+        return isNaN(floatVal) ? 0 : floatVal;
+    }
+
+    // --- MANIPULAÇÃO DO DOM E REPLANEJAMENTO ---
+    
+    let historicoExclusoes = [];
+
+    // Função para alternar campos entre Planejamento e Replanejamento
+    function alternarTipoAcao() {
+        const tipo = document.getElementById('selTipoAcao').value;
+        const msg = document.getElementById('msgReplanejamento');
+        const campos = document.querySelectorAll('.replanejamento-fields');
+
+        if (tipo === 'Replanejamento') {
+            msg.classList.remove('hidden');
+            campos.forEach(c => c.classList.remove('hidden'));
+        } else {
+            msg.classList.add('hidden');
+            campos.forEach(c => c.classList.add('hidden'));
+            
+            // Reseta estado de erro ao voltar pra Planejamento
+            forcarErroAcao = false;
+            const selDatas = document.getElementById('selStatusDatasGlobal');
+            if(selDatas) selDatas.style.borderColor = "var(--cinza)";
+        }
+        gerarTabela();
+    }
+
+    function adicionarNovaTarefa() {
+        criarElemento('tarefa');
+    }
+
+    function adicionarMarcoItem() {
+        criarElemento('marco');
+    }
+
+    function criarElemento(tipo, dados = null) {
+        const container = document.getElementById('listaItens');
+        const idUnico = Date.now().toString(36) + Math.random().toString(36).substring(2);
+        const div = document.createElement('div');
+        
+        div.id = 'item-' + idUnico;
+        div.dataset.type = tipo;
+        
+        if (tipo === 'tarefa') {
+            div.className = 'wrapper item-lista tarefa';
+            div.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center; gap: 7px; margin-bottom: 5px;">
+                    <div style="display:flex; align-items:center; flex:1; gap: 7px;">
+                        <span class="drag-handle" title="Mover">☰</span>
+                        <input type="text" class="inp-nivel replanejamento-fields hidden" placeholder="Nº Nível" oninput="gerarTabela()" style="margin:0; width: 65px;">
+                        <input type="text" class="inp-tarefa" placeholder="Tarefa" oninput="gerarTabela()" style="margin:0; flex: 1;">
+                    </div>
+                    <button class="excluir" style="margin:0;" onclick="removerItem('${idUnico}')">X</button>
+                </div>
+
+                <div class="input-group">
+                    <div class="input-item">
+                        <div class="custom-date-wrapper">
+                            <input type="text" class="inp-date-text inp-inicio" placeholder="Data Início" maxlength="10" oninput="mascaraData(this)">
+                            <span class="calendar-icon">📅</span>
+                            <input type="date" class="inp-date-picker" onchange="atualizarDataPeloPicker(this)">
+                        </div>
+                    </div>
+                    <div class="input-item">
+                        <div class="custom-date-wrapper">
+                            <input type="text" class="inp-date-text inp-fim" placeholder="Data Conclusão" maxlength="10" oninput="mascaraData(this)">
+                            <span class="calendar-icon">📅</span>
+                            <input type="date" class="inp-date-picker" onchange="atualizarDataPeloPicker(this)">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="input-group" style="margin-bottom:0;">
+                    <div class="input-item">
+                        <input type="text" class="inp-horas" placeholder="Horas (0,00)" oninput="gerarTabela()">
+                    </div>
+                    <div class="input-item">
+                        <input type="text" class="inp-analista" list="lista-analistas" placeholder="Analista (Digite ou escolha)" oninput="gerarTabela()">
+                    </div>
+                </div>
+            `;
+        } else {
+            div.className = 'wrapper item-lista marco';
+            div.innerHTML = `
+                <span class="drag-handle" title="Mover">☰</span>
+                <input type="text" class="inp-marco" placeholder="MARCO" oninput="gerarTabela()" style="flex:1;">
+                <button class="excluir" style="margin:0;" onclick="removerItem('${idUnico}')">X</button>
+            `;
+        }
+
+        container.appendChild(div);
+
+        if (dados) {
+            if (tipo === 'tarefa') {
+                div.querySelector('.inp-tarefa').value = dados.tarefa || '';
+                div.querySelector('.inp-inicio').value = dados.inicio || '';
+                div.querySelector('.inp-fim').value = dados.fim || '';
+                div.querySelector('.inp-horas').value = dados.horas || '';
+                div.querySelector('.inp-analista').value = dados.analista || '';
+                div.querySelector('.inp-nivel').value = dados.nivel || '';
+            } else {
+                div.querySelector('.inp-marco').value = dados.valor || '';
+            }
+        }
+
+        // Garante que o campo novo aparece se o Replanejamento já estiver ativo
+        if (tipo === 'tarefa' && document.getElementById('selTipoAcao') && document.getElementById('selTipoAcao').value === 'Replanejamento') {
+            div.querySelector('.inp-nivel').classList.remove('hidden');
+        }
+
+        gerarTabela();
+    }
+
+    function removerItem(id) {
+        const el = document.getElementById('item-' + id);
+        if (el) {
+            const tipo = el.dataset.type;
+            let valores = {};
+            
+            if (tipo === 'tarefa') {
+                valores = {
+                    tarefa: el.querySelector('.inp-tarefa').value,
+                    inicio: el.querySelector('.inp-inicio').value,
+                    fim: el.querySelector('.inp-fim').value,
+                    horas: el.querySelector('.inp-horas').value,
+                    analista: el.querySelector('.inp-analista').value,
+                    nivel: el.querySelector('.inp-nivel').value
+                };
+            } else {
+                valores = { valor: el.querySelector('.inp-marco').value };
+            }
+            
+            historicoExclusoes.push({ id, tipo, valores }); 
+            el.remove();
+            gerarTabela();
+            mostrarToast("Item removido. Ctrl+Z para desfazer.");
+        }
+    }
+
+    function desfazerExclusao() {
+        if (historicoExclusoes.length === 0) return;
+        const item = historicoExclusoes.pop();
+        criarElemento(item.tipo, item.valores);
+        mostrarToast("Ação desfeita!");
+    }
+
+    // --- VALIDAÇÃO OBRIGATÓRIA ANTES DE COPIAR ---
+    function validarCopiar() {
+        const tipoAcao = document.getElementById('selTipoAcao').value;
+        if (tipoAcao === 'Replanejamento') {
+            const acaoDatas = document.getElementById('selStatusDatasGlobal');
+            if (!acaoDatas.value) {
+                forcarErroAcao = true;
+                gerarTabela();
+                mostrarToast("⚠️ Selecione as OUTRAS TAREFAS antes de copiar!");
+                acaoDatas.focus();
+                return false;
+            }
+        }
+        return true;
+    }
+
+    // --- SALVAMENTO E CARREGAMENTO ---
+
+    function coletarDadosParaSalvar() {
+        const dados = {
+            tipoAcao: document.getElementById('selTipoAcao') ? document.getElementById('selTipoAcao').value : 'Planejamento',
+            statusDatasGlobal: document.getElementById('selStatusDatasGlobal') ? document.getElementById('selStatusDatasGlobal').value : '',
+            codProjeto: document.getElementById('txtCodProjeto').value,
+            nomeProjeto: document.getElementById('txtNomeProjeto').value,
+            observacao: document.getElementById('txtObservacao').value,
+            itens: []
+        };
+
+        document.querySelectorAll('.item-lista').forEach(el => {
+            if (el.dataset.type === 'marco') {
+                dados.itens.push({
+                    type: 'marco',
+                    valor: el.querySelector('.inp-marco').value
+                });
+            } else {
+                dados.itens.push({
+                    type: 'tarefa',
+                    tarefa: el.querySelector('.inp-tarefa').value,
+                    inicio: el.querySelector('.inp-inicio').value,
+                    fim: el.querySelector('.inp-fim').value,
+                    horas: el.querySelector('.inp-horas').value,
+                    analista: el.querySelector('.inp-analista').value,
+                    nivel: el.querySelector('.inp-nivel').value
+                });
+            }
+        });
+        return dados;
+    }
+
+    const salvarDadosStorage = debounce((dados) => {
+        if (dados.codProjeto && dados.codProjeto.trim() !== "") {
+            atualizarUrlDebounced(dados.codProjeto);
+        }
+        localStorage.setItem('planejamento_' + currentInstanceId, JSON.stringify(dados));
+    }, 1000);
+
+    function toggleAutoSave() {
+        const chk = document.getElementById('chkAutoSave');
+        const isAuto = chk.checked;
+        
+        // Memoriza a escolha
+        localStorage.setItem('preferencia_autosave', isAuto);
+        
+        if (isAuto) {
+            mostrarToast("Salvamento automático ATIVADO!");
+            triggerSalvar(); 
+        } else {
+            mostrarToast("Salvamento automático DESATIVADO.");
+        }
+    }
+
+    function triggerSalvar() {
+        const isAuto = document.getElementById('chkAutoSave').checked;
+        if (!isAuto) return; 
+
+        const dados = coletarDadosParaSalvar();
+        salvarDadosStorage(dados);
+    }
+
+    async function baixarBackup() {
+        const dados = coletarDadosParaSalvar();
+        const cod = dados.codProjeto ? dados.codProjeto.trim() : 'Novo';
+        const nomeSugestao = `Planejamento_${cod}.json`;
+        const conteudo = JSON.stringify(dados, null, 2);
+
+        if (window.showSaveFilePicker) {
+            try {
+                const handle = await window.showSaveFilePicker({
+                    suggestedName: nomeSugestao,
+                    types: [{
+                        description: 'Arquivo JSON',
+                        accept: {'application/json': ['.json']},
+                    }],
+                });
+                const writable = await handle.createWritable();
+                await writable.write(conteudo);
+                await writable.close();
+                mostrarToast("Arquivo salvo com sucesso!");
+            } catch (err) {}
+        } else {
+            const blob = new Blob([conteudo], {type: "application/json"});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = nomeSugestao;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            mostrarToast("Download iniciado!");
+        }
+    }
+
+    function processarArquivo(input) {
+        const file = input.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const dados = JSON.parse(e.target.result);
+                if(!dados || (!dados.itens && !dados.codProjeto)) {
+                    throw new Error("Formato inválido");
+                }
+                restaurarTela(dados);
+                mostrarToast("Planejamento carregado!");
+            } catch (err) {
+                alert("Erro ao ler o arquivo JSON. Verifique se é um backup válido.");
+                console.error(err);
+            }
+            input.value = ''; 
+        };
+        reader.readAsText(file);
+    }
+
+    function carregarDadosIniciais() {
+        const dadosSalvos = localStorage.getItem('planejamento_' + currentInstanceId);
+        if (dadosSalvos) {
+            try {
+                restaurarTela(JSON.parse(dadosSalvos));
+            } catch(e) {
+                console.error("Erro ao carregar storage", e);
+                iniciarTelaPadrao();
+            }
+        } else {
+            iniciarTelaPadrao();
+        }
+    }
+    
+    function iniciarTelaPadrao() {
+        if (document.getElementById('selTipoAcao')) {
+            document.getElementById('selTipoAcao').value = 'Planejamento';
+            if (document.getElementById('selStatusDatasGlobal')) {
+                document.getElementById('selStatusDatasGlobal').value = '';
+            }
+            alternarTipoAcao();
+        }
+        adicionarMarcoItem();
+        adicionarNovaTarefa();
+        gerarTabela();
+    }
+
+    function restaurarTela(dados) {
+        if (document.getElementById('selTipoAcao')) {
+            document.getElementById('selTipoAcao').value = dados.tipoAcao || 'Planejamento';
+            if (document.getElementById('selStatusDatasGlobal')) {
+                document.getElementById('selStatusDatasGlobal').value = dados.statusDatasGlobal || '';
+            }
+            alternarTipoAcao();
+        }
+        document.getElementById('txtCodProjeto').value = dados.codProjeto || '';
+        document.getElementById('txtNomeProjeto').value = dados.nomeProjeto || '';
+        document.getElementById('txtObservacao').value = dados.observacao || '';
+        
+        const container = document.getElementById('listaItens');
+        container.innerHTML = '';
+
+        if (dados.itens && dados.itens.length > 0) {
+            dados.itens.forEach(item => criarElemento(item.type, item));
+        } else {
+            iniciarTelaPadrao();
+        }
+        
+        gerarTabela();
+    }
+
+    // --- GERAÇÃO DA TABELA (CORE) ---
+
+    function gerarTabela() {
+        const tipoAcao = document.getElementById('selTipoAcao') ? document.getElementById('selTipoAcao').value : 'Planejamento';
+        const isRep = (tipoAcao === 'Replanejamento');
+        
+        const statusDatasGlobal = document.getElementById('selStatusDatasGlobal') ? document.getElementById('selStatusDatasGlobal').value : '';
+
+        const codProjeto = document.getElementById('txtCodProjeto').value;
+        const nomeProjeto = document.getElementById('txtNomeProjeto').value;
+        const observacao = document.getElementById('txtObservacao').value.trim();
+
+        let tituloAba = "Planejamento de Projetos";
+        if (codProjeto && nomeProjeto) {
+            tituloAba = `${codProjeto} - ${nomeProjeto}`;
+        } else if (codProjeto || nomeProjeto) {
+            tituloAba = codProjeto || nomeProjeto;
+        }
+        document.title = tituloAba;
+
+        // Altera o assunto baseado no tipo de ação
+        let assunto = isRep ? "Replanejamento" : "Liberação para Planejamento";
+        if (codProjeto) assunto += ` - ${codProjeto}`;
+        if (nomeProjeto) assunto += ` - ${nomeProjeto}`;
+        document.getElementById('resultadoAssunto').textContent = assunto;
+
+        const itens = document.querySelectorAll('.item-lista');
+        let linhasHTML = '';
+        let totalHoras = 0;
+
+        itens.forEach(el => {
+            if (el.dataset.type === 'marco') {
+                const titulo = el.querySelector('.inp-marco').value.toUpperCase();
+                if(titulo.trim()) {
+                    linhasHTML += `
+                        <tr>
+                            <td colspan="5" style="background-color: #f0f0f0; font-weight: bold; text-align: left; padding: 10px; border: 1px solid #ccc; color: #002233;">${titulo}</td>
+                        </tr>
+                    `;
+                }
+            } else {
+                let desc = el.querySelector('.inp-tarefa').value;
+                const inicio = el.querySelector('.inp-inicio').value;
+                const fim = el.querySelector('.inp-fim').value;
+                const horasInput = el.querySelector('.inp-horas').value;
+                const analista = el.querySelector('.inp-analista').value;
+
+                if (desc.length > 0) desc = desc.charAt(0).toUpperCase() + desc.slice(1);
+                
+                // Adiciona o nível hierárquico na frente do nome se for Replanejamento
+                if (isRep) {
+                    const nivel = el.querySelector('.inp-nivel').value.trim();
+                    if (nivel) {
+                        desc = `<strong>${nivel}</strong> - ${desc}`;
+                    }
+                }
+
+                const h = parseHoras(horasInput);
+                totalHoras += h;
+
+                const iniFmt = formatarDataFinal(inicio); 
+                const fimFmt = formatarDataFinal(fim);
+                const horasExib = h > 0 ? h.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : "";
+
+                if (desc || inicio || fim || h > 0 || analista) {
+                    linhasHTML += `
+                        <tr>
+                            <td style="text-align: left; padding: 8px; border: 1px solid #ccc;">${desc}</td>
+                            <td style="text-align: center; padding: 8px; border: 1px solid #ccc;">${iniFmt}</td>
+                            <td style="text-align: center; padding: 8px; border: 1px solid #ccc;">${fimFmt}</td>
+                            <td style="text-align: center; padding: 8px; border: 1px solid #ccc;">${horasExib}</td>
+                            <td style="text-align: center; padding: 8px; border: 1px solid #ccc;">${analista}</td>
+                        </tr>
+                    `;
+                }
+            }
+        });
+
+        const totalFmt = totalHoras.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        const saudacao = obterSaudacao();
+
+        const blocoObservacao = observacao ? `<br><p><strong>Observação:</strong> ${observacao}</p>` : '';
+        
+        // Exibe o alerta vermelho APENAS se "forcarErroAcao" for true (ou seja, tentou interagir/copiar)
+        let textoAcaoDatas = '';
+        if (isRep) {
+            if (statusDatasGlobal) {
+                textoAcaoDatas = `<strong><p>${statusDatasGlobal}.</p></strong>`;
+                document.getElementById('selStatusDatasGlobal').style.borderColor = "var(--cinza)";
+            } else if (forcarErroAcao) {
+                textoAcaoDatas = `<p style="color: red; font-weight: bold;">[AÇÃO PARA OUTRAS TAREFAS NÃO SELECIONADA]</p>`;
+                document.getElementById('selStatusDatasGlobal').style.borderColor = "var(--vermelho)";
+            } else {
+                document.getElementById('selStatusDatasGlobal').style.borderColor = "var(--cinza)";
+            }
+        }
+
+        // Troca dinamicamente a palavra no corpo do e-mail
+        const tipoPalavra = isRep ? "replanejamento" : "planejamento";
+
+        const htmlTabela = `
+            <div id="resultadoCorpo" style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-size: 13px; color: #333;">
+                <p>${saudacao},</p>
+                <p>Segue ${tipoPalavra} para o projeto:</p>
+                <p style="font-size: 14px; margin-bottom: 5px;"><strong>${codProjeto}  ${nomeProjeto}</strong></p>
+                ${textoAcaoDatas}
+                <br>
+                <table style="width: 100%; max-width: 650px; border-collapse: collapse; font-family: 'Segoe UI', sans-serif;">
+                    <thead>
+                        <tr style="background-color: #002233; color: white;">
+                            <th style="padding: 10px; border: 1px solid #000; text-align:center;">ATIVIDADE</th> 
+                            <th style="padding: 10px; border: 1px solid #000; width: 70px; text-align:center;">INÍCIO</th>
+                            <th style="padding: 10px; border: 1px solid #000; width: 70px; text-align:center;">FIM</th>
+                            <th style="padding: 10px; border: 1px solid #000; width: 60px; text-align:center;">HORAS</th>
+                            <th style="padding: 10px; border: 1px solid #000; width: 110px; text-align:center;">ANALISTA</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${linhasHTML}
+                        <tr>
+                            <td colspan="3" style="text-align: right; font-weight: bold; padding: 10px; border: 1px solid #ccc; background-color: #fafafa;">TOTAL</td>
+                            <td style="text-align: center; font-weight: bold; padding: 10px; border: 1px solid #ccc; background-color: #fafafa;">${totalFmt}</td>
+                            <td style="border: 1px solid #ccc; background-color: #fafafa;"></td>
+                        </tr>
+                    </tbody>
+                </table>
+                ${blocoObservacao}  <br>
+                <p>Fico à disposição para qualquer dúvida.</p>
+                <p>Atenciosamente,</p>
+            </div>
+        `;
+        
+        document.getElementById('areaTabela').innerHTML = htmlTabela;
+        
+        triggerSalvar();
+    }
+
+    // --- UX / TOAST / COPY ---
+
+    function mostrarToast(txt) {
+        const x = document.getElementById("toast");
+        x.textContent = txt; 
+        x.className = "show";
+        if(x.dataset.timeoutId) clearTimeout(x.dataset.timeoutId);
+        
+        const tId = setTimeout(() => { x.className = x.className.replace("show", ""); }, 3000);
+        x.dataset.timeoutId = tId;
+    }
+
+    function copiarTexto(id) {
+        if (!validarCopiar()) return; 
+        
+        const el = document.getElementById(id);
+        if(el && el.textContent) {
+            navigator.clipboard.writeText(el.textContent)
+                .then(() => mostrarToast("Assunto copiado!"))
+                .catch(() => mostrarToast("Erro ao copiar."));
+        }
+    }
+
+    function copiarTabela() {
+        if (!validarCopiar()) return; 
+        
+        const el = document.getElementById('resultadoCorpo');
+        if(!el) return;
+        
+        const range = document.createRange();
+        range.selectNode(el);
+        const selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+        
+        try {
+            document.execCommand('copy');
+            mostrarToast("Tabela copiada (Cole no e-mail)!");
+        } catch (err) {
+            mostrarToast("Erro ao copiar tabela.");
+        }
+        
+        selection.removeAllRanges();
+    }
+
+    function limparTudo() {
+        if (confirm("Tem certeza? Isso apagará o formulário atual.")) {
+            document.getElementById('txtCodProjeto').value='';
+            document.getElementById('txtNomeProjeto').value='';
+            document.getElementById('txtObservacao').value='';
+            document.getElementById('listaItens').innerHTML='';
+            
+            localStorage.removeItem('planejamento_' + currentInstanceId);
+            
+            const novoId = 'temp_' + Date.now().toString(36);
+            const novaUrl = window.location.pathname + '?id=' + novoId;
+            window.history.replaceState({path: novaUrl}, '', novaUrl);
+            currentInstanceId = novoId;
+
+            iniciarTelaPadrao();
+        }
+    }
+
+    // --- EVENT LISTENERS GLOBAIS ---
+
+    document.addEventListener('keydown', e => {
+        if((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
+            const tag = document.activeElement.tagName.toLowerCase();
+            if(tag !== 'input' && tag !== 'textarea') { 
+                e.preventDefault(); 
+                desfazerExclusao(); 
+            }
+        }
+    });
+
+    window.onload = function() {
+        verificarPrimeiraVisita();
+        inicializarAutoSave();
+        
+        carregarDadosIniciais();
+        
+        const el = document.getElementById('listaItens');
+        Sortable.create(el, { 
+            handle: '.drag-handle', 
+            animation: 150, 
+            ghostClass: 'sortable-ghost',
+            onEnd: gerarTabela 
+        });
+
+        // Evento invisível: Se a pessoa clicar/focar nos campos de marco ou tarefa
+        // no modo replanejamento sem ter selecionado a ação, dispara a mensagem vermelha
+        document.getElementById('listaItens').addEventListener('focusin', function(e) {
+            const tipoAcao = document.getElementById('selTipoAcao').value;
+            const acaoDatas = document.getElementById('selStatusDatasGlobal').value;
+            if (tipoAcao === 'Replanejamento' && !acaoDatas) {
+                if(!forcarErroAcao) {
+                    forcarErroAcao = true;
+                    gerarTabela();
+                }
+            }
+        });
+    };
+    </script>
+</body>
+</html>
