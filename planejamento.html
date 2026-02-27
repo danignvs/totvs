@@ -16,7 +16,7 @@
         }
 
         .wrapper {
-            padding: 7px;
+            padding: 10px 7px;
             background-color: var(--cinza-claro);
             border-radius: 3px;
             border: 1px solid var(--cinza);
@@ -69,12 +69,12 @@
 
         .tabela-container {
             width: 100%;
-            overflow-x: auto; /* Cria barra de rolagem se a tabela for grande */
+            overflow-x: auto; 
             background: #fff;
             padding: 10px;
             border: 1px solid var(--cinza);
             border-radius: 3px;
-            box-sizing: border-box; /* Garante que padding não aumente a largura total */
+            box-sizing: border-box; 
         }
 
         pre, .tabela-container {
@@ -127,20 +127,48 @@
 
         /* Define larguras específicas para ficar proporcional */
         .tarefa .input-group:nth-child(3) .input-item:first-child {
-            flex: 1; /* Horas ocupa menos espaço (1 parte) */
+            flex: 1; /* Horas ocupa menos espaço */
         }
         
         .tarefa .input-group:nth-child(3) .input-item:last-child {
-            flex: 3; /* Analista ocupa mais espaço (2 partes) */
+            flex: 3; /* Analista ocupa mais espaço */
         }
 
+        /* Remove a seta nativa de campos com Datalist (Autocompletar do Analista) */
+        input[list]::-webkit-calendar-picker-indicator {
+            display: none !important;
+        }
+
+        .msgReplanejamento {
+            margin: 20px 0 0 0; 
+            text-align: left; 
+            padding: 10px; 
+            border-radius: 5px;
+            font-size: 0.8em;
+            background-color: var(--cinza-claro);
+        }
+
+        .msgReplanejamento ul {
+            margin: 5px 0 0 20px; 
+            padding: 0;
+        }
 
     </style>
 </head>
 
 <body>
 
-    <h1>Planejamento de Projetos</h1>
+    <div id="modalBoasVindas" class="modal-overlay">
+        <div class="modal-box">
+            <button class="btn-fechar-modal" onclick="fecharModalBoasVindas()" title="Fechar">X</button>
+            <h3 style="color: var(--roxo); margin-top: 0;">Primeira vez aqui? 👋</h3>
+            <p style="font-size: 15px; color: var(--az-escuro); margin-bottom: 25px;">
+                Para evitar erros no preenchimento, separamos algumas <strong>dicas rápidas</strong>.</p>
+            <button class="btn-roxo" style="width: 100%; padding: 12px; font-size: 1em;" onclick="irParaTutorial()">Ver Dicas</button>
+        </div>
+    </div>
+
+    <h1><strong class="azul-claro">Planejamento</strong> de Projetos</h1>
 
     <div class="container container-azul">
 
@@ -182,32 +210,60 @@
                 <h2></h2>
             </div>
 
+            <div class="input-group" style="margin-bottom: 10px;">
+                <div class="input-item">
+                    <label for="selTipoAcao">Tipo de ação:</label>
+                    <select id="selTipoAcao" onchange="alternarTipoAcao()">
+                        <option value="Planejamento" selected>Planejamento</option>
+                        <option value="Replanejamento">Replanejamento</option>
+                    </select>
+                </div>
+                <div class="input-item replanejamento-fields hidden" id="boxStatusDatas">
+                    <label for="selStatusDatasGlobal">Outras tarefas:</label>
+                    <select id="selStatusDatasGlobal" onchange="forcarErroAcao = false; gerarTabela()">
+                        <option value=""></option>
+                        <option value="Manter demais tarefas">Manter demais tarefas</option>
+                        <option value="Excluir demais tarefas">Excluir demais tarefas</option>
+                    </select>
+                </div>
+            </div>
+
             <div class="input-group">
                 <div class="input-item">
-                    <label for="txtCodProjeto">Código do Projeto:</label>
+                    <label for="txtCodProjeto">Código do projeto:</label>
                     <input type="text" id="txtCodProjeto" placeholder="" oninput="gerarTabela()">
                 </div>
                 <div class="input-item">
-                    <label for="txtNomeProjeto">Nome do Projeto:</label>
+                    <label for="txtNomeProjeto">Nome do projeto:</label>
                     <input type="text" id="txtNomeProjeto" placeholder="" oninput="gerarTabela()">
                 </div>
             </div>
 
-            <label style="margin-bottom: -7px;">Marcos e Tarefas:</label>
+            <label style="margin-bottom: -7px;"><br></label>
             <div id="listaItens">
             </div>
 
             <input type="file" id="fileInput" accept=".json" style="display: none;" onchange="processarArquivo(this)">
 
             <div style="display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap;">
-                <button class="btn-roxo" style="flex: 1;" onclick="adicionarMarcoItem()">Adicionar Marco</button>
-                <button class="btn-laranja" style="flex: 1;" onclick="adicionarNovaTarefa()">Adicionar Tarefa</button>
+                <button class="btn-roxo" style="flex: 1;" onclick="adicionarMarcoItem()">+ Marco</button>
+                <button class="btn-laranja" style="flex: 1;" onclick="adicionarNovaTarefa()">+ Tarefa</button>
             </div>
 
             <br>
             <div class="input-item">
                 <label for="txtObservacao">Observação:</label>
                 <input type="text" id="txtObservacao" placeholder="" oninput="gerarTabela()">
+            </div>
+
+            <div id="msgReplanejamento" class="hidden msgReplanejamento" style="display: none;">
+                <p><strong>⚠️ IMPORTANTE</strong></p>
+                
+                <p>Para <strong>evitar erros</strong> no replanejamento, certifique-se de:</p>
+                <ul>
+                    <li>Selecionar acima a ação para as outras datas do projeto.</li>
+                    <li>Se possível, envie um print com a visão geral do cronograma final no e-mail.</li>
+                </ul>
             </div>
 
         </section>
@@ -224,7 +280,7 @@
                 <pre id="resultadoAssunto"></pre>
             </div>
 
-            <div class="resultado">
+            <div class="resultado" style="min-height: 348px;">
                 <button class="btn-azul btn-aux" onclick="copiarTabela()">Copiar</button>
                 <label>Mensagem:</label>
                 <div id="areaTabela" class="tabela-container"></div>
@@ -237,21 +293,37 @@
                 
     
     <div class="menu">
-        
         <button><a href="planejamento.html" target="_blank" style="text-decoration: none;">Novo</a></button>
-
         <button onclick="document.getElementById('fileInput').click()">Abrir</button>
-        
         <button onclick="baixarBackup()">Salvar</button> 
-        
         <button onclick="limparTudo()">Limpar</button>
+    </div>
 
+    <div style="display: flex; align-items: center; gap: 8px; justify-content: center; margin:20px 0;">
+        <input type="checkbox" id="chkAutoSave" onchange="toggleAutoSave()" style="cursor: pointer; width: 18px; height: 18px; accent-color: var(--az-claro);">
+        <div for="chkAutoSave" style="margin: 0; color: var(--branco); cursor: pointer;font-size: 0.9em;">Salvar automático</div>
+    </div>
+
+    <div id="secaoTutorial" class="container tutorial">
+        <h2>
+        💡 Dicas</h2>
+        <ul>
+            <li><mark class="mark-limao">Segure e arraste</mark> pelo ícone <strong class="azul-claro">☰</strong> para alterar a ordem.</li> 
+            <li>Os nomes dos analistas são apenas sugestões, você também pode digitar livremente.</li>
+            <li>Em caso de replanejamento, informe se outras tarefas devem ser <mark class="mark-limao">mantidas ou excluídas</mark> no campo 
+                "Outras tarefas" e preencha a caixinha "Nº nível" com o <strong>número de nível hierárquico</strong> correspondente do PSA.</li>
+            <li><strong>Terminou?</strong> Clique no botão azul <strong>"Copiar"</strong> e cole direto no seu e-mail.</li>
+            <li>Para <mark class="mark-limao">evitar erros</mark>, se possível, envie um print com a visão geral das tarefas no e-mail, do jeito que etiver.</li>
+            <li>Se a caixinha <mark class="mark-limao">"Salvar automático"</mark> estiver selecionada, o progresso do trabalho será sempre salvo no seu navegador. 
+                Fechou a guia sem querer? É só voltar e os dados estarão lá.</li>
+            <li>Também é possível <mark class="mark-limao">salvar</mark> seu planejamento em um arquivo <code>.json</code> e abrir depois para continuar seu preenchimento.</li>
+            <li>Sinta-se a vontade para editar a tabela ou corpo da mensagem no próprio e-mail, se preciso.</li>
+        </ul>
     </div>
 
     <script>
         // --- UTILITÁRIOS GERAIS ---
     
-    // Função Debounce: Evita que o salvamento/URL ocorra a cada tecla, aguardando o usuário parar de digitar
     function debounce(func, wait) {
         let timeout;
         return function(...args) {
@@ -266,34 +338,32 @@
     function obterIdInstancia() {
         const params = new URLSearchParams(window.location.search);
         let id = params.get('id');
-        // Se não houver ID, não cria um imediatamente para não sujar a URL sem necessidade
-        // Usaremos um temporário interno até o primeiro salvamento
         if (!id) {
             id = 'temp_' + Date.now().toString(36);
         }
         return id;
     }
 
-    // Atualiza a URL sem recarregar a página
     const atualizarUrlDebounced = debounce((novoCodOuId) => {
         if (!novoCodOuId) return;
 
-        // Limpa o ID: remove espaços e caracteres especiais
         const idLimpo = novoCodOuId.trim().replace(/[^a-zA-Z0-9-_]/g, '');
-        const idFinal = idLimpo || currentInstanceId; // Mantém o atual se o input estiver vazio
+        const idFinal = idLimpo || currentInstanceId; 
 
-        // Só atualiza se mudou
         const params = new URLSearchParams(window.location.search);
         if (params.get('id') !== idFinal && !idFinal.startsWith('temp_')) {
             const novaUrl = window.location.pathname + '?id=' + encodeURIComponent(idFinal);
             window.history.replaceState({path: novaUrl}, '', novaUrl);
             currentInstanceId = idFinal;
         }
-    }, 1000); // Espera 1 segundo após parar de digitar para mudar a URL
+    }, 1000); 
 
     let currentInstanceId = obterIdInstancia();
+    
+    // Variável para controlar quando mostrar o erro vermelho da ação
+    let forcarErroAcao = false;
 
-    // --- INICIALIZAÇÃO ---
+    // --- INICIALIZAÇÃO E PRIMEIRA VISITA ---
     if (history.scrollRestoration) history.scrollRestoration = 'manual';
     window.scrollTo(0, 0);
 
@@ -304,12 +374,39 @@
         return "Boa noite";
     }
 
+    function verificarPrimeiraVisita() {
+        if (!localStorage.getItem('visitou_planejamento_antes')) {
+            document.getElementById('modalBoasVindas').style.display = 'flex'; // flex para centralizar
+        }
+    }
+
+    function fecharModalBoasVindas() {
+        document.getElementById('modalBoasVindas').style.display = 'none';
+        localStorage.setItem('visitou_planejamento_antes', 'sim');
+    }
+
+    function irParaTutorial() {
+        fecharModalBoasVindas();
+        document.getElementById('secaoTutorial').scrollIntoView({behavior: 'smooth'});
+    }
+
+    function inicializarAutoSave() {
+        const chk = document.getElementById('chkAutoSave');
+        const prefSalva = localStorage.getItem('preferencia_autosave');
+        
+        if (prefSalva !== null) {
+            chk.checked = (prefSalva === 'true');
+        } else {
+            chk.checked = true;
+            localStorage.setItem('preferencia_autosave', 'true');
+        }
+    }
+
     // --- MÁSCARAS E TRATAMENTO DE DADOS ---
 
     function mascaraData(input) {
         let v = input.value.replace(/\D/g, "");
         
-        // Impede que o usuário digite mais do que o necessário
         if (v.length > 8) v = v.substring(0, 8);
 
         if (v.length > 2) v = v.substring(0, 2) + "/" + v.substring(2);
@@ -317,23 +414,20 @@
         
         input.value = v;
         
-        // Só valida se tiver a data completa
         if(v.length === 10) validarDatas(input);
         
         gerarTabela();
     }
 
-    // Parse de string "DD/MM/AAAA" para objeto Date seguro
     function stringParaData(dataStr) {
         if (!dataStr || dataStr.length !== 10) return null;
         const partes = dataStr.split('/');
         const dia = parseInt(partes[0], 10);
-        const mes = parseInt(partes[1], 10) - 1; // Mes é 0-indexado
+        const mes = parseInt(partes[1], 10) - 1; 
         const ano = parseInt(partes[2], 10);
         
         const data = new Date(ano, mes, dia);
         
-        // Verifica se é uma data válida (ex: não aceita 31/02)
         if (data.getFullYear() === ano && data.getMonth() === mes && data.getDate() === dia) {
             return data;
         }
@@ -355,9 +449,6 @@
         if (dInicio && dFim) {
             if (dFim < dInicio) {
                 mostrarToast("Atenção: Data final é menor que a inicial!");
-                // Não apagamos automaticamente para não frustrar o usuário, 
-                // mas você pode descomentar a linha abaixo se preferir:
-                // inpFim.value = ""; 
                 inpFim.style.borderColor = "var(--vermelho)";
             } else {
                 inpFim.style.borderColor = "var(--cinza)";
@@ -366,7 +457,7 @@
     }
 
     function atualizarDataPeloPicker(pickerInput) {
-        const valorISO = pickerInput.value; // Formato yyyy-mm-dd
+        const valorISO = pickerInput.value; 
         if (!valorISO) return;
         
         const [ano, mes, dia] = valorISO.split('-');
@@ -382,9 +473,6 @@
 
     function formatarDataFinal(valor) {
         if (!valor) return "";
-        // Remove o ano se estiver no formato DD/MM/AAAA para economizar espaço na tabela, se desejar.
-        // O código original fazia substring(0, 6) + substring(8, 10).
-        // Vamos manter o padrão DD/MM para visualização limpa.
         if (valor.length === 10 && valor.includes('/')) {
             return valor.substring(0, 5); // Retorna DD/MM
         }
@@ -393,9 +481,7 @@
 
     function parseHoras(valor) {
         if (!valor) return 0;
-        // Substitui vírgula por ponto e remove tudo que não for número ou ponto
         let limpo = valor.replace(',', '.').replace(/[^0-9.]/g, '');
-        // Garante apenas um ponto decimal
         const partes = limpo.split('.');
         if (partes.length > 2) {
             limpo = partes[0] + '.' + partes.slice(1).join('');
@@ -404,9 +490,30 @@
         return isNaN(floatVal) ? 0 : floatVal;
     }
 
-    // --- MANIPULAÇÃO DO DOM ---
+    // --- MANIPULAÇÃO DO DOM E REPLANEJAMENTO ---
     
     let historicoExclusoes = [];
+
+    // Função para alternar campos entre Planejamento e Replanejamento
+    function alternarTipoAcao() {
+        const tipo = document.getElementById('selTipoAcao').value;
+        const msg = document.getElementById('msgReplanejamento');
+        const campos = document.querySelectorAll('.replanejamento-fields');
+
+        if (tipo === 'Replanejamento') {
+            msg.classList.remove('hidden');
+            campos.forEach(c => c.classList.remove('hidden'));
+        } else {
+            msg.classList.add('hidden');
+            campos.forEach(c => c.classList.add('hidden'));
+            
+            // Reseta estado de erro ao voltar pra Planejamento
+            forcarErroAcao = false;
+            const selDatas = document.getElementById('selStatusDatasGlobal');
+            if(selDatas) selDatas.style.borderColor = "var(--cinza)";
+        }
+        gerarTabela();
+    }
 
     function adicionarNovaTarefa() {
         criarElemento('tarefa');
@@ -424,39 +531,41 @@
         div.id = 'item-' + idUnico;
         div.dataset.type = tipo;
         
-        // HTML interno (Mantido idêntico ao original para não quebrar estilos)
         if (tipo === 'tarefa') {
             div.className = 'wrapper item-lista tarefa';
             div.innerHTML = `
-                <div style="display:flex; justify-content:space-between; align-items:center; gap: 7px; ">
+                <div style="display:flex; justify-content:space-between; align-items:center; gap: 7px; margin-bottom: 5px;">
                     <div style="display:flex; align-items:center; flex:1; gap: 7px;">
                         <span class="drag-handle" title="Mover">☰</span>
-                        <input type="text" class="inp-tarefa" placeholder="Tarefa" oninput="gerarTabela()" style="margin:0; width:100%; margin: 5px 0;">
+                        <input type="text" class="inp-nivel replanejamento-fields hidden" placeholder="Nº nível" oninput="gerarTabela()" style="margin:0; width: 65px;">
+                        <input type="text" class="inp-tarefa" placeholder="Tarefa" oninput="gerarTabela()" style="margin:0; flex: 1;">
                     </div>
                     <button class="excluir" style="margin:0;" onclick="removerItem('${idUnico}')">X</button>
                 </div>
+
                 <div class="input-group">
                     <div class="input-item">
                         <div class="custom-date-wrapper">
-                            <input type="text" class="inp-date-text inp-inicio" placeholder="Data Início" maxlength="10" oninput="mascaraData(this)">
+                            <input type="text" class="inp-date-text inp-inicio" placeholder="Data início" maxlength="10" oninput="mascaraData(this)">
                             <span class="calendar-icon">📅</span>
                             <input type="date" class="inp-date-picker" onchange="atualizarDataPeloPicker(this)">
                         </div>
                     </div>
                     <div class="input-item">
                         <div class="custom-date-wrapper">
-                            <input type="text" class="inp-date-text inp-fim" placeholder="Data Conclusão" maxlength="10" oninput="mascaraData(this)">
+                            <input type="text" class="inp-date-text inp-fim" placeholder="Data conclusão" maxlength="10" oninput="mascaraData(this)">
                             <span class="calendar-icon">📅</span>
                             <input type="date" class="inp-date-picker" onchange="atualizarDataPeloPicker(this)">
                         </div>
                     </div>
                 </div>
+                
                 <div class="input-group" style="margin-bottom:0;">
                     <div class="input-item">
                         <input type="text" class="inp-horas" placeholder="Horas (0,00)" oninput="gerarTabela()">
                     </div>
                     <div class="input-item">
-                        <input type="text" class="inp-analista" list="lista-analistas" placeholder="Nome do Analista" oninput="gerarTabela()">
+                        <input type="text" class="inp-analista" list="lista-analistas" placeholder="Analista" oninput="gerarTabela()">
                     </div>
                 </div>
             `;
@@ -471,7 +580,6 @@
 
         container.appendChild(div);
 
-        // Preenchimento de dados (se houver)
         if (dados) {
             if (tipo === 'tarefa') {
                 div.querySelector('.inp-tarefa').value = dados.tarefa || '';
@@ -479,9 +587,15 @@
                 div.querySelector('.inp-fim').value = dados.fim || '';
                 div.querySelector('.inp-horas').value = dados.horas || '';
                 div.querySelector('.inp-analista').value = dados.analista || '';
+                div.querySelector('.inp-nivel').value = dados.nivel || '';
             } else {
                 div.querySelector('.inp-marco').value = dados.valor || '';
             }
+        }
+
+        // Garante que o campo novo aparece se o Replanejamento já estiver ativo
+        if (tipo === 'tarefa' && document.getElementById('selTipoAcao') && document.getElementById('selTipoAcao').value === 'Replanejamento') {
+            div.querySelector('.inp-nivel').classList.remove('hidden');
         }
 
         gerarTabela();
@@ -493,14 +607,14 @@
             const tipo = el.dataset.type;
             let valores = {};
             
-            // Salva o estado antes de excluir para o Undo
             if (tipo === 'tarefa') {
                 valores = {
                     tarefa: el.querySelector('.inp-tarefa').value,
                     inicio: el.querySelector('.inp-inicio').value,
                     fim: el.querySelector('.inp-fim').value,
                     horas: el.querySelector('.inp-horas').value,
-                    analista: el.querySelector('.inp-analista').value
+                    analista: el.querySelector('.inp-analista').value,
+                    nivel: el.querySelector('.inp-nivel').value
                 };
             } else {
                 valores = { valor: el.querySelector('.inp-marco').value };
@@ -520,10 +634,28 @@
         mostrarToast("Ação desfeita!");
     }
 
+    // --- VALIDAÇÃO OBRIGATÓRIA ANTES DE COPIAR ---
+    function validarCopiar() {
+        const tipoAcao = document.getElementById('selTipoAcao').value;
+        if (tipoAcao === 'Replanejamento') {
+            const acaoDatas = document.getElementById('selStatusDatasGlobal');
+            if (!acaoDatas.value) {
+                forcarErroAcao = true;
+                gerarTabela();
+                mostrarToast("⚠️ Selecione as OUTRAS TAREFAS antes de copiar!");
+                acaoDatas.focus();
+                return false;
+            }
+        }
+        return true;
+    }
+
     // --- SALVAMENTO E CARREGAMENTO ---
 
     function coletarDadosParaSalvar() {
         const dados = {
+            tipoAcao: document.getElementById('selTipoAcao') ? document.getElementById('selTipoAcao').value : 'Planejamento',
+            statusDatasGlobal: document.getElementById('selStatusDatasGlobal') ? document.getElementById('selStatusDatasGlobal').value : '',
             codProjeto: document.getElementById('txtCodProjeto').value,
             nomeProjeto: document.getElementById('txtNomeProjeto').value,
             observacao: document.getElementById('txtObservacao').value,
@@ -543,28 +675,40 @@
                     inicio: el.querySelector('.inp-inicio').value,
                     fim: el.querySelector('.inp-fim').value,
                     horas: el.querySelector('.inp-horas').value,
-                    analista: el.querySelector('.inp-analista').value
+                    analista: el.querySelector('.inp-analista').value,
+                    nivel: el.querySelector('.inp-nivel').value
                 });
             }
         });
         return dados;
     }
 
-    // Função debounced para salvar (evita escritas excessivas no disco/storage)
     const salvarDadosStorage = debounce((dados) => {
-        // Atualiza a URL baseada no código do projeto (se houver)
         if (dados.codProjeto && dados.codProjeto.trim() !== "") {
             atualizarUrlDebounced(dados.codProjeto);
         }
-        
-        // Salva usando o ID da instância (seja o da URL ou o temporário)
         localStorage.setItem('planejamento_' + currentInstanceId, JSON.stringify(dados));
-        
-        // Log discreto para debug
-        // console.log("Dados salvos automaticamente em: planejamento_" + currentInstanceId);
     }, 1000);
 
+    function toggleAutoSave() {
+        const chk = document.getElementById('chkAutoSave');
+        const isAuto = chk.checked;
+        
+        // Memoriza a escolha
+        localStorage.setItem('preferencia_autosave', isAuto);
+        
+        if (isAuto) {
+            mostrarToast("Salvamento automático ATIVADO!");
+            triggerSalvar(); 
+        } else {
+            mostrarToast("Salvamento automático DESATIVADO.");
+        }
+    }
+
     function triggerSalvar() {
+        const isAuto = document.getElementById('chkAutoSave').checked;
+        if (!isAuto) return; 
+
         const dados = coletarDadosParaSalvar();
         salvarDadosStorage(dados);
     }
@@ -588,11 +732,8 @@
                 await writable.write(conteudo);
                 await writable.close();
                 mostrarToast("Arquivo salvo com sucesso!");
-            } catch (err) {
-                // Usuário cancelou ou erro
-            }
+            } catch (err) {}
         } else {
-            // Fallback
             const blob = new Blob([conteudo], {type: "application/json"});
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -623,7 +764,6 @@
                 alert("Erro ao ler o arquivo JSON. Verifique se é um backup válido.");
                 console.error(err);
             }
-            // Importante: limpa o input para permitir recarregar o mesmo arquivo se necessário
             input.value = ''; 
         };
         reader.readAsText(file);
@@ -631,11 +771,6 @@
 
     function carregarDadosIniciais() {
         const dadosSalvos = localStorage.getItem('planejamento_' + currentInstanceId);
-        
-        // Se a URL tiver um ID mas o storage estiver vazio (link compartilhado sem backend),
-        // aqui seria o lugar de buscar num banco de dados real.
-        // Como é 100% local, apenas carregamos se existir no navegador do usuário.
-        
         if (dadosSalvos) {
             try {
                 restaurarTela(JSON.parse(dadosSalvos));
@@ -649,23 +784,30 @@
     }
     
     function iniciarTelaPadrao() {
+        if (document.getElementById('selTipoAcao')) {
+            document.getElementById('selTipoAcao').value = 'Planejamento';
+            if (document.getElementById('selStatusDatasGlobal')) {
+                document.getElementById('selStatusDatasGlobal').value = '';
+            }
+            alternarTipoAcao();
+        }
         adicionarMarcoItem();
         adicionarNovaTarefa();
         gerarTabela();
     }
 
     function restaurarTela(dados) {
+        if (document.getElementById('selTipoAcao')) {
+            document.getElementById('selTipoAcao').value = dados.tipoAcao || 'Planejamento';
+            if (document.getElementById('selStatusDatasGlobal')) {
+                document.getElementById('selStatusDatasGlobal').value = dados.statusDatasGlobal || '';
+            }
+            alternarTipoAcao();
+        }
         document.getElementById('txtCodProjeto').value = dados.codProjeto || '';
         document.getElementById('txtNomeProjeto').value = dados.nomeProjeto || '';
         document.getElementById('txtObservacao').value = dados.observacao || '';
         
-        // Se carregou um arquivo com código de projeto, atualizamos a URL
-        if(dados.codProjeto) {
-             // Força atualização imediata da variável de ID para sincronizar o salvamento futuro
-             // Mas não muda a URL visualmente até o debounce, ou podemos forçar aqui:
-             // currentInstanceId = dados.codProjeto.trim().replace(/[^a-zA-Z0-9-_]/g, '');
-        }
-
         const container = document.getElementById('listaItens');
         container.innerHTML = '';
 
@@ -681,6 +823,11 @@
     // --- GERAÇÃO DA TABELA (CORE) ---
 
     function gerarTabela() {
+        const tipoAcao = document.getElementById('selTipoAcao') ? document.getElementById('selTipoAcao').value : 'Planejamento';
+        const isRep = (tipoAcao === 'Replanejamento');
+        
+        const statusDatasGlobal = document.getElementById('selStatusDatasGlobal') ? document.getElementById('selStatusDatasGlobal').value : '';
+
         const codProjeto = document.getElementById('txtCodProjeto').value;
         const nomeProjeto = document.getElementById('txtNomeProjeto').value;
         const observacao = document.getElementById('txtObservacao').value.trim();
@@ -693,12 +840,12 @@
         }
         document.title = tituloAba;
 
-        let assunto = "Liberação para Planejamento";
+        // Altera o assunto baseado no tipo de ação
+        let assunto = isRep ? "Replanejamento" : "Liberação para Planejamento";
         if (codProjeto) assunto += ` - ${codProjeto}`;
         if (nomeProjeto) assunto += ` - ${nomeProjeto}`;
         document.getElementById('resultadoAssunto').textContent = assunto;
 
-        // 2. Processa Itens
         const itens = document.querySelectorAll('.item-lista');
         let linhasHTML = '';
         let totalHoras = 0;
@@ -706,7 +853,6 @@
         itens.forEach(el => {
             if (el.dataset.type === 'marco') {
                 const titulo = el.querySelector('.inp-marco').value.toUpperCase();
-                // Só exibe marco se tiver texto
                 if(titulo.trim()) {
                     linhasHTML += `
                         <tr>
@@ -721,21 +867,23 @@
                 const horasInput = el.querySelector('.inp-horas').value;
                 const analista = el.querySelector('.inp-analista').value;
 
-                // Capitaliza primeira letra
                 if (desc.length > 0) desc = desc.charAt(0).toUpperCase() + desc.slice(1);
                 
-                // Calcula horas de forma segura
+                // Adiciona o nível hierárquico na frente do nome se for Replanejamento
+                if (isRep) {
+                    const nivel = el.querySelector('.inp-nivel').value.trim();
+                    if (nivel) {
+                        desc = `<strong>${nivel}</strong> - ${desc}`;
+                    }
+                }
+
                 const h = parseHoras(horasInput);
                 totalHoras += h;
 
-                // Formatações para exibição
-                const iniFmt = formatarDataFinal(inicio); // Agora retorna só DD/MM se tiver ano
+                const iniFmt = formatarDataFinal(inicio); 
                 const fimFmt = formatarDataFinal(fim);
-                
-                // Formata número para BR (2 casas decimais, vírgula)
                 const horasExib = h > 0 ? h.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : "";
 
-                // Só adiciona na tabela se tiver algum dado relevante
                 if (desc || inicio || fim || h > 0 || analista) {
                     linhasHTML += `
                         <tr>
@@ -754,18 +902,34 @@
         const saudacao = obterSaudacao();
 
         const blocoObservacao = observacao ? `<br><p><strong>Observação:</strong> ${observacao}</p>` : '';
+        
+        // Exibe o alerta vermelho APENAS se "forcarErroAcao" for true (ou seja, tentou interagir/copiar)
+        let textoAcaoDatas = '';
+        if (isRep) {
+            if (statusDatasGlobal) {
+                textoAcaoDatas = `<strong><p>${statusDatasGlobal}.</p></strong>`;
+                document.getElementById('selStatusDatasGlobal').style.borderColor = "var(--cinza)";
+            } else if (forcarErroAcao) {
+                textoAcaoDatas = `<p style="color: red; font-weight: bold;">[AÇÃO PARA OUTRAS TAREFAS NÃO SELECIONADA]</p>`;
+                document.getElementById('selStatusDatasGlobal').style.borderColor = "var(--vermelho)";
+            } else {
+                document.getElementById('selStatusDatasGlobal').style.borderColor = "var(--cinza)";
+            }
+        }
 
-        // 3. Monta HTML Final
+        // Troca dinamicamente a palavra no corpo do e-mail
+        const tipoPalavra = isRep ? "replanejamento" : "planejamento";
+
         const htmlTabela = `
             <div id="resultadoCorpo" style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-size: 13px; color: #333;">
                 <p>${saudacao},</p>
-                <p>Segue planejamento para o projeto:</p>
-                <p style="font-size: 14px;"><strong>${codProjeto}  ${nomeProjeto}</strong></p>
+                <p>Segue ${tipoPalavra} para o projeto:</p>
+                <p style="font-size: 14px; margin-bottom: 5px;"><strong>${codProjeto}  ${nomeProjeto}</strong></p>
                 <br>
                 <table style="width: 100%; max-width: 650px; border-collapse: collapse; font-family: 'Segoe UI', sans-serif;">
                     <thead>
                         <tr style="background-color: #002233; color: white;">
-                            <th style="padding: 10px; border: 1px solid #000; text-align:center;">ATIVIDADE</th> 
+                            <th style="padding: 10px; border: 1px solid #000; text-align:center;"></th> 
                             <th style="padding: 10px; border: 1px solid #000; width: 70px; text-align:center;">INÍCIO</th>
                             <th style="padding: 10px; border: 1px solid #000; width: 70px; text-align:center;">FIM</th>
                             <th style="padding: 10px; border: 1px solid #000; width: 60px; text-align:center;">HORAS</th>
@@ -781,6 +945,7 @@
                         </tr>
                     </tbody>
                 </table>
+                ${textoAcaoDatas}
                 ${blocoObservacao}  <br>
                 <p>Fico à disposição para qualquer dúvida.</p>
                 <p>Atenciosamente,</p>
@@ -789,7 +954,6 @@
         
         document.getElementById('areaTabela').innerHTML = htmlTabela;
         
-        // 4. Dispara salvamento (Debounced)
         triggerSalvar();
     }
 
@@ -799,7 +963,6 @@
         const x = document.getElementById("toast");
         x.textContent = txt; 
         x.className = "show";
-        // Limpa timeout anterior se houver (para não piscar errático se chamar várias vezes)
         if(x.dataset.timeoutId) clearTimeout(x.dataset.timeoutId);
         
         const tId = setTimeout(() => { x.className = x.className.replace("show", ""); }, 3000);
@@ -807,6 +970,8 @@
     }
 
     function copiarTexto(id) {
+        if (!validarCopiar()) return; 
+        
         const el = document.getElementById(id);
         if(el && el.textContent) {
             navigator.clipboard.writeText(el.textContent)
@@ -816,10 +981,11 @@
     }
 
     function copiarTabela() {
+        if (!validarCopiar()) return; 
+        
         const el = document.getElementById('resultadoCorpo');
         if(!el) return;
         
-        // Seleção e cópia precisa para Rich Text (Gmail/Outlook)
         const range = document.createRange();
         range.selectNode(el);
         const selection = window.getSelection();
@@ -843,10 +1009,8 @@
             document.getElementById('txtObservacao').value='';
             document.getElementById('listaItens').innerHTML='';
             
-            // Remove do storage o ID atual
             localStorage.removeItem('planejamento_' + currentInstanceId);
             
-            // Reseta para um novo ID limpo para evitar conflitos
             const novoId = 'temp_' + Date.now().toString(36);
             const novaUrl = window.location.pathname + '?id=' + novoId;
             window.history.replaceState({path: novaUrl}, '', novaUrl);
@@ -859,10 +1023,8 @@
     // --- EVENT LISTENERS GLOBAIS ---
 
     document.addEventListener('keydown', e => {
-        // Atalho Ctrl+Z
         if((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
             const tag = document.activeElement.tagName.toLowerCase();
-            // Evita disparar se estiver digitando num input (comportamento padrão do browser)
             if(tag !== 'input' && tag !== 'textarea') { 
                 e.preventDefault(); 
                 desfazerExclusao(); 
@@ -871,15 +1033,30 @@
     });
 
     window.onload = function() {
+        verificarPrimeiraVisita();
+        inicializarAutoSave();
+        
         carregarDadosIniciais();
         
         const el = document.getElementById('listaItens');
-        // Inicializa Drag and Drop
         Sortable.create(el, { 
             handle: '.drag-handle', 
             animation: 150, 
             ghostClass: 'sortable-ghost',
-            onEnd: gerarTabela // Regenera a tabela ao soltar o item
+            onEnd: gerarTabela 
+        });
+
+        // Evento invisível: Se a pessoa clicar/focar nos campos de marco ou tarefa
+        // no modo replanejamento sem ter selecionado a ação, dispara a mensagem vermelha
+        document.getElementById('listaItens').addEventListener('focusin', function(e) {
+            const tipoAcao = document.getElementById('selTipoAcao').value;
+            const acaoDatas = document.getElementById('selStatusDatasGlobal').value;
+            if (tipoAcao === 'Replanejamento' && !acaoDatas) {
+                if(!forcarErroAcao) {
+                    forcarErroAcao = true;
+                    gerarTabela();
+                }
+            }
         });
     };
     </script>
