@@ -16,7 +16,7 @@
         }
 
         .wrapper {
-            padding: 7px;
+            padding: 10px 7px;
             background-color: var(--cinza-claro);
             border-radius: 3px;
             border: 1px solid var(--cinza);
@@ -151,76 +151,6 @@
         .msgReplanejamento ul {
             margin: 5px 0 0 20px; 
             padding: 0;
-        }
-
-        .tutorial {
-            color: var(--branco);
-            max-width: 1200px; 
-            margin-top: 40px; 
-            margin-bottom: 60px; 
-            display: block; 
-            border-top: none; 
-            background: transparent; 
-            box-shadow: none;
-            line-height: 1.7;
-            font-size: 0.85em;
-        }
-
-        .tutorial h2 {
-            color: var(--az-claro); 
-            border-bottom: 2px solid var(--az-claro); 
-            padding-bottom: 10px; 
-            margin-bottom: 15px; 
-            font-size: 1.2em;
-        }
-
-        .tutorial ul {
-            padding-left: 20px; 
-            margin: 0; 
-        }
-
-        .tutorial ul li {
-            padding: 7px 0;
-        }
-
-        /* --- MODAL DA PRIMEIRA VISITA --- */
-        .modal-overlay {
-            display: none;  /*Inicia oculto */
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(0, 0, 0, 0.6);
-            z-index: 2000;
-            justify-content: center;
-            align-items: center;
-            backdrop-filter: blur(2px);
-        }
-
-        .modal-box {
-            background-color: #fff;
-            padding: 30px;
-            border-radius: 8px;
-            max-width: 300px;
-            width: 75%;
-            text-align: center;
-            position: relative;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            border-top: 6px solid var(--roxo);
-            animation: fadeIn 0.3s ease-in-out;
-            margin: 0 auto;
-            margin-top: 200px;
-        }
-
-        .modal-box .btn-fechar-modal {
-            position: absolute;
-            top: 0px; 
-            right: -5px;
-            background: transparent; border: none;
-            font-size: 18px; font-weight: bold; cursor: pointer; color: var(--cinza-escuro);
-            width: 50px;
-        }
-
-        .modal-box .btn-fechar-modal:hover {
-            color: var(--vermelho);
         }
 
     </style>
@@ -378,15 +308,15 @@
         <h2>
         💡 Dicas</h2>
         <ul>
-            <li><strong class="mark-limao">Segure e arraste</strong> pelo ícone <strong class="azul-claro">☰</strong> para alterar a ordem.</li> 
+            <li><mark class="mark-limao">Segure e arraste</mark> pelo ícone <strong class="azul-claro">☰</strong> para alterar a ordem.</li> 
             <li>Os nomes dos analistas são apenas sugestões, você também pode digitar livremente.</li>
-            <li>Em caso de replanejamento, informe se outras tarefas devem ser <strong class="mark-limao">mantidas ou excluídas</strong> no campo 
+            <li>Em caso de replanejamento, informe se outras tarefas devem ser <mark class="mark-limao">mantidas ou excluídas</mark> no campo 
                 "Outras tarefas" e preencha a caixinha "Nº nível" com o <strong>número de nível hierárquico</strong> correspondente do PSA.</li>
             <li><strong>Terminou?</strong> Clique no botão azul <strong>"Copiar"</strong> e cole direto no seu e-mail.</li>
-            <li>Para <strong class="mark-limao">evitar erros</strong>, se possível, envie um print com a visão geral das tarefas no e-mail, do jeito que etiver.</li>
-            <li>Se a caixinha <strong class="mark-limao">"Salvar automático"</strong> estiver selecionada, o progresso do trabalho será sempre salvo no seu navegador. 
+            <li>Para <mark class="mark-limao">evitar erros</mark>, se possível, envie um print com a visão geral das tarefas no e-mail, do jeito que etiver.</li>
+            <li>Se a caixinha <mark class="mark-limao">"Salvar automático"</mark> estiver selecionada, o progresso do trabalho será sempre salvo no seu navegador. 
                 Fechou a guia sem querer? É só voltar e os dados estarão lá.</li>
-            <li>Também é possível <strong class="mark-limao">salvar</strong> seu planejamento em um arquivo <code>.json</code> e abrir depois para continuar seu preenchimento.</li>
+            <li>Também é possível <mark class="mark-limao">salvar</mark> seu planejamento em um arquivo <code>.json</code> e abrir depois para continuar seu preenchimento.</li>
             <li>Sinta-se a vontade para editar a tabela ou corpo da mensagem no próprio e-mail, se preciso.</li>
         </ul>
     </div>

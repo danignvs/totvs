@@ -7,18 +7,35 @@
     <title>Fretado TOTVS</title>
     <link rel="stylesheet" href="style.css">
 
-    <style>        
+    <style>   
+        p {
+            font-size: small; 
+            padding: 0 0 30px 0;
+        }     
+
         .container {            
             max-width: 600px; 
             display: flex; 
             flex-direction: column;
             gap: 0;
+            position: relative;
+        }
+
+       
+        .btn-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            margin: 0; 
+            padding: 10px 15px;
+            z-index: 10; 
         }
 
         .container h1 {
             margin: 0;
             color: var(--az-escuro);
             font-size: 24px;
+            padding: 10px 0 0;
         }
 
         .container h2 {
@@ -131,13 +148,6 @@
             font-weight: bold;
         }
 
-        @media (max-width: 800px) {
-            
-            .btn-close {
-                
-                margin: -10px;
-            }
-        }
 
     </style>
 </head>
@@ -163,7 +173,7 @@
             <button class="btn-close" onclick="fecharTodos()">X</button>
 
             <h1>BARRA FUNDA</h1>
-            <p style="font-size: small; padding-bottom: 10px;">
+            <p>
                 Av. Mário de Andrade, 664 (sentido Lapa).
                 
             <a target="_blank" class="mark-limao" href="https://maps.app.goo.gl/B5zseMG3oxo1ydfd7">
@@ -234,14 +244,14 @@
     </div>
 
     <div id="container-santana" class="hidden">
-        <div class="container container-azul" style="max-width: 600px;"> 
+        <div class="container container-azul"> 
             <button class="btn-close" onclick="fecharTodos()">X</button>
 
             <H1>SANTANA</H1>
-            <p style="font-size: small; padding-bottom: 10px;">
+            <p>
                 Rua Voluntários da Pátria, 1.935 (Drogaria São Paulo).
                 
-            <a target="_blank" class="link-limao" href="https://maps.app.goo.gl/ygwJDGRsv87Rf9Gm8">
+            <a target="_blank" class="mark-limao" href="https://maps.app.goo.gl/ygwJDGRsv87Rf9Gm8">
                Google Maps</a>
         </p>
             
