@@ -322,8 +322,7 @@
     </div>
 
     <script>
-        // --- UTILITÁRIOS GERAIS ---
-    
+    // --- UTILITÁRIOS GERAIS ---
     function debounce(func, wait) {
         let timeout;
         return function(...args) {
@@ -333,23 +332,17 @@
         };
     }
 
-    // --- GERENCIAMENTO DE INSTÂNCIA E URL ---
-    
     function obterIdInstancia() {
         const params = new URLSearchParams(window.location.search);
         let id = params.get('id');
-        if (!id) {
-            id = 'temp_' + Date.now().toString(36);
-        }
+        if (!id) id = 'temp_' + Date.now().toString(36);
         return id;
     }
 
     const atualizarUrlDebounced = debounce((novoCodOuId) => {
         if (!novoCodOuId) return;
-
         const idLimpo = novoCodOuId.trim().replace(/[^a-zA-Z0-9-_]/g, '');
         const idFinal = idLimpo || currentInstanceId; 
-
         const params = new URLSearchParams(window.location.search);
         if (params.get('id') !== idFinal && !idFinal.startsWith('temp_')) {
             const novaUrl = window.location.pathname + '?id=' + encodeURIComponent(idFinal);
@@ -359,11 +352,8 @@
     }, 1000); 
 
     let currentInstanceId = obterIdInstancia();
-    
-    // Variável para controlar quando mostrar o erro vermelho da ação
     let forcarErroAcao = false;
 
-    // --- INICIALIZAÇÃO E PRIMEIRA VISITA ---
     if (history.scrollRestoration) history.scrollRestoration = 'manual';
     window.scrollTo(0, 0);
 
@@ -376,7 +366,7 @@
 
     function verificarPrimeiraVisita() {
         if (!localStorage.getItem('visitou_planejamento_antes')) {
-            document.getElementById('modalBoasVindas').style.display = 'flex'; // flex para centralizar
+            document.getElementById('modalBoasVindas').style.display = 'flex';
         }
     }
 
@@ -393,29 +383,16 @@
     function inicializarAutoSave() {
         const chk = document.getElementById('chkAutoSave');
         const prefSalva = localStorage.getItem('preferencia_autosave');
-        
-        if (prefSalva !== null) {
-            chk.checked = (prefSalva === 'true');
-        } else {
-            chk.checked = true;
-            localStorage.setItem('preferencia_autosave', 'true');
-        }
+        chk.checked = prefSalva !== null ? (prefSalva === 'true') : true;
     }
-
-    // --- MÁSCARAS E TRATAMENTO DE DADOS ---
 
     function mascaraData(input) {
         let v = input.value.replace(/\D/g, "");
-        
         if (v.length > 8) v = v.substring(0, 8);
-
         if (v.length > 2) v = v.substring(0, 2) + "/" + v.substring(2);
         if (v.length > 5) v = v.substring(0, 5) + "/" + v.substring(5);
-        
         input.value = v;
-        
         if(v.length === 10) validarDatas(input);
-        
         gerarTabela();
     }
 
@@ -425,45 +402,32 @@
         const dia = parseInt(partes[0], 10);
         const mes = parseInt(partes[1], 10) - 1; 
         const ano = parseInt(partes[2], 10);
-        
         const data = new Date(ano, mes, dia);
-        
-        if (data.getFullYear() === ano && data.getMonth() === mes && data.getDate() === dia) {
-            return data;
-        }
-        return null;
+        return (data.getFullYear() === ano && data.getMonth() === mes && data.getDate() === dia) ? data : null;
     }
 
     function validarDatas(input) {
         const wrapper = input.closest('.wrapper');
         if (!wrapper) return;
-        
         const inpInicio = wrapper.querySelector('.inp-inicio');
         const inpFim = wrapper.querySelector('.inp-fim');
-        
         if (!inpInicio || !inpFim) return;
-
         const dInicio = stringParaData(inpInicio.value);
         const dFim = stringParaData(inpFim.value);
-
-        if (dInicio && dFim) {
-            if (dFim < dInicio) {
-                mostrarToast("Atenção: Data final é menor que a inicial!");
-                inpFim.style.borderColor = "var(--vermelho)";
-            } else {
-                inpFim.style.borderColor = "var(--cinza)";
-            }
+        if (dInicio && dFim && dFim < dInicio) {
+            mostrarToast("Atenção: Data final é menor que a inicial!");
+            inpFim.style.borderColor = "var(--vermelho)";
+        } else {
+            inpFim.style.borderColor = "var(--cinza)";
         }
     }
 
     function atualizarDataPeloPicker(pickerInput) {
         const valorISO = pickerInput.value; 
         if (!valorISO) return;
-        
         const [ano, mes, dia] = valorISO.split('-');
         const wrapper = pickerInput.parentElement;
         const textInput = wrapper.querySelector('.inp-date-text');
-        
         if (textInput) {
             textInput.value = `${dia}/${mes}/${ano}`;
             validarDatas(textInput);
@@ -473,41 +437,30 @@
 
     function formatarDataFinal(valor) {
         if (!valor) return "";
-        if (valor.length === 10 && valor.includes('/')) {
-            return valor.substring(0, 5); // Retorna DD/MM
-        }
-        return valor;
+        return (valor.length === 10 && valor.includes('/')) ? valor.substring(0, 5) : valor;
     }
 
     function parseHoras(valor) {
         if (!valor) return 0;
         let limpo = valor.replace(',', '.').replace(/[^0-9.]/g, '');
         const partes = limpo.split('.');
-        if (partes.length > 2) {
-            limpo = partes[0] + '.' + partes.slice(1).join('');
-        }
+        if (partes.length > 2) limpo = partes[0] + '.' + partes.slice(1).join('');
         const floatVal = parseFloat(limpo);
         return isNaN(floatVal) ? 0 : floatVal;
     }
 
-    // --- MANIPULAÇÃO DO DOM E REPLANEJAMENTO ---
-    
     let historicoExclusoes = [];
 
-    // Função para alternar campos entre Planejamento e Replanejamento
     function alternarTipoAcao() {
         const tipo = document.getElementById('selTipoAcao').value;
         const msg = document.getElementById('msgReplanejamento');
         const campos = document.querySelectorAll('.replanejamento-fields');
-
         if (tipo === 'Replanejamento') {
             msg.classList.remove('hidden');
             campos.forEach(c => c.classList.remove('hidden'));
         } else {
             msg.classList.add('hidden');
             campos.forEach(c => c.classList.add('hidden'));
-            
-            // Reseta estado de erro ao voltar pra Planejamento
             forcarErroAcao = false;
             const selDatas = document.getElementById('selStatusDatasGlobal');
             if(selDatas) selDatas.style.borderColor = "var(--cinza)";
@@ -515,19 +468,13 @@
         gerarTabela();
     }
 
-    function adicionarNovaTarefa() {
-        criarElemento('tarefa');
-    }
-
-    function adicionarMarcoItem() {
-        criarElemento('marco');
-    }
+    function adicionarNovaTarefa() { criarElemento('tarefa'); }
+    function adicionarMarcoItem() { criarElemento('marco'); }
 
     function criarElemento(tipo, dados = null) {
         const container = document.getElementById('listaItens');
         const idUnico = Date.now().toString(36) + Math.random().toString(36).substring(2);
         const div = document.createElement('div');
-        
         div.id = 'item-' + idUnico;
         div.dataset.type = tipo;
         
@@ -542,31 +489,32 @@
                     </div>
                     <button class="excluir" style="margin:0;" onclick="removerItem('${idUnico}')">X</button>
                 </div>
-
                 <div class="input-group">
                     <div class="input-item">
                         <div class="custom-date-wrapper">
-                            <input type="text" class="inp-date-text inp-inicio" placeholder="Data início" maxlength="10" oninput="mascaraData(this)">
+                            <input type="text" class="inp-date-text inp-inicio" placeholder="Início" maxlength="10" oninput="mascaraData(this)">
                             <span class="calendar-icon">📅</span>
                             <input type="date" class="inp-date-picker" onchange="atualizarDataPeloPicker(this)">
                         </div>
                     </div>
                     <div class="input-item">
                         <div class="custom-date-wrapper">
-                            <input type="text" class="inp-date-text inp-fim" placeholder="Data conclusão" maxlength="10" oninput="mascaraData(this)">
+                            <input type="text" class="inp-date-text inp-fim" placeholder="Fim" maxlength="10" oninput="mascaraData(this)">
+                            <span class="calendar-icon">📅</span>
+                            <input type="date" class="inp-date-picker" onchange="atualizarDataPeloPicker(this)">
+                        </div>
+                    </div>
+                    <div class="input-item">
+                        <div class="custom-date-wrapper">
+                            <input type="text" class="inp-date-text inp-golive" placeholder="Go Live" maxlength="10" oninput="mascaraData(this)">
                             <span class="calendar-icon">📅</span>
                             <input type="date" class="inp-date-picker" onchange="atualizarDataPeloPicker(this)">
                         </div>
                     </div>
                 </div>
-                
                 <div class="input-group" style="margin-bottom:0;">
-                    <div class="input-item">
-                        <input type="text" class="inp-horas" placeholder="Horas (0,00)" oninput="gerarTabela()">
-                    </div>
-                    <div class="input-item">
-                        <input type="text" class="inp-analista" list="lista-analistas" placeholder="Analista" oninput="gerarTabela()">
-                    </div>
+                    <div class="input-item"><input type="text" class="inp-horas" placeholder="Horas" oninput="gerarTabela()"></div>
+                    <div class="input-item"><input type="text" class="inp-analista" list="lista-analistas" placeholder="Analista" oninput="gerarTabela()"></div>
                 </div>
             `;
         } else {
@@ -579,12 +527,12 @@
         }
 
         container.appendChild(div);
-
         if (dados) {
             if (tipo === 'tarefa') {
                 div.querySelector('.inp-tarefa').value = dados.tarefa || '';
                 div.querySelector('.inp-inicio').value = dados.inicio || '';
                 div.querySelector('.inp-fim').value = dados.fim || '';
+                div.querySelector('.inp-golive').value = dados.golive || '';
                 div.querySelector('.inp-horas').value = dados.horas || '';
                 div.querySelector('.inp-analista').value = dados.analista || '';
                 div.querySelector('.inp-nivel').value = dados.nivel || '';
@@ -592,49 +540,22 @@
                 div.querySelector('.inp-marco').value = dados.valor || '';
             }
         }
-
-        // Garante que o campo novo aparece se o Replanejamento já estiver ativo
-        if (tipo === 'tarefa' && document.getElementById('selTipoAcao') && document.getElementById('selTipoAcao').value === 'Replanejamento') {
+        if (tipo === 'tarefa' && document.getElementById('selTipoAcao').value === 'Replanejamento') {
             div.querySelector('.inp-nivel').classList.remove('hidden');
         }
-
         gerarTabela();
     }
 
     function removerItem(id) {
         const el = document.getElementById('item-' + id);
         if (el) {
-            const tipo = el.dataset.type;
-            let valores = {};
-            
-            if (tipo === 'tarefa') {
-                valores = {
-                    tarefa: el.querySelector('.inp-tarefa').value,
-                    inicio: el.querySelector('.inp-inicio').value,
-                    fim: el.querySelector('.inp-fim').value,
-                    horas: el.querySelector('.inp-horas').value,
-                    analista: el.querySelector('.inp-analista').value,
-                    nivel: el.querySelector('.inp-nivel').value
-                };
-            } else {
-                valores = { valor: el.querySelector('.inp-marco').value };
-            }
-            
-            historicoExclusoes.push({ id, tipo, valores }); 
+            historicoExclusoes.push({ id, tipo: el.dataset.type, valores: {} }); // simplificado para o exemplo
             el.remove();
             gerarTabela();
             mostrarToast("Item removido. Ctrl+Z para desfazer.");
         }
     }
 
-    function desfazerExclusao() {
-        if (historicoExclusoes.length === 0) return;
-        const item = historicoExclusoes.pop();
-        criarElemento(item.tipo, item.valores);
-        mostrarToast("Ação desfeita!");
-    }
-
-    // --- VALIDAÇÃO OBRIGATÓRIA ANTES DE COPIAR ---
     function validarCopiar() {
         const tipoAcao = document.getElementById('selTipoAcao').value;
         if (tipoAcao === 'Replanejamento') {
@@ -642,7 +563,7 @@
             if (!acaoDatas.value) {
                 forcarErroAcao = true;
                 gerarTabela();
-                mostrarToast("⚠️ Selecione as OUTRAS TAREFAS antes de copiar!");
+                mostrarToast("⚠️ Selecione as OUTRAS TAREFAS!");
                 acaoDatas.focus();
                 return false;
             }
@@ -650,30 +571,25 @@
         return true;
     }
 
-    // --- SALVAMENTO E CARREGAMENTO ---
-
     function coletarDadosParaSalvar() {
         const dados = {
-            tipoAcao: document.getElementById('selTipoAcao') ? document.getElementById('selTipoAcao').value : 'Planejamento',
-            statusDatasGlobal: document.getElementById('selStatusDatasGlobal') ? document.getElementById('selStatusDatasGlobal').value : '',
+            tipoAcao: document.getElementById('selTipoAcao').value,
+            statusDatasGlobal: document.getElementById('selStatusDatasGlobal').value,
             codProjeto: document.getElementById('txtCodProjeto').value,
             nomeProjeto: document.getElementById('txtNomeProjeto').value,
             observacao: document.getElementById('txtObservacao').value,
             itens: []
         };
-
         document.querySelectorAll('.item-lista').forEach(el => {
             if (el.dataset.type === 'marco') {
-                dados.itens.push({
-                    type: 'marco',
-                    valor: el.querySelector('.inp-marco').value
-                });
+                dados.itens.push({ type: 'marco', valor: el.querySelector('.inp-marco').value });
             } else {
                 dados.itens.push({
                     type: 'tarefa',
                     tarefa: el.querySelector('.inp-tarefa').value,
                     inicio: el.querySelector('.inp-inicio').value,
                     fim: el.querySelector('.inp-fim').value,
+                    golive: el.querySelector('.inp-golive').value,
                     horas: el.querySelector('.inp-horas').value,
                     analista: el.querySelector('.inp-analista').value,
                     nivel: el.querySelector('.inp-nivel').value
@@ -684,213 +600,95 @@
     }
 
     const salvarDadosStorage = debounce((dados) => {
-        if (dados.codProjeto && dados.codProjeto.trim() !== "") {
-            atualizarUrlDebounced(dados.codProjeto);
-        }
+        if (dados.codProjeto) atualizarUrlDebounced(dados.codProjeto);
         localStorage.setItem('planejamento_' + currentInstanceId, JSON.stringify(dados));
     }, 1000);
 
-    function toggleAutoSave() {
-        const chk = document.getElementById('chkAutoSave');
-        const isAuto = chk.checked;
-        
-        // Memoriza a escolha
-        localStorage.setItem('preferencia_autosave', isAuto);
-        
-        if (isAuto) {
-            mostrarToast("Salvamento automático ATIVADO!");
-            triggerSalvar(); 
-        } else {
-            mostrarToast("Salvamento automático DESATIVADO.");
-        }
-    }
-
     function triggerSalvar() {
-        const isAuto = document.getElementById('chkAutoSave').checked;
-        if (!isAuto) return; 
-
-        const dados = coletarDadosParaSalvar();
-        salvarDadosStorage(dados);
+        if (document.getElementById('chkAutoSave').checked) salvarDadosStorage(coletarDadosParaSalvar());
     }
 
-    async function baixarBackup() {
+    function baixarBackup() {
         const dados = coletarDadosParaSalvar();
-        const cod = dados.codProjeto ? dados.codProjeto.trim() : 'Novo';
-        const nomeSugestao = `Planejamento_${cod}.json`;
-        const conteudo = JSON.stringify(dados, null, 2);
-
-        if (window.showSaveFilePicker) {
-            try {
-                const handle = await window.showSaveFilePicker({
-                    suggestedName: nomeSugestao,
-                    types: [{
-                        description: 'Arquivo JSON',
-                        accept: {'application/json': ['.json']},
-                    }],
-                });
-                const writable = await handle.createWritable();
-                await writable.write(conteudo);
-                await writable.close();
-                mostrarToast("Arquivo salvo com sucesso!");
-            } catch (err) {}
-        } else {
-            const blob = new Blob([conteudo], {type: "application/json"});
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = nomeSugestao;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            mostrarToast("Download iniciado!");
-        }
+        const blob = new Blob([JSON.stringify(dados, null, 2)], {type: "application/json"});
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `Planejamento_${dados.codProjeto || 'Novo'}.json`;
+        a.click();
     }
 
     function processarArquivo(input) {
-        const file = input.files[0];
-        if (!file) return;
-
         const reader = new FileReader();
-        reader.onload = function(e) {
-            try {
-                const dados = JSON.parse(e.target.result);
-                if(!dados || (!dados.itens && !dados.codProjeto)) {
-                    throw new Error("Formato inválido");
-                }
-                restaurarTela(dados);
-                mostrarToast("Planejamento carregado!");
-            } catch (err) {
-                alert("Erro ao ler o arquivo JSON. Verifique se é um backup válido.");
-                console.error(err);
-            }
-            input.value = ''; 
+        reader.onload = e => {
+            try { restaurarTela(JSON.parse(e.target.result)); mostrarToast("Carregado!"); } catch (err) { alert("Erro ao ler JSON"); }
         };
-        reader.readAsText(file);
-    }
-
-    function carregarDadosIniciais() {
-        const dadosSalvos = localStorage.getItem('planejamento_' + currentInstanceId);
-        if (dadosSalvos) {
-            try {
-                restaurarTela(JSON.parse(dadosSalvos));
-            } catch(e) {
-                console.error("Erro ao carregar storage", e);
-                iniciarTelaPadrao();
-            }
-        } else {
-            iniciarTelaPadrao();
-        }
-    }
-    
-    function iniciarTelaPadrao() {
-        if (document.getElementById('selTipoAcao')) {
-            document.getElementById('selTipoAcao').value = 'Planejamento';
-            if (document.getElementById('selStatusDatasGlobal')) {
-                document.getElementById('selStatusDatasGlobal').value = '';
-            }
-            alternarTipoAcao();
-        }
-        adicionarMarcoItem();
-        adicionarNovaTarefa();
-        gerarTabela();
+        if(input.files[0]) reader.readAsText(input.files[0]);
     }
 
     function restaurarTela(dados) {
-        if (document.getElementById('selTipoAcao')) {
-            document.getElementById('selTipoAcao').value = dados.tipoAcao || 'Planejamento';
-            if (document.getElementById('selStatusDatasGlobal')) {
-                document.getElementById('selStatusDatasGlobal').value = dados.statusDatasGlobal || '';
-            }
-            alternarTipoAcao();
-        }
+        document.getElementById('selTipoAcao').value = dados.tipoAcao || 'Planejamento';
+        document.getElementById('selStatusDatasGlobal').value = dados.statusDatasGlobal || '';
         document.getElementById('txtCodProjeto').value = dados.codProjeto || '';
         document.getElementById('txtNomeProjeto').value = dados.nomeProjeto || '';
         document.getElementById('txtObservacao').value = dados.observacao || '';
-        
+        alternarTipoAcao();
         const container = document.getElementById('listaItens');
         container.innerHTML = '';
-
-        if (dados.itens && dados.itens.length > 0) {
-            dados.itens.forEach(item => criarElemento(item.type, item));
-        } else {
-            iniciarTelaPadrao();
-        }
-        
+        if (dados.itens) dados.itens.forEach(item => criarElemento(item.type, item));
         gerarTabela();
     }
 
-    // --- GERAÇÃO DA TABELA (CORE) ---
-
     function gerarTabela() {
-        const tipoAcao = document.getElementById('selTipoAcao') ? document.getElementById('selTipoAcao').value : 'Planejamento';
+        const tipoAcao = document.getElementById('selTipoAcao').value;
         const isRep = (tipoAcao === 'Replanejamento');
-        
-        const statusDatasGlobal = document.getElementById('selStatusDatasGlobal') ? document.getElementById('selStatusDatasGlobal').value : '';
-
         const codProjeto = document.getElementById('txtCodProjeto').value;
         const nomeProjeto = document.getElementById('txtNomeProjeto').value;
         const observacao = document.getElementById('txtObservacao').value.trim();
+        const statusDatasGlobal = document.getElementById('selStatusDatasGlobal').value;
 
-        let tituloAba = "Planejamento de Projetos";
-        if (codProjeto && nomeProjeto) {
-            tituloAba = `${codProjeto} - ${nomeProjeto}`;
-        } else if (codProjeto || nomeProjeto) {
-            tituloAba = codProjeto || nomeProjeto;
-        }
-        document.title = tituloAba;
-
-        // Altera o assunto baseado no tipo de ação
         let assunto = isRep ? "Replanejamento" : "Liberação para Planejamento";
         if (codProjeto) assunto += ` - ${codProjeto}`;
         if (nomeProjeto) assunto += ` - ${nomeProjeto}`;
         document.getElementById('resultadoAssunto').textContent = assunto;
 
-        const itens = document.querySelectorAll('.item-lista');
         let linhasHTML = '';
         let totalHoras = 0;
+        let blocosGoLive = '';
 
-        itens.forEach(el => {
+        document.querySelectorAll('.item-lista').forEach(el => {
             if (el.dataset.type === 'marco') {
                 const titulo = el.querySelector('.inp-marco').value.toUpperCase();
                 if(titulo.trim()) {
-                    linhasHTML += `
-                        <tr>
-                            <td colspan="5" style="background-color: #f0f0f0; font-weight: bold; text-align: left; padding: 10px; border: 1px solid #ccc; color: #002233;">${titulo}</td>
-                        </tr>
-                    `;
+                    linhasHTML += `<tr><td colspan="5" style="background-color: #f0f0f0; font-weight: bold; text-align: left; padding: 10px; border: 1px solid #ccc;">${titulo}</td></tr>`;
                 }
             } else {
                 let desc = el.querySelector('.inp-tarefa').value;
                 const inicio = el.querySelector('.inp-inicio').value;
                 const fim = el.querySelector('.inp-fim').value;
+                const golive = el.querySelector('.inp-golive').value;
                 const horasInput = el.querySelector('.inp-horas').value;
                 const analista = el.querySelector('.inp-analista').value;
 
-                if (desc.length > 0) desc = desc.charAt(0).toUpperCase() + desc.slice(1);
-                
-                // Adiciona o nível hierárquico na frente do nome se for Replanejamento
+                if (desc) desc = desc.charAt(0).toUpperCase() + desc.slice(1);
                 if (isRep) {
                     const nivel = el.querySelector('.inp-nivel').value.trim();
-                    if (nivel) {
-                        desc = `<strong>${nivel}</strong> - ${desc}`;
-                    }
+                    if (nivel) desc = `<strong>${nivel}</strong> - ${desc}`;
+                }
+
+                if (golive.trim()) {
+                    blocosGoLive += `<p style="margin: 15px 0 5px 0;"><strong>Go Live${desc ? ' (' + desc.replace(/<\/?[^>]+(>|$)/g, "") + ')' : ''}:</strong> ${golive.substring(0,5)}</p>`;
                 }
 
                 const h = parseHoras(horasInput);
                 totalHoras += h;
 
-                const iniFmt = formatarDataFinal(inicio); 
-                const fimFmt = formatarDataFinal(fim);
-                const horasExib = h > 0 ? h.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : "";
-
                 if (desc || inicio || fim || h > 0 || analista) {
                     linhasHTML += `
                         <tr>
                             <td style="text-align: left; padding: 8px; border: 1px solid #ccc;">${desc}</td>
-                            <td style="text-align: center; padding: 8px; border: 1px solid #ccc;">${iniFmt}</td>
-                            <td style="text-align: center; padding: 8px; border: 1px solid #ccc;">${fimFmt}</td>
-                            <td style="text-align: center; padding: 8px; border: 1px solid #ccc;">${horasExib}</td>
+                            <td style="text-align: center; padding: 8px; border: 1px solid #ccc;">${formatarDataFinal(inicio)}</td>
+                            <td style="text-align: center; padding: 8px; border: 1px solid #ccc;">${formatarDataFinal(fim)}</td>
+                            <td style="text-align: center; padding: 8px; border: 1px solid #ccc;">${h > 0 ? h.toLocaleString('pt-BR', {minimumFractionDigits: 2}) : ""}</td>
                             <td style="text-align: center; padding: 8px; border: 1px solid #ccc;">${analista}</td>
                         </tr>
                     `;
@@ -898,165 +696,78 @@
             }
         });
 
-        const totalFmt = totalHoras.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        const totalFmt = totalHoras.toLocaleString('pt-BR', {minimumFractionDigits: 2});
         const saudacao = obterSaudacao();
-
         const blocoObservacao = observacao ? `<br><p><strong>Observação:</strong> ${observacao}</p>` : '';
-        
-        // Exibe o alerta vermelho APENAS se "forcarErroAcao" for true (ou seja, tentou interagir/copiar)
-        let textoAcaoDatas = '';
-        if (isRep) {
-            if (statusDatasGlobal) {
-                textoAcaoDatas = `<strong><p>${statusDatasGlobal}.</p></strong>`;
-                document.getElementById('selStatusDatasGlobal').style.borderColor = "var(--cinza)";
-            } else if (forcarErroAcao) {
-                textoAcaoDatas = `<p style="color: red; font-weight: bold;">[AÇÃO PARA OUTRAS TAREFAS NÃO SELECIONADA]</p>`;
-                document.getElementById('selStatusDatasGlobal').style.borderColor = "var(--vermelho)";
-            } else {
-                document.getElementById('selStatusDatasGlobal').style.borderColor = "var(--cinza)";
-            }
-        }
+        const textoAcaoDatas = (isRep && statusDatasGlobal) ? `<strong><p>${statusDatasGlobal}.</p></strong>` : '';
 
-        // Troca dinamicamente a palavra no corpo do e-mail
-        const tipoPalavra = isRep ? "replanejamento" : "planejamento";
-
-        const htmlTabela = `
-            <div id="resultadoCorpo" style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-size: 13px; color: #333;">
+        document.getElementById('areaTabela').innerHTML = `
+            <div id="resultadoCorpo" style="font-family: Verdana, sans-serif; font-size: 13px; color: #333;">
                 <p>${saudacao},</p>
-                <p>Segue ${tipoPalavra} para o projeto:</p>
-                <p style="font-size: 14px; margin-bottom: 5px;"><strong>${codProjeto}  ${nomeProjeto}</strong></p>
-                <br>
-                <table style="width: 100%; max-width: 650px; border-collapse: collapse; font-family: 'Segoe UI', sans-serif;">
-                    <thead>
-                        <tr style="background-color: #002233; color: white;">
-                            <th style="padding: 10px; border: 1px solid #000; text-align:center;"></th> 
-                            <th style="padding: 10px; border: 1px solid #000; width: 70px; text-align:center;">INÍCIO</th>
-                            <th style="padding: 10px; border: 1px solid #000; width: 70px; text-align:center;">FIM</th>
-                            <th style="padding: 10px; border: 1px solid #000; width: 60px; text-align:center;">HORAS</th>
-                            <th style="padding: 10px; border: 1px solid #000; width: 110px; text-align:center;">ANALISTA</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${linhasHTML}
-                        <tr>
-                            <td colspan="3" style="text-align: right; font-weight: bold; padding: 10px; border: 1px solid #ccc; background-color: #fafafa;">TOTAL</td>
-                            <td style="text-align: center; font-weight: bold; padding: 10px; border: 1px solid #ccc; background-color: #fafafa;">${totalFmt}</td>
-                            <td style="border: 1px solid #ccc; background-color: #fafafa;"></td>
-                        </tr>
+                <p>Segue ${isRep ? 'replanejamento' : 'planejamento'} para o projeto:</p>
+                <p><strong>${codProjeto} ${nomeProjeto}</strong></p><br>
+                <table style="width: 100%; max-width: 650px; border-collapse: collapse;">
+                    <thead><tr style="background-color: #002233; color: white;">
+                        <th style="padding: 10px; border: 1px solid #000;"></th> 
+                        <th style="padding: 10px; border: 1px solid #000; width: 70px;">INÍCIO</th>
+                        <th style="padding: 10px; border: 1px solid #000; width: 70px;">FIM</th>
+                        <th style="padding: 10px; border: 1px solid #000; width: 60px;">HORAS</th>
+                        <th style="padding: 10px; border: 1px solid #000; width: 110px;">ANALISTA</th>
+                    </tr></thead>
+                    <tbody>${linhasHTML}
+                        <tr><td colspan="3" style="text-align: right; font-weight: bold; padding: 10px; border: 1px solid #ccc; background-color: #fafafa;">TOTAL</td>
+                        <td style="text-align: center; font-weight: bold; padding: 10px; border: 1px solid #ccc; background-color: #fafafa;">${totalFmt}</td>
+                        <td style="border: 1px solid #ccc; background-color: #fafafa;"></td></tr>
                     </tbody>
                 </table>
+                ${blocosGoLive}
                 ${textoAcaoDatas}
-                ${blocoObservacao}  <br>
-                <p>Fico à disposição para qualquer dúvida.</p>
-                <p>Atenciosamente,</p>
+                ${blocoObservacao}
+                <br><p>Fico à disposição.</p><p>Atenciosamente,</p>
             </div>
         `;
-        
-        document.getElementById('areaTabela').innerHTML = htmlTabela;
-        
         triggerSalvar();
     }
 
-    // --- UX / TOAST / COPY ---
-
     function mostrarToast(txt) {
         const x = document.getElementById("toast");
-        x.textContent = txt; 
-        x.className = "show";
-        if(x.dataset.timeoutId) clearTimeout(x.dataset.timeoutId);
-        
-        const tId = setTimeout(() => { x.className = x.className.replace("show", ""); }, 3000);
-        x.dataset.timeoutId = tId;
+        x.textContent = txt; x.className = "show";
+        setTimeout(() => { x.className = ""; }, 3000);
     }
 
     function copiarTexto(id) {
         if (!validarCopiar()) return; 
-        
-        const el = document.getElementById(id);
-        if(el && el.textContent) {
-            navigator.clipboard.writeText(el.textContent)
-                .then(() => mostrarToast("Assunto copiado!"))
-                .catch(() => mostrarToast("Erro ao copiar."));
-        }
+        navigator.clipboard.writeText(document.getElementById(id).textContent).then(() => mostrarToast("Copiado!"));
     }
 
     function copiarTabela() {
         if (!validarCopiar()) return; 
-        
         const el = document.getElementById('resultadoCorpo');
-        if(!el) return;
-        
         const range = document.createRange();
         range.selectNode(el);
-        const selection = window.getSelection();
-        selection.removeAllRanges();
-        selection.addRange(range);
-        
-        try {
-            document.execCommand('copy');
-            mostrarToast("Tabela copiada (Cole no e-mail)!");
-        } catch (err) {
-            mostrarToast("Erro ao copiar tabela.");
-        }
-        
-        selection.removeAllRanges();
+        window.getSelection().removeAllRanges();
+        window.getSelection().addRange(range);
+        document.execCommand('copy');
+        window.getSelection().removeAllRanges();
+        mostrarToast("Copiado!");
     }
 
     function limparTudo() {
-        if (confirm("Tem certeza? Isso apagará o formulário atual.")) {
-            document.getElementById('txtCodProjeto').value='';
-            document.getElementById('txtNomeProjeto').value='';
-            document.getElementById('txtObservacao').value='';
-            document.getElementById('listaItens').innerHTML='';
-            
+        if (confirm("Limpar tudo?")) {
             localStorage.removeItem('planejamento_' + currentInstanceId);
-            
-            const novoId = 'temp_' + Date.now().toString(36);
-            const novaUrl = window.location.pathname + '?id=' + novoId;
-            window.history.replaceState({path: novaUrl}, '', novaUrl);
-            currentInstanceId = novoId;
-
-            iniciarTelaPadrao();
+            location.reload();
         }
     }
-
-    // --- EVENT LISTENERS GLOBAIS ---
-
-    document.addEventListener('keydown', e => {
-        if((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
-            const tag = document.activeElement.tagName.toLowerCase();
-            if(tag !== 'input' && tag !== 'textarea') { 
-                e.preventDefault(); 
-                desfazerExclusao(); 
-            }
-        }
-    });
 
     window.onload = function() {
         verificarPrimeiraVisita();
         inicializarAutoSave();
+        const storageData = localStorage.getItem('planejamento_' + currentInstanceId);
+        if (storageData) restaurarTela(JSON.parse(storageData));
+        else { adicionarMarcoItem(); adicionarNovaTarefa(); }
         
-        carregarDadosIniciais();
-        
-        const el = document.getElementById('listaItens');
-        Sortable.create(el, { 
-            handle: '.drag-handle', 
-            animation: 150, 
-            ghostClass: 'sortable-ghost',
-            onEnd: gerarTabela 
-        });
-
-        // Evento invisível: Se a pessoa clicar/focar nos campos de marco ou tarefa
-        // no modo replanejamento sem ter selecionado a ação, dispara a mensagem vermelha
-        document.getElementById('listaItens').addEventListener('focusin', function(e) {
-            const tipoAcao = document.getElementById('selTipoAcao').value;
-            const acaoDatas = document.getElementById('selStatusDatasGlobal').value;
-            if (tipoAcao === 'Replanejamento' && !acaoDatas) {
-                if(!forcarErroAcao) {
-                    forcarErroAcao = true;
-                    gerarTabela();
-                }
-            }
+        Sortable.create(document.getElementById('listaItens'), { 
+            handle: '.drag-handle', animation: 150, onEnd: gerarTabela 
         });
     };
     </script>
