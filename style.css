@@ -58,7 +58,7 @@
         }
 
         strong {
-            font-weight: bold;
+            font-weight: 800;
         }
 
         .hidden {
@@ -115,7 +115,6 @@
         h2,
         h3 {
             text-transform: uppercase;
-            font-weight: bold;
         }
 
         h1 {
@@ -244,14 +243,14 @@
         }
 
         .container label {
-            margin: 10px 0 0 0;
+            margin: 5px 0 0 0;
         }
 
         .resultado label {
             margin: 5px 0 10px;
         }
 
-        input[type="text"],
+        input[type="text"], textarea,
         select {
             width: 100%;
             padding: 5px;
@@ -265,11 +264,11 @@
             transition: border-color 0.3s, box-shadow 0.3s;
         }
 
-        input[type="text"]:focus,
+        input[type="text"]:focus, textarea:focus,
         select:focus {
-            border-color: var(--az-claro);
+            border-color: var(--cinza-escuro);
             outline: none;
-            box-shadow: 0 0 0 3px rgba(0, 219, 255, 0.2);
+            box-shadow: 0 0 0 3px rgba(0, 221, 255, 0.3);
             background-color: var(--branco);
         }
 
@@ -345,9 +344,9 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 0.7em;
-            letter-spacing: 0.3px;
-            font-weight: bold;
+            font-size: 0.8em;
+            letter-spacing: 0.1px;
+            font-weight: 800;
             text-transform: uppercase;
         }
 
@@ -385,7 +384,7 @@
             cursor: pointer;
             border-radius: 3px;
             border: 0;
-            font-weight: bold;
+            font-weight: 800;
             margin: -20px;
         }
 
@@ -409,7 +408,7 @@
             color: var(--az-claro);
             border: none;
             cursor: pointer;
-            font-weight: bold;
+            font-weight: 800;
             position: relative;
             padding: 0 5px; /* Pequeno respiro interno */
             margin: 0;
@@ -422,7 +421,7 @@
             top: 50%; /* Posiciona no meio verticalmente */
             transform: translateY(-50%); /* Ajuste fino de centralização */
             height: 20px; /* Altura da linha divisora */
-            width: 1px; /* Espessura da linha */
+            width: 2px; /* Espessura da linha */
             background-color: var(--az-claro); /* Cor da linha (pode mudar para var(--cinza)) */
         }
 
@@ -467,11 +466,12 @@
 
         .btn-azul {
             background-color: var(--az-claro);
-            color: var(--branco);
+            color: var(--az-escuro);
         }
 
         .btn-azul:hover {
             background-color: var(--az-claro2);
+            color: var(--preto);
         }
 
         .topo {
@@ -533,8 +533,8 @@
         #toast {
             visibility: hidden;
             min-width: 250px;
-            background-color: #333;
-            color: #fff;
+            background-color: var(--az-claro);
+            color: var(--az-escuro);
             text-align: center;
             border-radius: 4px;
             padding: 16px;
@@ -544,7 +544,7 @@
             bottom: 30px;
             transform: translateX(-50%);
             font-size: 15px;
-            font-weight: 500;
+            font-weight: bold;
             letter-spacing: 0.03em;
             opacity: 0;
             transition: opacity 0.5s, bottom 0.5s;
@@ -567,7 +567,7 @@
             background: transparent; 
             box-shadow: none;
             line-height: 1.7;
-            font-size: 0.85em;
+            font-size: 1em;
         }
 
         .tutorial h2 {
@@ -575,7 +575,7 @@
             border-bottom: 2px solid var(--az-claro); 
             padding-bottom: 5px; 
             margin-bottom: 20px; 
-            font-size: 1.3em;
+            font-size: 1.4em;
             width: 100%;
         }
 
@@ -585,12 +585,12 @@
         }
 
         .tutorial ul li {
-            padding: 7px 0;
+            padding: 10px 0;
         }
 
         /* --- MODAL DA PRIMEIRA VISITA --- */
         .modal-overlay {
-            display: none; /* Inicia oculto */
+            display: none;  /* Inicia oculto */
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
             background-color: rgba(0, 0, 0, 0.6);
@@ -618,14 +618,14 @@
         .modal-box .btn-fechar-modal {
             position: absolute;
             top: 0px; 
-            right: -7px;
+            right: -5px;
             background: transparent; border: none;
-            font-size: 18px; font-weight: bold; cursor: pointer; color: var(--az-escuro);
+            font-size: 1em; font-weight: 800; cursor: pointer; color: var(--az-escuro);
             width: 50px;
         }
 
         .modal-box .btn-fechar-modal:hover {
-            color: var(--laranja);
+            color: var(--roxo);
         }
 
 

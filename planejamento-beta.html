@@ -261,8 +261,8 @@
             </div>
 
             <div class="input-item" style="margin-top: 40px;">
-                <label for="txtObservacao">Observação:</label>
-                <input type="text" id="txtObservacao" placeholder="" oninput="gerarTabela()">
+                <label for="txtObservacao">Observações:</label>
+                <textarea id="txtObservacao" placeholder="" oninput="gerarTabela()" style="width: 100%; min-height: 80px; padding: 5px;  resize: vertical; box-sizing: border-box;"></textarea>
             </div>
 
             <div id="msgReplanejamento" class="hidden msgReplanejamento" style="display: none;">
@@ -284,15 +284,19 @@
             </div>
 
             <div class="resultado">
-                <button class="btn-azul btn-aux" onclick="copiarTexto('resultadoAssunto')">Copiar</button>
-                <label>Assunto:</label>
-                <pre id="resultadoAssunto"></pre>
-            </div>
 
-            <div class="resultado" style="min-height: 348px;">
-                <button class="btn-azul btn-aux" onclick="copiarTabela()">Copiar</button>
-                <label>Mensagem:</label>
-                <div id="areaTabela" class="tabela-container"></div>
+                <div class="topo">
+                    <label>Assunto:</label>
+                    <button class="btn-azul btn-aux" onclick="copiarTexto('resultadoAssunto')">Copiar</button>
+                </div>
+
+                <pre id="resultadoAssunto" style="margin-bottom: 30px;"></pre>
+                
+                <div class="topo">
+                    <label>Corpo do E-mail:</label>
+                    <button class="btn-azul btn-aux" onclick="copiarTabela()">Copiar</button>
+                </div>
+                <div id="areaTabela" class="tabela-container" style="min-height: 450px;"></div>
             </div>
         </section>
 
@@ -321,6 +325,7 @@
             <li>Ao digitar o nome do analista, uma lista de sugestões será aberta, mas você também pode digitar livremente.</li>
             <li>Em caso de replanejamento, informe se outras tarefas devem ser <mark class="mark-limao">mantidas ou excluídas</mark> no campo 
                 "Outras tarefas" e preencha a caixinha "Nº nível" com o <strong>número de nível hierárquico</strong> correspondente do PSA.</li>
+            <li>Para deixar um texto em <strong>negrito</strong> nas observações, coloque a palavra entre asteriscos. Ex: *urgente*.</li>
             <li><strong>Terminou?</strong> Clique no botão azul <strong>"Copiar"</strong> e cole direto no seu e-mail.</li>
             <li>Para <mark class="mark-limao">evitar erros</mark>, se possível, envie um print com a visão geral das tarefas no e-mail, do jeito que etiver.</li>
             <li>Se a caixinha <mark class="mark-limao">"Salvar automático"</mark> estiver selecionada, o progresso do trabalho será sempre salvo no seu navegador. 
@@ -764,7 +769,12 @@
         const codProjeto = document.getElementById('txtCodProjeto').value;
         const nomeProjeto = document.getElementById('txtNomeProjeto').value;
         const goLiveGlobal = document.getElementById('txtGoLiveGlobal').value;
-        const observacao = document.getElementById('txtObservacao').value.trim();
+        let observacao = document.getElementById('txtObservacao').value.trim();
+        const temMultiplasLinhas = observacao.includes('\n');
+        // Transforma **texto** ou *texto* em negrito, e quebras de linha em <br>
+        observacao = observacao.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                            .replace(/\*(.*?)\*/g, '<strong>$1</strong>')
+                            .replace(/\n/g, '<br>');
         const statusDatasGlobal = document.getElementById('selStatusDatasGlobal').value;
 
         let assunto = isRep ? "Replanejamento" : "Liberação para Planejamento";
@@ -841,7 +851,8 @@
 
         const totalFmt = totalHoras.toLocaleString('pt-BR', {minimumFractionDigits: 2});
         const saudacao = obterSaudacao();
-        const blocoObservacao = observacao ? `<br><p><strong>Observação:</strong> ${observacao}</p>` : '';
+        const separadorObs = temMultiplasLinhas ? '<br>' : ' ';
+        const blocoObservacao = observacao ? `<br><p><strong>Observações:</strong>${separadorObs}${observacao}</p>` : '';
         const textoAcaoDatas = (isRep && statusDatasGlobal) ? `<strong><p>${statusDatasGlobal}.</p></strong>` : '';
         
         // Aplica o bloco Go Live Global
