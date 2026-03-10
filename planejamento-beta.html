@@ -852,7 +852,7 @@
         const totalFmt = totalHoras.toLocaleString('pt-BR', {minimumFractionDigits: 2});
         const saudacao = obterSaudacao();
         const separadorObs = temMultiplasLinhas ? '<br>' : ' ';
-        const blocoObservacao = observacao ? `<br><p><strong>Observações:</strong>${separadorObs}${observacao}</p>` : '';
+        const blocoObservacao = observacao ? `<br><p style="line-height: 1.5;"><strong>Observações:</strong>${separadorObs}${observacao}</p>` : '';
         const textoAcaoDatas = (isRep && statusDatasGlobal) ? `<strong><p>${statusDatasGlobal}.</p></strong>` : '';
         
         // Aplica o bloco Go Live Global
