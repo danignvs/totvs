@@ -25,7 +25,7 @@
         }
 
         .item-lista {
-            margin: 10px 0;
+            margin: 20px 0;
         }
 
         .inp-tarefa {
@@ -210,7 +210,7 @@
                 <h2></h2>
             </div>
 
-            <div class="input-group" style="margin-bottom: 10px;">
+            <div class="input-group">
                 <div class="input-item">
                     <label for="selTipoAcao">Tipo de ação:</label>
                     <select id="selTipoAcao" onchange="alternarTipoAcao()">
@@ -220,7 +220,7 @@
                 </div>
                 <div class="input-item replanejamento-fields hidden" id="boxStatusDatas">
                     <label for="selStatusDatasGlobal">Outras tarefas:</label>
-                    <select id="selStatusDatasGlobal" onchange="forcarErroAcao = false; gerarTabela()">
+                    <select id="selStatusDatasGlobal" onchange="limparErroAcaoDatas(); gerarTabela()">
                         <option value=""></option>
                         <option value="Manter demais tarefas">Manter demais tarefas</option>
                         <option value="Excluir demais tarefas">Excluir demais tarefas</option>
@@ -234,13 +234,23 @@
                     <input type="text" id="txtCodProjeto" placeholder="" oninput="gerarTabela()">
                 </div>
                 <div class="input-item">
+                    <label for="txtGoLiveGlobal">Go Live:</label>
+                    <div class="custom-date-wrapper">
+                        <input type="text" id="txtGoLiveGlobal" class="inp-date-text" placeholder="Data Go Live" maxlength="10" oninput="mascaraData(this)">
+                        <span class="calendar-icon">📅</span>
+                        <input type="date" class="inp-date-picker" onchange="atualizarDataPeloPickerGlobal(this)">
+                    </div>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <div class="input-item">
                     <label for="txtNomeProjeto">Nome do projeto:</label>
                     <input type="text" id="txtNomeProjeto" placeholder="" oninput="gerarTabela()">
                 </div>
             </div>
 
-            <label style="margin-bottom: -7px;"><br></label>
-            <div id="listaItens">
+            <div id="listaItens" style="margin-top: 40px;">
             </div>
 
             <input type="file" id="fileInput" accept=".json" style="display: none;" onchange="processarArquivo(this)">
@@ -250,10 +260,9 @@
                 <button class="btn-laranja" style="flex: 1;" onclick="adicionarNovaTarefa()">+ Tarefa</button>
             </div>
 
-            <br>
-            <div class="input-item">
-                <label for="txtObservacao">Observação:</label>
-                <input type="text" id="txtObservacao" placeholder="" oninput="gerarTabela()">
+            <div class="input-item" style="margin-top: 40px;">
+                <label for="txtObservacao">Observações:</label>
+                <textarea id="txtObservacao" placeholder="" oninput="gerarTabela()" style="width: 100%; min-height: 50px; padding: 5px;  resize: vertical; box-sizing: border-box;"></textarea>
             </div>
 
             <div id="msgReplanejamento" class="hidden msgReplanejamento" style="display: none;">
@@ -275,15 +284,19 @@
             </div>
 
             <div class="resultado">
-                <button class="btn-azul btn-aux" onclick="copiarTexto('resultadoAssunto')">Copiar</button>
-                <label>Assunto:</label>
-                <pre id="resultadoAssunto"></pre>
-            </div>
 
-            <div class="resultado" style="min-height: 348px;">
-                <button class="btn-azul btn-aux" onclick="copiarTabela()">Copiar</button>
-                <label>Mensagem:</label>
-                <div id="areaTabela" class="tabela-container"></div>
+                <div class="topo">
+                    <label>Assunto:</label>
+                    <button class="btn-azul btn-aux" onclick="copiarTexto('resultadoAssunto')">Copiar</button>
+                </div>
+
+                <pre id="resultadoAssunto" style="margin-bottom: 30px;"></pre>
+                
+                <div class="topo">
+                    <label>Corpo do E-mail:</label>
+                    <button class="btn-azul btn-aux" onclick="copiarTabela()">Copiar</button>
+                </div>
+                <div id="areaTabela" class="tabela-container" style="min-height: 450px;"></div>
             </div>
         </section>
 
@@ -309,9 +322,10 @@
         💡 Dicas</h2>
         <ul>
             <li><mark class="mark-limao">Segure e arraste</mark> pelo ícone <strong class="azul-claro">☰</strong> para alterar a ordem.</li> 
-            <li>Os nomes dos analistas são apenas sugestões, você também pode digitar livremente.</li>
+            <li>Ao digitar o nome do analista, uma lista de sugestões será aberta, mas você também pode digitar livremente.</li>
             <li>Em caso de replanejamento, informe se outras tarefas devem ser <mark class="mark-limao">mantidas ou excluídas</mark> no campo 
                 "Outras tarefas" e preencha a caixinha "Nº nível" com o <strong>número de nível hierárquico</strong> correspondente do PSA.</li>
+            <li>Para deixar um texto em <strong>negrito</strong> nas observações, coloque a palavra entre asteriscos. Ex: *urgente*.</li>
             <li><strong>Terminou?</strong> Clique no botão azul <strong>"Copiar"</strong> e cole direto no seu e-mail.</li>
             <li>Para <mark class="mark-limao">evitar erros</mark>, se possível, envie um print com a visão geral das tarefas no e-mail, do jeito que etiver.</li>
             <li>Se a caixinha <mark class="mark-limao">"Salvar automático"</mark> estiver selecionada, o progresso do trabalho será sempre salvo no seu navegador. 
@@ -320,8 +334,7 @@
             <li>Sinta-se a vontade para editar a tabela ou corpo da mensagem no próprio e-mail, se preciso.</li>
         </ul>
     </div>
-
-    <script>
+<script>
     // --- UTILITÁRIOS GERAIS ---
     function debounce(func, wait) {
         let timeout;
@@ -352,7 +365,6 @@
     }, 1000); 
 
     let currentInstanceId = obterIdInstancia();
-    let forcarErroAcao = false;
 
     if (history.scrollRestoration) history.scrollRestoration = 'manual';
     window.scrollTo(0, 0);
@@ -392,7 +404,7 @@
         if (v.length > 2) v = v.substring(0, 2) + "/" + v.substring(2);
         if (v.length > 5) v = v.substring(0, 5) + "/" + v.substring(5);
         input.value = v;
-        if(v.length === 10) validarDatas(input);
+        if(v.length === 10 && input.id !== 'txtGoLiveGlobal') validarDatas(input);
         gerarTabela();
     }
 
@@ -415,7 +427,7 @@
         const dInicio = stringParaData(inpInicio.value);
         const dFim = stringParaData(inpFim.value);
         if (dInicio && dFim && dFim < dInicio) {
-            mostrarToast("Atenção: Data final é menor que a inicial!");
+            mostrarToast("📅 A data final deve ser posterior a inicial");
             inpFim.style.borderColor = "var(--vermelho)";
         } else {
             inpFim.style.borderColor = "var(--cinza)";
@@ -431,6 +443,17 @@
         if (textInput) {
             textInput.value = `${dia}/${mes}/${ano}`;
             validarDatas(textInput);
+            gerarTabela();
+        }
+    }
+
+    function atualizarDataPeloPickerGlobal(pickerInput) {
+        const valorISO = pickerInput.value; 
+        if (!valorISO) return;
+        const [ano, mes, dia] = valorISO.split('-');
+        const textInput = document.getElementById('txtGoLiveGlobal');
+        if (textInput) {
+            textInput.value = `${dia}/${mes}/${ano}`;
             gerarTabela();
         }
     }
@@ -461,11 +484,14 @@
         } else {
             msg.classList.add('hidden');
             campos.forEach(c => c.classList.add('hidden'));
-            forcarErroAcao = false;
-            const selDatas = document.getElementById('selStatusDatasGlobal');
-            if(selDatas) selDatas.style.borderColor = "var(--cinza)";
+            limparErroAcaoDatas();
         }
         gerarTabela();
+    }
+
+    function limparErroAcaoDatas() {
+        const selDatas = document.getElementById('selStatusDatasGlobal');
+        if(selDatas) selDatas.style.borderColor = "var(--cinza)";
     }
 
     function adicionarNovaTarefa() { criarElemento('tarefa'); }
@@ -484,7 +510,7 @@
                 <div style="display:flex; justify-content:space-between; align-items:center; gap: 7px; margin-bottom: 5px;">
                     <div style="display:flex; align-items:center; flex:1; gap: 7px;">
                         <span class="drag-handle" title="Mover">☰</span>
-                        <input type="text" class="inp-nivel replanejamento-fields hidden" placeholder="Nº nível" oninput="gerarTabela()" style="margin:0; width: 65px;">
+                        <input type="text" class="inp-nivel replanejamento-fields hidden" placeholder="Nº" oninput="gerarTabela()" style="margin:0; width: 65px;">
                         <input type="text" class="inp-tarefa" placeholder="Tarefa" oninput="gerarTabela()" style="margin:0; flex: 1;">
                     </div>
                     <button class="excluir" style="margin:0;" onclick="removerItem('${idUnico}')">X</button>
@@ -504,23 +530,21 @@
                             <input type="date" class="inp-date-picker" onchange="atualizarDataPeloPicker(this)">
                         </div>
                     </div>
-                    <div class="input-item">
-                        <div class="custom-date-wrapper">
-                            <input type="text" class="inp-date-text inp-golive" placeholder="Go Live" maxlength="10" oninput="mascaraData(this)">
-                            <span class="calendar-icon">📅</span>
-                            <input type="date" class="inp-date-picker" onchange="atualizarDataPeloPicker(this)">
-                        </div>
-                    </div>
                 </div>
                 <div class="input-group" style="margin-bottom:0;">
-                    <div class="input-item"><input type="text" class="inp-horas" placeholder="Horas" oninput="gerarTabela()"></div>
-                    <div class="input-item"><input type="text" class="inp-analista" list="lista-analistas" placeholder="Analista" oninput="gerarTabela()"></div>
+                    <div class="input-item">
+                        <input type="text" class="inp-horas" placeholder="Horas" oninput="gerarTabela()">
+                    </div>
+                    <div class="input-item">
+                        <input type="text" class="inp-analista" placeholder="Analista" oninput="gerenciarSugestoes(this)">
+                    </div>
                 </div>
             `;
         } else {
             div.className = 'wrapper item-lista marco';
             div.innerHTML = `
                 <span class="drag-handle" title="Mover">☰</span>
+                <input type="text" class="inp-nivel replanejamento-fields hidden" placeholder="Nº" oninput="gerarTabela()" style="margin:0; width: 65px;">
                 <input type="text" class="inp-marco" placeholder="MARCO" oninput="gerarTabela()" style="flex:1;">
                 <button class="excluir" style="margin:0;" onclick="removerItem('${idUnico}')">X</button>
             `;
@@ -532,16 +556,27 @@
                 div.querySelector('.inp-tarefa').value = dados.tarefa || '';
                 div.querySelector('.inp-inicio').value = dados.inicio || '';
                 div.querySelector('.inp-fim').value = dados.fim || '';
-                div.querySelector('.inp-golive').value = dados.golive || '';
                 div.querySelector('.inp-horas').value = dados.horas || '';
                 div.querySelector('.inp-analista').value = dados.analista || '';
                 div.querySelector('.inp-nivel').value = dados.nivel || '';
             } else {
                 div.querySelector('.inp-marco').value = dados.valor || '';
+                div.querySelector('.inp-nivel').value = dados.nivel || '';
             }
         }
-        if (tipo === 'tarefa' && document.getElementById('selTipoAcao').value === 'Replanejamento') {
-            div.querySelector('.inp-nivel').classList.remove('hidden');
+        
+        if (document.getElementById('selTipoAcao').value === 'Replanejamento') {
+            div.querySelectorAll('.inp-nivel').forEach(el => el.classList.remove('hidden'));
+        }
+        
+        gerarTabela();
+    }
+
+    function gerenciarSugestoes(input) {
+        if (input.value.length > 0) {
+            input.setAttribute("list", "lista-analistas");
+        } else {
+            input.removeAttribute("list");
         }
         gerarTabela();
     }
@@ -549,10 +584,10 @@
     function removerItem(id) {
         const el = document.getElementById('item-' + id);
         if (el) {
-            historicoExclusoes.push({ id, tipo: el.dataset.type, valores: {} }); // simplificado para o exemplo
+            historicoExclusoes.push({ id, tipo: el.dataset.type, valores: {} }); 
             el.remove();
             gerarTabela();
-            mostrarToast("Item removido. Ctrl+Z para desfazer.");
+            mostrarToast("❌ Item removido. Tecle Ctrl+Z para desfazer");
         }
     }
 
@@ -561,11 +596,12 @@
         if (tipoAcao === 'Replanejamento') {
             const acaoDatas = document.getElementById('selStatusDatasGlobal');
             if (!acaoDatas.value) {
-                forcarErroAcao = true;
-                gerarTabela();
-                mostrarToast("⚠️ Selecione as OUTRAS TAREFAS!");
+                acaoDatas.style.borderColor = "var(--vermelho)";
+                mostrarToast("⚠️ Decida se as OUTRAS TAREFAS devem ser mantidas ou excluídas");
                 acaoDatas.focus();
                 return false;
+            } else {
+                acaoDatas.style.borderColor = "var(--cinza)";
             }
         }
         return true;
@@ -577,19 +613,23 @@
             statusDatasGlobal: document.getElementById('selStatusDatasGlobal').value,
             codProjeto: document.getElementById('txtCodProjeto').value,
             nomeProjeto: document.getElementById('txtNomeProjeto').value,
+            goLiveGlobal: document.getElementById('txtGoLiveGlobal').value,
             observacao: document.getElementById('txtObservacao').value,
             itens: []
         };
         document.querySelectorAll('.item-lista').forEach(el => {
             if (el.dataset.type === 'marco') {
-                dados.itens.push({ type: 'marco', valor: el.querySelector('.inp-marco').value });
+                dados.itens.push({ 
+                    type: 'marco', 
+                    valor: el.querySelector('.inp-marco').value,
+                    nivel: el.querySelector('.inp-nivel').value 
+                });
             } else {
                 dados.itens.push({
                     type: 'tarefa',
                     tarefa: el.querySelector('.inp-tarefa').value,
                     inicio: el.querySelector('.inp-inicio').value,
                     fim: el.querySelector('.inp-fim').value,
-                    golive: el.querySelector('.inp-golive').value,
                     horas: el.querySelector('.inp-horas').value,
                     analista: el.querySelector('.inp-analista').value,
                     nivel: el.querySelector('.inp-nivel').value
@@ -608,19 +648,46 @@
         if (document.getElementById('chkAutoSave').checked) salvarDadosStorage(coletarDadosParaSalvar());
     }
 
-    function baixarBackup() {
+    async function baixarBackup() {
         const dados = coletarDadosParaSalvar();
-        const blob = new Blob([JSON.stringify(dados, null, 2)], {type: "application/json"});
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = `Planejamento_${dados.codProjeto || 'Novo'}.json`;
-        a.click();
+        const conteudo = JSON.stringify(dados, null, 2);
+        const nomeSugerido = `Planejamento_${dados.codProjeto || 'Novo'}.json`;
+
+        try {
+            // Tenta forçar a janela de "Salvar Como" em navegadores compatíveis
+            if (window.showSaveFilePicker) {
+                const handle = await window.showSaveFilePicker({
+                    suggestedName: nomeSugerido,
+                    types: [{
+                        description: 'Arquivo JSON',
+                        accept: { 'application/json': ['.json'] },
+                    }],
+                });
+                const writable = await handle.createWritable();
+                await writable.write(conteudo);
+                await writable.close();
+                mostrarToast("Feito!");
+            } else {
+                // Fallback caso o navegador não suporte a API (ex: Firefox antigo ou Safari)
+                const blob = new Blob([conteudo], {type: "application/json"});
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = nomeSugerido;
+                a.click();
+            }
+        } catch (err) {
+            // Ignora erro se a pessoa apenas clicou em "Cancelar" na janela
+            if (err.name !== 'AbortError') {
+                console.error(err);
+                mostrarToast("⚠️ Erro ao salvar");
+            }
+        }
     }
 
     function processarArquivo(input) {
         const reader = new FileReader();
         reader.onload = e => {
-            try { restaurarTela(JSON.parse(e.target.result)); mostrarToast("Carregado!"); } catch (err) { alert("Erro ao ler JSON"); }
+            try { restaurarTela(JSON.parse(e.target.result)); mostrarToast("Feito!"); } catch (err) { alert("Erro ao ler JSON"); }
         };
         if(input.files[0]) reader.readAsText(input.files[0]);
     }
@@ -630,6 +697,7 @@
         document.getElementById('selStatusDatasGlobal').value = dados.statusDatasGlobal || '';
         document.getElementById('txtCodProjeto').value = dados.codProjeto || '';
         document.getElementById('txtNomeProjeto').value = dados.nomeProjeto || '';
+        document.getElementById('txtGoLiveGlobal').value = dados.goLiveGlobal || '';
         document.getElementById('txtObservacao').value = dados.observacao || '';
         alternarTipoAcao();
         const container = document.getElementById('listaItens');
@@ -638,12 +706,75 @@
         gerarTabela();
     }
 
+    function atualizarNumeracao() {
+        const tipoAcao = document.getElementById('selTipoAcao').value;
+        const isRep = (tipoAcao === 'Replanejamento');
+
+        let marcoIndex = 0;
+        let tarefaIndex = 0;
+        let currentMarcoNum = "";
+
+        document.querySelectorAll('.item-lista').forEach(el => {
+            const inpNivel = el.querySelector('.inp-nivel');
+            if (!inpNivel) return;
+
+            if (el.dataset.type === 'marco') {
+                marcoIndex++;
+                tarefaIndex = 0;
+                
+                let defaultNum = marcoIndex.toString();
+                
+                if (isRep) {
+                    inpNivel.placeholder = defaultNum;
+                    currentMarcoNum = inpNivel.value.trim() || defaultNum; 
+                } else {
+                    inpNivel.value = defaultNum;
+                    inpNivel.placeholder = ""; 
+                    currentMarcoNum = defaultNum;
+                }
+            } else if (el.dataset.type === 'tarefa') {
+                tarefaIndex++;
+                let defaultMarco = marcoIndex > 0 ? marcoIndex : 0;
+                let defaultNum = defaultMarco + '.' + tarefaIndex;
+                
+                if (isRep) {
+                    let parentMarcoNum = currentMarcoNum || defaultMarco.toString();
+                    inpNivel.placeholder = parentMarcoNum + '.' + tarefaIndex;
+                    
+                    let typedVal = inpNivel.value.trim();
+                    if (typedVal) {
+                        let expectedPrefix = parentMarcoNum + '.';
+                        if (!typedVal.startsWith(expectedPrefix) && typedVal !== parentMarcoNum) {
+                            let parts = typedVal.split('.');
+                            if (parts.length > 1) {
+                                inpNivel.value = expectedPrefix + parts.slice(1).join('.');
+                            } else {
+                                inpNivel.value = expectedPrefix + typedVal;
+                            }
+                        }
+                    }
+                } else {
+                    inpNivel.value = defaultNum;
+                    inpNivel.placeholder = "";
+                }
+            }
+        });
+    }
+
     function gerarTabela() {
+        atualizarNumeracao();
+
         const tipoAcao = document.getElementById('selTipoAcao').value;
         const isRep = (tipoAcao === 'Replanejamento');
         const codProjeto = document.getElementById('txtCodProjeto').value;
         const nomeProjeto = document.getElementById('txtNomeProjeto').value;
-        const observacao = document.getElementById('txtObservacao').value.trim();
+        const goLiveGlobal = document.getElementById('txtGoLiveGlobal').value;
+        let observacao = document.getElementById('txtObservacao').value.trim();
+        const temMultiplasLinhas = observacao.includes('\n');
+        // Transforma **texto** ou *texto* em negrito, e quebras de linha em <br>
+        observacao = observacao.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                            .replace(/\*(.*?)\*/g, '<strong>$1</strong>')
+                            .replace(/\n/g, '<br>');
         const statusDatasGlobal = document.getElementById('selStatusDatasGlobal').value;
 
         let assunto = isRep ? "Replanejamento" : "Liberação para Planejamento";
@@ -653,31 +784,53 @@
 
         let linhasHTML = '';
         let totalHoras = 0;
-        let blocosGoLive = '';
+
+        let horasPorMarco = {};
+        let currentMarcoId = null;
+        document.querySelectorAll('.item-lista').forEach(el => {
+            if (el.dataset.type === 'marco') {
+                currentMarcoId = el.id;
+                horasPorMarco[currentMarcoId] = 0;
+            } else if (el.dataset.type === 'tarefa') {
+                const horasInput = el.querySelector('.inp-horas').value;
+                const h = parseHoras(horasInput);
+                if (currentMarcoId) {
+                    horasPorMarco[currentMarcoId] += h;
+                }
+            }
+        });
 
         document.querySelectorAll('.item-lista').forEach(el => {
             if (el.dataset.type === 'marco') {
-                const titulo = el.querySelector('.inp-marco').value.toUpperCase();
-                if(titulo.trim()) {
-                    linhasHTML += `<tr><td colspan="5" style="background-color: #f0f0f0; font-weight: bold; text-align: left; padding: 10px; border: 1px solid #ccc;">${titulo}</td></tr>`;
+                let titulo = el.querySelector('.inp-marco').value.toUpperCase();
+                let nivelInput = el.querySelector('.inp-nivel');
+                const nivel = nivelInput ? (nivelInput.value.trim() || nivelInput.placeholder) : '';
+                
+                if (nivel && titulo) titulo = `${nivel} - ${titulo}`;
+                else if (nivel) titulo = nivel; 
+
+                if(titulo.trim() !== "") {
+                    const hMarco = horasPorMarco[el.id] || 0;
+                    const hMarcoFmt = hMarco > 0 ? hMarco.toLocaleString('pt-BR', {minimumFractionDigits: 2}) : "";
+
+                    linhasHTML += `<tr>
+                        <td colspan="3" style="background-color: #f0f0f0; font-weight: bold; text-align: left; padding: 10px; border: 1px solid #ccc;">${titulo}</td>
+                        <td style="background-color: #f0f0f0; font-weight: bold; text-align: center; padding: 10px; border: 1px solid #ccc;">${hMarcoFmt}</td>
+                        <td style="background-color: #f0f0f0; border: 1px solid #ccc;"></td>
+                    </tr>`;
                 }
             } else {
                 let desc = el.querySelector('.inp-tarefa').value;
                 const inicio = el.querySelector('.inp-inicio').value;
                 const fim = el.querySelector('.inp-fim').value;
-                const golive = el.querySelector('.inp-golive').value;
                 const horasInput = el.querySelector('.inp-horas').value;
                 const analista = el.querySelector('.inp-analista').value;
+                
+                let nivelInput = el.querySelector('.inp-nivel');
+                const nivel = nivelInput ? (nivelInput.value.trim() || nivelInput.placeholder) : '';
 
                 if (desc) desc = desc.charAt(0).toUpperCase() + desc.slice(1);
-                if (isRep) {
-                    const nivel = el.querySelector('.inp-nivel').value.trim();
-                    if (nivel) desc = `<strong>${nivel}</strong> - ${desc}`;
-                }
-
-                if (golive.trim()) {
-                    blocosGoLive += `<p style="margin: 15px 0 5px 0;"><strong>Go Live${desc ? ' (' + desc.replace(/<\/?[^>]+(>|$)/g, "") + ')' : ''}:</strong> ${golive.substring(0,5)}</p>`;
-                }
+                if (nivel) desc = `<strong>${nivel}</strong> - ${desc}`;
 
                 const h = parseHoras(horasInput);
                 totalHoras += h;
@@ -698,8 +851,15 @@
 
         const totalFmt = totalHoras.toLocaleString('pt-BR', {minimumFractionDigits: 2});
         const saudacao = obterSaudacao();
-        const blocoObservacao = observacao ? `<br><p><strong>Observação:</strong> ${observacao}</p>` : '';
+        const separadorObs = temMultiplasLinhas ? '<br>' : ' ';
+        const blocoObservacao = observacao ? `<br><p style="line-height: 1.5;"><strong>Observações:</strong>${separadorObs}${observacao}</p>` : '';
         const textoAcaoDatas = (isRep && statusDatasGlobal) ? `<strong><p>${statusDatasGlobal}.</p></strong>` : '';
+        
+        // Aplica o bloco Go Live Global
+        let blocoGoLiveGlobal = '';
+        if (goLiveGlobal.trim()) {
+            blocoGoLiveGlobal = `<p style="margin: 15px 0 5px 0;"><strong>Go Live:</strong> ${formatarDataFinal(goLiveGlobal)}</p>`;
+        }
 
         document.getElementById('areaTabela').innerHTML = `
             <div id="resultadoCorpo" style="font-family: Verdana, sans-serif; font-size: 13px; color: #333;">
@@ -720,7 +880,7 @@
                         <td style="border: 1px solid #ccc; background-color: #fafafa;"></td></tr>
                     </tbody>
                 </table>
-                ${blocosGoLive}
+                ${blocoGoLiveGlobal}
                 ${textoAcaoDatas}
                 ${blocoObservacao}
                 <br><p>Fico à disposição.</p><p>Atenciosamente,</p>
