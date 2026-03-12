@@ -861,7 +861,10 @@
     async function baixarBackup() {
         const dados = coletarDadosParaSalvar();
         const conteudo = JSON.stringify(dados, null, 2);
-        const nomeSugerido = `Planejamento_${dados.codProjeto || 'Novo'}.json`;
+        
+        // Verifica o tipo de ação para definir o nome do arquivo
+        const prefixo = dados.tipoAcao === 'Replanejamento' ? 'Replanejamento' : 'Planejamento';
+        const nomeSugerido = `${prefixo}_${dados.codProjeto || 'Novo'}.json`;
 
         try {
             // Tenta forçar a janela de "Salvar Como" em navegadores compatíveis
