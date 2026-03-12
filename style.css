@@ -3,7 +3,7 @@
             --az-escuro: #002233;
             --preto: #000;
             --az-claro: #00DBFF;
-            --az-claro2: #00cceb;
+            --az-claro2: #01c2e0;
             --az-bg: #e4fbff;
             --roxo: #A44DFF;
             --roxo2: #833ad1;
@@ -274,7 +274,8 @@
 
         .input-group {
             display: flex;
-            gap: 10px;
+            align-items: center;
+            gap: 7px;
             margin-bottom: 0;
             align-self: center;
         }
@@ -352,7 +353,7 @@
 
         .btn-aux {
             width: auto;
-            padding: 5px 7px;
+            padding: 3px 7px;
             font-size: 0.7em;
             float: right;
         }
@@ -554,7 +555,7 @@
         #toast.show {
             visibility: visible;
             opacity: 1;
-            bottom: 100px;
+            bottom: 50px;
         }
 
         .tutorial {
@@ -609,7 +610,7 @@
             text-align: center;
             position: relative;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            border-top: 6px solid var(--roxo);
+            border-top: 6px solid var(--az-claro);
             animation: fadeIn 0.3s ease-in-out;
             margin: 0 auto;
             margin-top: 200px;
@@ -618,14 +619,17 @@
         .modal-box .btn-fechar-modal {
             position: absolute;
             top: 0px; 
-            right: -5px;
+            right: -10px;
             background: transparent; border: none;
-            font-size: 1em; font-weight: 800; cursor: pointer; color: var(--az-escuro);
+            font-size: 1em; 
+            font-weight: 600; 
+            cursor: pointer; 
+            color: var(--az-escuro);
             width: 50px;
         }
 
         .modal-box .btn-fechar-modal:hover {
-            color: var(--roxo);
+            color: var(--az-claro);
         }
 
 
