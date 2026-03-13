@@ -939,7 +939,6 @@
                 
                 if (isRep) {
                     inpNivel.placeholder = defaultNum;
-                    // Só pega o que foi realmente digitado, não assume o defaultNum
                     currentMarcoNum = inpNivel.value.trim(); 
                 } else {
                     inpNivel.value = defaultNum;
@@ -949,25 +948,43 @@
             } else if (el.dataset.type === 'tarefa') {
                 tarefaIndex++;
                 let defaultMarco = marcoIndex > 0 ? marcoIndex : 0;
-                let defaultNum = defaultMarco + '.' + tarefaIndex;
                 
                 if (isRep) {
-                    let parentMarcoNum = currentMarcoNum; 
-                    inpNivel.placeholder = parentMarcoNum ? (parentMarcoNum + '.' + tarefaIndex) : (defaultMarco + '.' + tarefaIndex);
+                    let parentMarcoNum = currentMarcoNum || defaultMarco.toString();
+                    let prefixo = parentMarcoNum + ".";
+                    
+                    inpNivel.placeholder = prefixo + tarefaIndex;
                     
                     let typedVal = inpNivel.value.trim();
-                    if (typedVal && parentMarcoNum) {
-                        let expectedPrefix = parentMarcoNum + '.';
-                        if (!typedVal.startsWith(expectedPrefix) && typedVal !== parentMarcoNum) {
-                            let parts = typedVal.split('.');
-                            if (parts.length > 1) {
-                                inpNivel.value = expectedPrefix + parts.slice(1).join('.');
+                    let lastVal = inpNivel.dataset.lastVal || "";
+
+                    if (typedVal !== "") {
+                        // Detecta se o usuário está apagando o número (Backspace)
+                        let isDeletion = lastVal.startsWith(typedVal) && typedVal.length < lastVal.length;
+
+                        if (isDeletion && typedVal.length < prefixo.length) {
+                            // Se o usuário apagou até comer o ponto do prefixo, limpamos o campo para ele não ficar preso
+                            inpNivel.value = "";
+                        } 
+                        else if (!typedVal.startsWith(prefixo)) {
+                            // Se o texto não tem o prefixo certinho...
+                            if (!typedVal.includes(".")) {
+                                // O usuário digitou um número direto (ex: 1). Já grudamos o prefixo!
+                                inpNivel.value = prefixo + typedVal;
                             } else {
-                                inpNivel.value = expectedPrefix + typedVal;
+                                // O usuário colou algo com ponto ou arrastou de outro marco. Pega só o finalzinho.
+                                let partes = typedVal.split('.');
+                                inpNivel.value = prefixo + partes[partes.length - 1];
                             }
                         }
                     }
+                    
+                    // Salva o valor para a memória da próxima vez que você digitar algo
+                    inpNivel.dataset.lastVal = inpNivel.value.trim();
+
                 } else {
+                    // Planejamento normal (Automático)
+                    let defaultNum = (marcoIndex > 0 ? marcoIndex : 0) + '.' + tarefaIndex;
                     inpNivel.value = defaultNum;
                     inpNivel.placeholder = "";
                 }
@@ -978,7 +995,7 @@
     function gerarTabela() {
         const valTipoAcao = document.getElementById('selTipoAcao').value;
         if (!valTipoAcao) {
-            document.getElementById('areaTabela').innerHTML = '<p style="text-align:center; padding: 20px; color: var(--cinza); font-weight: bold;">Selecione o "Planejamento" ou "Replanejamento" para começar.</p>';
+            document.getElementById('areaTabela').innerHTML = '<p style="text-align:center; padding: 20px; color: var(--cinza); font-weight: bold;">Selecione "Planejamento" ou "Replanejamento" para começar.</p>';
             document.getElementById('resultadoAssunto').textContent = 'Aguardando seleção...';
             return;
         }
