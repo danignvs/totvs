@@ -750,53 +750,22 @@
     let pendingCopyId = null;
 
     function validarCopiar(actionType, id = null) {
-        const tipoAcao = document.getElementById('selTipoAcao').value;
-        if (tipoAcao === 'Replanejamento') {
-            
-            // 1. Verifica os níveis primeiro e já pinta se faltar algo
-            let niveisValidos = true;
-            let primeiroInvalido = null; // Guarda o primeiro campo vazio para rolar a tela
-
-            document.querySelectorAll('.item-lista .inp-nivel').forEach(inp => {
-                if (!inp.value.trim()) {
-                    // Deixa o erro bem evidente com estilo inline (sem precisar de novo CSS)
-                    inp.style.border = "2px solid var(--vermelho)";
-                    inp.style.backgroundColor = "#ffe6e6"; // Fundo levemente avermelhado
-                    niveisValidos = false;
-                    
-                    if (!primeiroInvalido) primeiroInvalido = inp;
-                } else {
-                    // Limpa se estiver preenchido
-                    inp.style.border = "";
-                    inp.style.backgroundColor = "";
-                }
-            });
-
-            // 2. Verifica a seleção do dropdown "Manter/Excluir"
-            const acaoDatas = document.getElementById('selStatusDatasGlobal');
-            if (!acaoDatas.value) {
-                acaoDatas.style.borderColor = "var(--vermelho)";
-                pendingCopyAction = actionType;
-                pendingCopyId = id;
-                document.getElementById('modalAcaoDatas').style.display = 'flex';
-                return false; // Bloqueia a cópia para abrir o modal
-            } else {
-                acaoDatas.style.borderColor = "var(--cinza)";
-            }
-
-            // 3. Se passou do modal, mas os níveis ainda estão vazios, emite o alerta final e rola a tela
-            if (!niveisValidos) {
-                mostrarToast("⚠️ Preencha os números de nível para copiar!");
-                if (primeiroInvalido) {
-                    // Rola a tela suavemente até o campo e coloca o cursor piscando lá
-                    primeiroInvalido.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    primeiroInvalido.focus();
-                }
-                return false; // Bloqueia a cópia
-            }
-        }
-        return true;
-    }
+        const tipoAcao = document.getElementById('selTipoAcao').value;
+        if (tipoAcao === 'Replanejamento') {
+            // Verifica a seleção do dropdown "Manter/Excluir"
+            const acaoDatas = document.getElementById('selStatusDatasGlobal');
+            if (!acaoDatas.value) {
+                acaoDatas.style.borderColor = "var(--vermelho)";
+                pendingCopyAction = actionType;
+                pendingCopyId = id;
+                document.getElementById('modalAcaoDatas').style.display = 'flex';
+                return false; // Bloqueia a cópia para abrir o modal
+            } else {
+                acaoDatas.style.borderColor = "var(--cinza)";
+            }
+        }
+        return true;
+    }
 
     function confirmarAcaoDatasModal(valor) {
         const selDatas = document.getElementById('selStatusDatasGlobal');
