@@ -157,41 +157,50 @@
                 const cod = codigos[i].value.trim();
                 const nome = nomes[i].value.trim();
                 
-                // Salva os dados do primeiro projeto para usar no assunto
                 if ((cod || nome) && qtdProjetosPreenchidos === 0) {
                     primeiroCodigo = cod;
                     primeiroNome = nome;
                 }
                 
-                if (cod || nome) qtdProjetosPreenchidos++;
-
-                const exibirCod = cod ? cod : "[Cód. Projeto]";
-                const exibirNome = nome ? nome : "[Nome do Projeto]";
-                
-                projetosFormatados += `${exibirCod} - ${exibirNome}\n`;
+                if (cod || nome) {
+                    qtdProjetosPreenchidos++;
+                    const exibirCod = cod ? cod : "[Cód. Projeto]";
+                    const exibirNome = nome ? nome : "[Nome do Projeto]";
+                    
+                    projetosFormatados += `${exibirCod} - ${exibirNome}\n`;
+                }
             }
 
-            // Lógica atualizada do Assunto
+            // Lógica do Assunto atualizada com o hífen
             let assunto = 'Alteração de item contábil';
             if (qtdProjetosPreenchidos === 1 && (primeiroCodigo || primeiroNome)) {
-                // Junta o código e o nome (remove espaços extras se um dos dois estiver vazio)
-                let infoProjeto = `${primeiroCodigo} ${primeiroNome}`.trim();
+                // Usa o array com filter para garantir que o hífen só apareça se houver as duas informações
+                let infoProjeto = [primeiroCodigo, primeiroNome].filter(Boolean).join(' - ');
                 assunto = `Alteração de item contábil - ${infoProjeto}`;
             } else if (qtdProjetosPreenchidos > 1) {
                 assunto = `Alteração de item contábil - Diversos Projetos`;
             }
 
             const saudacao = obterSaudacao();
-            const pluralTexto = codigos.length > 1 ? "dos projetos abaixo" : "do projeto abaixo";
+            const pluralTexto = qtdProjetosPreenchidos > 1 ? "dos projetos abaixo" : "do projeto abaixo";
 
+            // Se nada for digitado, mostra uma estrutura base
+            if (qtdProjetosPreenchidos === 0) {
+                 projetosFormatados = "[Cód. Projeto] - [Nome do Projeto]\n";
+            }
+
+            // Corpo do e-mail atualizado com espaçamentos e <strong> (negrito)
             const corpoEmail = `Olá, ${saudacao}!
 
-Solicito a alteração do item contábil ${pluralTexto} para ${novoItem}:
+Solicito a alteração do item contábil ${pluralTexto} para <strong>${novoItem}</strong>:
+
 ${projetosFormatados}
+
 Atenciosamente,`;
 
             document.getElementById('resultadoAssunto').textContent = assunto;
-            document.getElementById('resultadoCorpo').textContent = corpoEmail;
+            // Mudamos de .textContent para .innerHTML para que o negrito (<strong>) seja renderizado
+            document.getElementById('resultadoCorpo').innerHTML = corpoEmail; 
         }
 
         function mostrarToast(texto) {
@@ -202,15 +211,24 @@ Atenciosamente,`;
             setTimeout(function () { x.className = x.className.replace("show", ""); }, 4000);
         }
 
+        // Função de copiar modificada para copiar o texto com formatação (negrito)
         function copiarTexto(idElemento) {
-            const texto = document.getElementById(idElemento).textContent;
-            if (!texto.trim()) return;
-            navigator.clipboard.writeText(texto).then(() => {
-                mostrarToast(texto);
-            }).catch(err => {
+            const elemento = document.getElementById(idElemento);
+            const selecao = window.getSelection();
+            const range = document.createRange();
+            
+            range.selectNodeContents(elemento);
+            selecao.removeAllRanges();
+            selecao.addRange(range);
+
+            try {
+                document.execCommand('copy');
+                mostrarToast(elemento.textContent);
+            } catch (err) {
                 console.error('Erro ao copiar: ', err);
                 alert('Erro manual ao copiar.');
-            });
+            }
+            selecao.removeAllRanges();
         }
 
         function limparFormulario() {
@@ -231,14 +249,6 @@ Atenciosamente,`;
                 </div>
             `;
             gerarEmail();
-        }
-
-        function copiarString(texto) {
-            navigator.clipboard.writeText(texto).then(() => {
-                mostrarToast(texto);
-            }).catch(err => {
-                console.error('Erro ao copiar: ', err);
-            });
         }
 
         window.onload = function () {
