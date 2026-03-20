@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Gerador de Email - Item Contábil</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .excluir {
+            margin: 0;
+            margin-top: -64px;
+            background: transparent;
+            color: var(--vermelho);
+            position: relative;
+            z-index: 10;
+            float: right;
+            border: none;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            padding: 5px;
+            width: 25px;
+        }
+
+        novoitem, projetosformatados {
+            font-weight: 800;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1><strong class="azul-claro">Alteração de</strong> Item Contábil</h1>
+    <div class="container container-azul">
+
+        <section class="container-formulario">
+            <div class="topo">
+                <h2>Projetos para alteração</h2>                
+            </div>
+
+            <br>
+            
+            <div id="projetosContainer">
+                <div class="projeto-row">
+                    <div class="input-group">
+                        <div class="input-item">
+                            <label>Cód. projeto:</label>
+                            <input type="text" class="codProjeto" placeholder="Ex: D000..." oninput="gerarEmail()">
+                        </div>
+                        <div class="input-item">
+                            <label>Nome do projeto:</label>
+                            <input type="text" class="nomeProjeto" placeholder=" " oninput="gerarEmail()">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn-azul btn-add" style="margin-top: 15px;" onclick="adicionarProjeto()">+ Adicionar Projeto</button>
+            
+            <br> <br> 
+
+            <div class="input-group">
+                <div class="input-item">
+                    <label for="novoItem">Novo item contábil:</label>
+                    <select id="novoItem" onchange="gerarEmail()">
+                        <option value="16 - HOSPITALITY - 1600">16 - HOSPITALITY - 1600</option>
+                    </select>
+                </div>
+            </div>
+            
+        </section>
+
+        <section class="container-resultado">
+            <h3 class="roxo"><span class="azul">E-mail</span> gerado</h3>
+
+            <div class="resultado">
+                <button class="btn-roxo btn-aux" onclick="copiarTexto('resultadoAssunto')">Copiar</button>
+                <label>Assunto</label>
+                <pre id="resultadoAssunto"></pre>
+            </div>
+
+            <div class="resultado">
+                <button class="btn-roxo btn-aux" onclick="copiarTexto('resultadoCorpo')">Copiar</button>
+                <label>Mensagem</label>
+                <pre id="resultadoCorpo"></pre>
+            </div>
+        </section>
+
+        <section class="botoes-de-acao">
+            <button class="btn-roxo" onclick="copiarString('Status: Alteração de Item Contábil Solicitada')">Copiar Status</button>
+            <button class="btn-laranja" onclick="limparFormulario()">Limpar</button>
+            <div id="toast">Copiado para a área de transferência!</div>
+        </section>
+    </div>  
+
+    <script>
+        if (history.scrollRestoration) {
+            history.scrollRestoration = 'manual';
+        }
+        window.scrollTo(0, 0);
+
+        function obterSaudacao() {
+            const hora = parseInt(new Date().toLocaleString("pt-BR", {
+                timeZone: "America/Sao_Paulo",
+                hour: "numeric",
+                hour12: false
+            }));
+
+            if (hora >= 5 && hora < 12) return "bom dia";
+            else if (hora >= 12 && hora < 18) return "boa tarde";
+            else return "bom dia/boa tarde";
+        }
+
+        function adicionarProjeto() {
+            const container = document.getElementById('projetosContainer');
+            const novaLinha = document.createElement('div');
+            novaLinha.className = 'projeto-row';
+            novaLinha.style.marginTop = '20px'; 
+            
+            novaLinha.innerHTML = `
+                <div>
+                    <div class="input-group">
+                        <div class="input-item">
+                            <label>Cód. projeto:</label>
+                            <input type="text" class="codProjeto" placeholder="Ex: D000..." oninput="gerarEmail()">
+                        </div>
+                        <div class="input-item">
+                            <label>Nome do projeto:</label>
+                            <input type="text" class="nomeProjeto" placeholder=" " oninput="gerarEmail()">
+                        </div>
+                    </div>
+                    <button class="excluir" title="Remover este projeto" onclick="removerProjeto(this)">X</button>
+                </div>
+            `;
+            container.appendChild(novaLinha);
+            gerarEmail(); 
+        }
+
+        function removerProjeto(botao) {
+            botao.closest('.projeto-row').remove();
+            gerarEmail(); 
+        }
+
+        function gerarEmail() {
+            const novoItem = document.getElementById('novoItem').value;
+            const codigos = document.querySelectorAll('.codProjeto');
+            const nomes = document.querySelectorAll('.nomeProjeto');
+            
+            let projetosFormatados = "";
+            let primeiroCodigo = "";
+            let primeiroNome = "";
+            let qtdProjetosPreenchidos = 0;
+
+            for (let i = 0; i < codigos.length; i++) {
+                const cod = codigos[i].value.trim();
+                const nome = nomes[i].value.trim();
+                
+                // Salva os dados do primeiro projeto para usar no assunto
+                if ((cod || nome) && qtdProjetosPreenchidos === 0) {
+                    primeiroCodigo = cod;
+                    primeiroNome = nome;
+                }
+                
+                if (cod || nome) qtdProjetosPreenchidos++;
+
+                const exibirCod = cod ? cod : "[Cód. Projeto]";
+                const exibirNome = nome ? nome : "[Nome do Projeto]";
+                
+                projetosFormatados += `${exibirCod} - ${exibirNome}\n`;
+            }
+
+            // Lógica atualizada do Assunto
+            let assunto = 'Alteração de item contábil';
+            if (qtdProjetosPreenchidos === 1 && (primeiroCodigo || primeiroNome)) {
+                // Junta o código e o nome (remove espaços extras se um dos dois estiver vazio)
+                let infoProjeto = `${primeiroCodigo} ${primeiroNome}`.trim();
+                assunto = `Alteração de item contábil - ${infoProjeto}`;
+            } else if (qtdProjetosPreenchidos > 1) {
+                assunto = `Alteração de item contábil - Diversos Projetos`;
+            }
+
+            const saudacao = obterSaudacao();
+            const pluralTexto = codigos.length > 1 ? "dos projetos abaixo" : "do projeto abaixo";
+
+            const corpoEmail = `Olá, ${saudacao}!
+
+Solicito a alteração do item contábil ${pluralTexto} para ${novoItem}:
+${projetosFormatados}
+Atenciosamente,`;
+
+            document.getElementById('resultadoAssunto').textContent = assunto;
+            document.getElementById('resultadoCorpo').textContent = corpoEmail;
+        }
+
+        function mostrarToast(texto) {
+            var x = document.getElementById("toast");
+            let textoExibido = texto.length > 40 ? texto.substring(0, 40) + "..." : texto;
+            x.textContent = `"${textoExibido}" copiado!`;
+            x.className = "show";
+            setTimeout(function () { x.className = x.className.replace("show", ""); }, 4000);
+        }
+
+        function copiarTexto(idElemento) {
+            const texto = document.getElementById(idElemento).textContent;
+            if (!texto.trim()) return;
+            navigator.clipboard.writeText(texto).then(() => {
+                mostrarToast(texto);
+            }).catch(err => {
+                console.error('Erro ao copiar: ', err);
+                alert('Erro manual ao copiar.');
+            });
+        }
+
+        function limparFormulario() {
+            document.getElementById('novoItem').selectedIndex = 0;
+            const container = document.getElementById('projetosContainer');
+            container.innerHTML = `
+                <div class="projeto-row">
+                    <div class="input-group">
+                        <div class="input-item">
+                            <label>Cód. projeto:</label>
+                            <input type="text" class="codProjeto" placeholder="Ex: D000..." oninput="gerarEmail()">
+                        </div>
+                        <div class="input-item">
+                            <label>Nome do projeto:</label>
+                            <input type="text" class="nomeProjeto" placeholder=" " oninput="gerarEmail()">
+                        </div>
+                    </div>
+                </div>
+            `;
+            gerarEmail();
+        }
+
+        function copiarString(texto) {
+            navigator.clipboard.writeText(texto).then(() => {
+                mostrarToast(texto);
+            }).catch(err => {
+                console.error('Erro ao copiar: ', err);
+            });
+        }
+
+        window.onload = function () {
+            gerarEmail();
+        };
+    </script>
+</body>
+</html>
