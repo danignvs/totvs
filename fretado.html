@@ -47,52 +47,65 @@
             padding-left: 10px;
         }
 
-        /* Capa / Hero Section */
+        /* Capa / Hero Section (Ajustada para o novo layout) */
         .hero-section {
-            color: var(--branco);
-            padding: 40px 20px;
-            animation: fadeIn 1s ease-in;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+            gap: 40px;
             width: 100%;
-            max-width: 1200px;
+            max-width: 900px;
             margin: 0 auto;
+            padding: 40px 20px;
+            min-height: 80vh; /* Mantém o menu centralizado verticalmente na tela */
+            box-sizing: border-box;
+            animation: fadeIn 1s ease-in;
+        }
+
+        .titulos-hero {
+            text-align: left;
         }
 
         .hero-title {
             font-size: 3.5rem; 
-            margin-bottom: 0.5rem;
-            color: var(--limao);
-            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            margin: 0;
+            color: var(--roxo);
+            line-height: 1.1;
+            padding: 0;
         }
 
         .hero-subtitle {
-            font-size: 1.5rem;
+            font-size: 1.7rem;
             color: var(--branco);
             font-weight: 300;
-            margin-top: 0;
-            margin-bottom: 40px;
-            letter-spacing: 2px;
+            margin: 0;
         }
 
-        /* Menu de Botões */
+        .hero-subtitle strong {
+            font-weight: 800;
+        }
+
+        /* Menu de Botões (Empilhados) */
         .menu-container {
             display: flex;
-            justify-content: center;
-            gap: 30px;
-            flex-wrap: wrap;
-            max-width: 800px;
-            margin: 0 auto;            
-            padding: 50px 0;
+            flex-direction: column;
+            gap: 20px;
+            width: auto;
         }
 
         .btn-menu {
-            padding: 20px 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 18px 40px;
             font-size: 1.2rem;
             text-transform: uppercase;
             border-radius: 50px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.3);
             transition: transform 0.2s, box-shadow 0.2s;
-            width: auto;
-            min-width: 250px;
+            min-width: 260px;
+            box-sizing: border-box;
             border: none;
             cursor: pointer;
             font-weight: bold;
@@ -100,15 +113,32 @@
 
         .btn-menu:hover {
             transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.5);
         }
 
-        .btn-santana, .btn-barra {
-            background-color: var(--roxo);
-            color: var(--branco);
-        }
-        .btn-santana:hover, .btn-barra:hover {
-            background-color: var(--roxo2);
+        /* Responsividade para Celulares */
+        @media (max-width: 800px) {
+            .hero-section {
+                flex-direction: column;
+                justify-content: center;
+                gap: 50px;
+                min-height: auto;
+                padding-top: 10vh;
+            }
+
+            .titulos-hero {
+                text-align: center;
+            }
+
+            .menu-container {
+                width: 100%;
+                align-items: center;
+            }
+
+            .btn-menu {
+                width: 100%;
+                max-width: 350px;
+            }
         }
 
         /* Estilos Internos dos Containers (Tabelas) */
@@ -155,14 +185,17 @@
 <body>
 
     <div id="hero-menu" class="hero-section">
-        <h1 class="hero-title">FRETADO</h1>
-        <h2 class="hero-subtitle"><strong>TOTVS</strong> MATRIZ</h2>
+        <div class="titulos-hero">
+            <h1 class="hero-title">FRETADO</h1>
+            <h2 class="hero-subtitle"><strong>TOTVS</strong> MATRIZ</h2>
+        </div>
+        
 
         <div class="menu-container">
-            <button class="btn-menu btn-barra" onclick="toggleFretado('barra')">
+            <button class="btn-menu btn-azul" onclick="toggleFretado('barra')">
                 Barra Funda
             </button>
-            <button class="btn-menu btn-santana" onclick="toggleFretado('santana')">
+            <button class="btn-menu btn-azul" onclick="toggleFretado('santana')">
                 Santana
             </button>
         </div>

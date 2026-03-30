@@ -1,1 +1,130 @@
-teste
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Portal de Ferramentas - TOTVS</title>
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        /* Centraliza o conteúdo verticalmente e horizontalmente na tela toda */
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh; /* Ocupa 100% da altura da janela */
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        /* Estrutura principal lado a lado */
+        .grade {
+            width: 100%;
+            max-width: 900px;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between; /* Afasta o título do menu */
+            gap: 40px; /* Garante que nunca grudem um no outro */
+        }
+
+        /* Tipografia do Título */
+        h1 {
+            font-size: 3rem; /* Tamanho mais imponente no desktop */
+            margin: 0;            
+            color: var(--branco);
+            font-weight: 400;
+            text-align: left;
+            line-height: 1.1;
+            flex: 1; /* Permite que o título ocupe o espaço livre */
+        }
+
+        h1 strong {
+            font-weight: 800; /* Garante o negrito no TOTVS */
+        }
+
+        /* Container dos Botões */
+        .menu-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            width: auto;
+        }
+
+        /* Estilo base dos botões */
+        .btn-menu {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            padding: 18px 40px;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            border-radius: 50px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            transition: transform 0.2s, box-shadow 0.2s;
+            min-width: 260px; /* Largura mínima unificada */
+            box-sizing: border-box;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn-menu:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+        }
+
+        /* Responsividade para telas menores (celulares e tablets pequenos) */
+        @media (max-width: 800px) {
+            .grade {
+                flex-direction: column;
+                justify-content: center;
+                gap: 50px;
+                padding: 0;
+            }
+
+            h1 {
+                text-align: center;
+                font-size: 2.5rem;
+            }
+            
+            .menu-container {
+                width: 100%;
+                align-items: center; /* Centraliza os botões no mobile */
+            }
+            
+            .btn-menu {
+                width: 100%;
+                max-width: 350px; /* Evita que o botão fique gigante no mobile */
+            }
+        }
+        
+    </style>
+</head>
+
+<body>
+
+    <div class="grade">
+        
+        <h1>ferramentas<br><strong>TOTVS</strong></h1>
+
+        <div class="menu-container">
+            <a href="planejamento.html" class="btn-menu btn-azul">
+                Planejamento
+            </a>
+            
+            <a href="item-contabil.html" class="btn-menu btn-azul">
+                Item Contábil
+            </a>
+            
+            <a href="fretado.html" class="btn-menu btn-azul">
+                Fretado
+            </a>
+        </div>
+    </div>
+
+</body>
+</html>
