@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Gerador de Email de Faturamento</title>
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+    </style>
+</head>
+
+<body>
+    <!--h1></h1-->
+
+    <div class="container container-azul">
+
+        <section class="container-formulario">
+        
+            <div class="topo">
+                <h2>Faturamento</h2>                
+            </div>
+        
+            <div class="input-group">
+                <div class="input-item">
+                    <label for="codProjeto">Cód. projeto:</label>
+                    <input type="text" id="codProjeto" placeholder="Ex: D...001" oninput="preencherContrato(); gerarEmail()">
+                </div>
+                <div class="input-item">
+                    <label for="codContratoPSA">Cód. contrato PSA:</label>
+                    <input type="text" id="codContratoPSA" placeholder="Ex: D..." oninput="gerarEmail()">
+                </div>
+            </div>
+        
+            <div class="input-group">
+                <div class="input-item">
+                    <label for="codCliente">Cod. cliente:</label>
+                    <input type="text" id="codCliente" placeholder="Ex: T..." oninput="gerarEmail()">
+                </div>
+                <div class="input-item">
+                    <label for="valorLiquido">Valor líquido:</label>
+                    <input type="text" id="valorLiquido" placeholder="Ex: R$..." oninput="gerarEmail()">
+                </div>
+            </div>
+        
+            <div class="input-group">
+                <div class="input-item">
+                    <label for="nomeProjeto">Nome do projeto:</label>
+                    <input type="text" id="nomeProjeto" placeholder="" oninput="gerarEmail()">
+                </div>
+                <div class="input-item">
+                    <label for="tipoAssunto">Assunto:</label>
+                    <select id="tipoAssunto" onchange="gerarEmail()">
+                        <option value="Faturamento">Solicitação de faturamento</option>
+                        <option value="Projeto">Nome do projeto</option>
+                    </select>
+                </div>
+            </div>
+        
+            <label for="tipoJustificativa">Justificativa:</label>
+            <select id="tipoJustificativa" onchange="mudarJustificativa(); gerarEmail()">
+                <option value="Padrao">Padrão (Termo de conclusão assinado...)</option>
+                <option value="Outras">Outras (digitar abaixo)</option>
+            </select>
+        
+            <div id="justificativaManualDiv" class="justificativa-manual">
+                <label for="justificativa">Digite sua Justificativa:</label>
+                <input type="text" id="justificativa" placeholder="Descreva a justificativa aqui..." oninput="gerarEmail()">
+            </div>
+        </section>
+
+        <section class="container-resultado">
+            <h3 class="roxo"><span class="azul">E-mail</span> gerado</h3>
+
+
+
+            <div class="resultado">
+                <button class="btn-roxo btn-aux" onclick="copiarTexto('resultadoAssunto')">Copiar</button>
+                <label>Assunto</label>
+                <pre id="resultadoAssunto"></pre>
+            </div>
+
+            <div class="resultado">
+                <button class="btn-roxo btn-aux" onclick="copiarTexto('resultadoCorpo')">Copiar</button>
+                <label>Mensagem</label>
+                <pre id="resultadoCorpo"></pre>
+            </div>
+        </section>
+
+        <section class="botoes-de-acao">
+            <button class="btn-roxo" onclick="copiarString('TERMO ANEXO - Faturamento Solicitado')">Copiar Status</button>
+
+            <button class="btn-verde" onclick="abrirIndicadores()">Indicadores</button>
+
+            <button class="btn-laranja" onclick="limparFormulario()">Limpar</button>
+
+            <div id="toast">Copiado para a área de transferência!</div>
+        </section>
+    </div>  
+
+
+    <script>
+        // --- FORÇAR A PÁGINA A IR PARA O TOPO AO ATUALIZAR ---
+        if (history.scrollRestoration) {
+            history.scrollRestoration = 'manual';
+        }
+        window.scrollTo(0, 0);
+        
+        const JUSTIFICATIVA_PADRAO = "Termo de conclusão assinado no repositório do projeto.";
+
+        function obterSaudacao() {
+            const hora = parseInt(new Date().toLocaleString("pt-BR", {
+                timeZone: "America/Sao_Paulo",
+                hour: "numeric",
+                hour12: false
+            }));
+
+            if (hora >= 5 && hora < 12) return "bom dia";
+            else if (hora >= 12 && hora < 18) return "boa tarde";
+            else return "bom dia/boa tarde";
+        }
+
+        function preencherContrato() {
+            const codProjeto = document.getElementById('codProjeto').value;
+            if (codProjeto.length > 3) {
+                const codContratoPSA = codProjeto.slice(0, -3);
+                document.getElementById('codContratoPSA').value = codContratoPSA;
+            } else if (codProjeto.length === 0) {
+                document.getElementById('codContratoPSA').value = "";
+            }
+        }
+
+        function mudarJustificativa() {
+            const tipoJustificativa = document.getElementById('tipoJustificativa').value;
+            const inputJustificativa = document.getElementById('justificativa');
+            const justificativaDiv = document.getElementById('justificativaManualDiv');
+
+            if (tipoJustificativa === 'Padrao') {
+                justificativaDiv.style.display = 'none';
+                inputJustificativa.value = JUSTIFICATIVA_PADRAO;
+            } else {
+                justificativaDiv.style.display = 'block';
+                // Limpa se estiver com o texto padrão para facilitar a digitação
+                if (inputJustificativa.value === JUSTIFICATIVA_PADRAO) {
+                    inputJustificativa.value = "";
+                }
+                inputJustificativa.focus();
+            }
+            gerarEmail();
+        }
+
+        function gerarEmail() {
+            const codProjeto = document.getElementById('codProjeto').value;
+            const nomeProjeto = document.getElementById('nomeProjeto').value;
+            const tipoAssunto = document.getElementById('tipoAssunto').value;
+            const tipoJustificativa = document.getElementById('tipoJustificativa').value;
+            const codContratoPSA = document.getElementById('codContratoPSA').value;
+            const codCliente = document.getElementById('codCliente').value;
+
+            let valorLiquido = document.getElementById('valorLiquido').value.trim();
+            if (valorLiquido && !valorLiquido.toUpperCase().startsWith("R$")) {
+                valorLiquido = `R$${valorLiquido}`;
+            }
+
+            let justificativa;
+            if (tipoJustificativa === 'Padrao') {
+                justificativa = JUSTIFICATIVA_PADRAO;
+            } else {
+                justificativa = document.getElementById('justificativa').value;
+            }
+
+            let assunto = '';
+            if (tipoAssunto === 'Faturamento') {
+                assunto = codProjeto ? `${codProjeto} - Solicitação de Faturamento` : '';
+            } else {
+                assunto = (codProjeto && nomeProjeto) ? `${codProjeto} - ${nomeProjeto}` : '';
+            }
+
+            const saudacao = obterSaudacao();
+
+            const corpoEmail = `Olá, ${saudacao}!
+
+Favor proceder com o faturamento abaixo:
+
+Código do contrato PSA: ${codContratoPSA}
+Código do cliente: ${codCliente}
+Valor líquido: ${valorLiquido}
+
+Código do projeto: ${codProjeto}
+Nome do projeto: ${nomeProjeto}
+
+Justificativa: ${justificativa}
+
+
+Atenciosamente,`;
+
+            document.getElementById('resultadoAssunto').textContent = assunto;
+            document.getElementById('resultadoCorpo').textContent = corpoEmail;
+        }
+
+        // --- FUNÇÕES NOVAS ---
+
+        function mostrarToast(texto) {
+            var x = document.getElementById("toast");
+
+            // Se o texto for muito longo (ex: corpo do email), cortamos para não quebrar o layout
+            let textoExibido = texto;
+            if (textoExibido.length > 40) {
+                textoExibido = textoExibido.substring(0, 40) + "...";
+            }
+
+            // Define a mensagem dinâmica
+            x.textContent = `"${textoExibido}" copiado!`;
+
+            x.className = "show";
+            setTimeout(function () { x.className = x.className.replace("show", ""); }, 4000);
+        }
+
+        function copiarTexto(idElemento) {
+            const texto = document.getElementById(idElemento).textContent;
+
+            if (!texto.trim()) return;
+
+            navigator.clipboard.writeText(texto).then(() => {
+                mostrarToast(texto); // Passa o texto para a notificação
+            }).catch(err => {
+                console.error('Erro ao copiar: ', err);
+                alert('Erro manual ao copiar.');
+            });
+        }
+
+        // Função para Limpar tudo
+        function limparFormulario() {
+            // Seleciona todos os inputs de texto e limpa
+            const inputs = document.querySelectorAll('input[type="text"]');
+            inputs.forEach(input => input.value = '');
+
+            // Reseta os selects para a primeira opção
+            document.getElementById('tipoAssunto').selectedIndex = 0;
+            document.getElementById('tipoJustificativa').selectedIndex = 0;
+
+            // Restaura a visualização da justificativa (esconde o manual)
+            mudarJustificativa();
+
+            // Atualiza o email (vai ficar em branco)
+            gerarEmail();
+        }
+
+        function copiarString(texto) {
+            navigator.clipboard.writeText(texto).then(() => {
+                mostrarToast(texto); // Passa o texto para a notificação
+            }).catch(err => {
+                console.error('Erro ao copiar: ', err);
+            });
+        }
+
+        function abrirIndicadores() {
+            const codProjeto = document.getElementById('codProjeto').value;
+            // COLOQUE O LINK DA SUA PLANILHA AQUI EMBAIXO:
+            const linkPlanilha = "https://docs.google.com/spreadsheets/d/19b-F8VDW_tJeJ2h4lM_owYeUDWt0upNsK_OR_bVe0aw/edit";
+
+            navigator.clipboard.writeText(codProjeto).then(() => {
+                // Se tiver código, mostra ele. Se estiver vazio, mostra mensagem genérica.
+                if (codProjeto) {
+                    mostrarToast(codProjeto);
+                } else {
+                    mostrarToast("Vazio");
+                }
+                window.open(linkPlanilha, '_blank');
+            }).catch(err => {
+                window.open(linkPlanilha, '_blank');
+            });
+        }
+
+        window.onload = function () {
+            mudarJustificativa();
+            gerarEmail();
+        };
+    </script>
+
+</body>
+
+</html>
