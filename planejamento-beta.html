@@ -165,8 +165,6 @@
 
         }
 
-
-
         /* --- CALENDÁRIO DE DETALHAMENTO DE HORAS --- */
         .calendario-header {
             display: flex;
@@ -175,7 +173,7 @@
             margin-bottom: 15px;
             font-weight: bold;
             color: var(--az-escuro);
-            width: 80%;
+            width: 270px;
             margin: 0 auto;
             padding: 0 0 20px 0;
         }
@@ -209,9 +207,7 @@
         .cal-dia.descanso { background-color: var(--cinza-claro);  }
         .cal-dia.descanso input {
             color: var(--laranja);
-            border-color: var(--laranja);
             font-weight: bold;
-            background-color: #fffaf0; 
         }
         .cal-dia.fora-periodo { 
             opacity: 0.3; 
@@ -223,6 +219,28 @@
             border: 1px solid var(--az-claro); border-radius: 3px; font-size: 0.9em;
         }
         .cal-dia input:disabled { display: none; }
+
+        /* Estilo para quando um dia de descanso tem horas preenchidas */
+        .cal-dia.descanso.preenchido input {
+            background-color: #fff4e5 !important;
+            border-color: var(--laranja) !important;
+            color: var(--laranja) !important;
+            font-weight: bold;
+        }
+
+        /* Ajuste no alerta do rodapé para suportar duas mensagens */
+        #containerDicasModal {
+            min-height: 20px;
+            margin-bottom: 10px;
+        }
+
+        .aviso-feriado {
+            color: var(--laranja);
+            font-weight: bold;
+            font-size: 0.85em;
+            animation: fadeIn 0.3s;
+        }
+
         #modalHoras {
             padding: 15px;
             box-sizing: border-box;
@@ -242,6 +260,7 @@
             overflow-y: auto; 
             flex-grow: 1; /* Ocupa o espaço disponível do modal */
             padding: 5px 2px;
+            min-height: 400px;
         }
 
         .modal-footer-fixo {
@@ -444,15 +463,20 @@
             <button class="btn-fechar-modal" onclick="fecharModalHoras()" title="Fechar">X</button>
             <br>
             <div class="calendario-header">
-                <button class="btn-azul btn-aux" onclick="mudarMes(-1)">&#10094;</button>
+                <button class="btn-aux" onclick="mudarMes(-1)">&#10094;</button>
                 <span id="calMesAno">MARÇO</span>
-                <button class="btn-azul btn-aux" onclick="mudarMes(1)">&#10095;</button>
+                <button class="btn-aux" onclick="mudarMes(1)">&#10095;</button>
             </div>
             <div id="calendarioHoras" class="calendario-grid"></div>
 
             <div class="modal-footer-fixo">
-                <div id="dicaTabModal" style="display:none; color: var(--az-escuro); font-size: 0.85em; text-align: center; margin-bottom: 10px; animation: fadeIn 0.3s;">
-                    💡 Use a tecla TAB para avançar os dias mais rápido!
+                <div id="containerDicasModal">
+                    <div id="dicaTabModal" style="display:none; color: var(--az-escuro); font-size: 0.85em; text-align: center; animation: fadeIn 0.3s;">
+                        💡 Use a tecla TAB para avançar os dias mais rápido!
+                    </div>
+                    <div id="avisoFeriadoModal" style="display:none; text-align: center;" class="aviso-feriado">
+                        ⚠️ Atenção: horas lançadas em dias de descanso
+                    </div>
                 </div>
                 <div id="previewTotalHoras" style="text-align: center; margin-bottom: 15px; color: var(--az-escuro); font-size: 1.1em;">Total de horas</div>
 
@@ -636,7 +660,8 @@
 
     function formatarDataFinal(valor) {
         if (!valor) return "";
-        return (valor.length === 10 && valor.includes('/')) ? valor.substring(0, 5) : valor;
+        // Pega o "DD/MM/" (0 a 6) e junta com o "YY" (8 a 10)
+        return (valor.length === 10 && valor.includes('/')) ? valor.substring(0, 6) + valor.substring(8, 10) : valor;
     }
 
     function parseHoras(valor) {
@@ -691,75 +716,6 @@
             input.value = "0 horas";
         }
         gerarTabela();
-    }
-
-    // --- CONTADOR E DICA DO TAB NO MODAL ---
-    let contadorCliquesHora = 0;
-    let usouTabNesteModal = false;
-    let ultimoInputClicado = -1;
-    
-    function registrarCliqueHora(indexAtual) {
-        if (usouTabNesteModal) return;
-
-        // Verifica se clicou no campo imediatamente seguinte
-        if (indexAtual === ultimoInputClicado + 1) {
-            contadorCliquesHora++;
-        } else {
-            // Se pulou de campo fora da ordem, recomeça a contagem
-            contadorCliquesHora = 1; 
-        }
-        
-        ultimoInputClicado = indexAtual;
-
-        if (contadorCliquesHora >= 5) {
-            document.getElementById('dicaTabModal').style.display = 'block';
-        }
-    }
-
-    function verificarTab(event) {
-        if (event.key === 'Tab') {
-            document.getElementById('dicaTabModal').style.display = 'none';
-            usouTabNesteModal = true; // Desativa a dica para as próximas vezes que clicar
-        }
-    }
-
-    // --- PREVIEW TOTAL NO MODAL DE CALENDÁRIO ---
-    function atualizarPreviewTotalHoras() {
-        let total = 0;
-        for (let key in modalHorasState) {
-            if (modalHorasState[key] > 0) {
-                let dAtual = stringParaData(key);
-                if (dAtual && dAtual >= modalTaskStart && dAtual <= modalTaskEnd) {
-                    total += modalHorasState[key];
-                }
-            }
-        }
-        
-        // Pega o total de horas declarado na tarefa principal
-        const idTarefa = document.getElementById('modalHorasTarefaId').value;
-        let totalDeclarado = 0;
-        if (idTarefa) {
-            const elTarefa = document.getElementById('item-' + idTarefa);
-            if (elTarefa) {
-                totalDeclarado = parseHoras(elTarefa.querySelector('.inp-horas').value);
-            }
-        }
-
-        const elTotal = document.getElementById('previewTotalHoras');
-        if (elTotal) {
-            const strTotal = total.toLocaleString('pt-BR', {maximumFractionDigits: 2});
-            const strDeclarado = totalDeclarado.toLocaleString('pt-BR', {maximumFractionDigits: 2});
-            
-            // Usando innerHTML para o <strong> funcionar
-            elTotal.innerHTML = `Total <strong>${strTotal}</strong> de <strong>${strDeclarado} horas</strong>`;
-            
-            // Regra da cor: Cinza inativo até bater com o valor da tarefa
-            if (total === totalDeclarado && totalDeclarado > 0) {
-                elTotal.style.color = "var(--az-escuro)";
-            } else {
-                elTotal.style.color = "var(--cinza)";
-            }
-        }
     }
 
     function adicionarNovaTarefa() { criarElemento('tarefa'); }
@@ -1139,14 +1095,17 @@
                 // Pega só o valor digitado se for Replanejamento
                 const nivel = nivelInput ? (isRep ? nivelInput.value.trim() : (nivelInput.value.trim() || nivelInput.placeholder)) : '';
                 
-                if (nivel && titulo) titulo = `${nivel} - ${titulo}`;
-                else if (nivel) titulo = nivel; 
+                // Remove estas duas linhas:
+                // if (nivel && titulo) titulo = `${nivel} - ${titulo}`;
+                // else if (nivel) titulo = nivel;
 
-                if(titulo.trim() !== "") {
+                // Altere a montagem do HTML para ter o <td> do nível separado:
+                if(titulo.trim() !== "" || nivel.trim() !== "") {
                     const hMarco = horasPorMarco[el.id] || 0;
-                    const hMarcoFmt = hMarco > 0 ? hMarco.toLocaleString('pt-BR', {minimumFractionDigits: 2}) : "";
+                    const hMarcoFmt = hMarco > 0 ? hMarco.toLocaleString('pt-BR', {minimumFractionDigits: 1, maximumFractionDigits: 1}) : "";
 
                     linhasHTML += `<tr>
+                        <td style="background-color: #f0f0f0; font-weight: bold; text-align: center; padding: 10px; border: 1px solid #ccc;">${nivel}</td>
                         <td colspan="3" style="background-color: #f0f0f0; font-weight: bold; text-align: left; padding: 10px; border: 1px solid #ccc;">${titulo}</td>
                         <td style="background-color: #f0f0f0; font-weight: bold; text-align: center; padding: 10px; border: 1px solid #ccc;">${hMarcoFmt}</td>
                         <td style="background-color: #f0f0f0; border: 1px solid #ccc;"></td>
@@ -1165,7 +1124,7 @@
                     nivelInput.style.backgroundColor = "";
                 }
                 // Pega só o valor digitado se for Replanejamento
-                const nivel = nivelInput ? (isRep ? nivelInput.value.trim() : (nivelInput.value.trim() || nivelInput.placeholder)) : '';              
+                const nivel = nivelInput ? (isRep ? nivelInput.value.trim() : (nivelInput.value.trim() || nivelInput.placeholder)) : '';             
 
                 const detalheInput = el.querySelector('.inp-detalhe-horas');
                 if (detalheInput && detalheInput.value) {
@@ -1275,7 +1234,7 @@
                                     taskHtml += `<div style="margin: 0px 0 20px 0; font-size: 13px;">Total: <strong>${fmt.format(totalHorasDetalhe)} horas</strong></div>`;
                                     
                                     detalhamentosTemp.push(taskHtml);
-                                }
+                            }
                         }
                     } catch(e) {
                         console.error("Erro ao processar detalhamento:", e);
@@ -1283,7 +1242,8 @@
                 }
 
                 if (desc) desc = desc.charAt(0).toUpperCase() + desc.slice(1);
-                if (nivel) desc = `<strong>${nivel}</strong> - ${desc}`;
+                // Remova esta linha que grudava o nível na descrição:
+                // if (nivel) desc = `<strong>${nivel}</strong> - ${desc}`;
 
                 const h = parseHoras(horasInput);
                 totalHoras += h;
@@ -1291,10 +1251,11 @@
                 if (desc || inicio || fim || h > 0 || analista) {
                     linhasHTML += `
                         <tr>
+                            <td style="text-align: center; font-weight: bold; padding: 8px; border: 1px solid #ccc;">${nivel}</td>
                             <td style="text-align: left; padding: 8px; border: 1px solid #ccc;">${desc}</td>
                             <td style="text-align: center; padding: 8px; border: 1px solid #ccc;">${formatarDataFinal(inicio)}</td>
                             <td style="text-align: center; padding: 8px; border: 1px solid #ccc;">${formatarDataFinal(fim)}</td>
-                            <td style="text-align: center; padding: 8px; border: 1px solid #ccc;">${h > 0 ? h.toLocaleString('pt-BR', {minimumFractionDigits: 2}) : ""}</td>
+                            <td style="text-align: center; padding: 8px; border: 1px solid #ccc;">${h > 0 ? h.toLocaleString('pt-BR', {minimumFractionDigits: 1, maximumFractionDigits: 1}) : ""}</td>
                             <td style="text-align: center; padding: 8px; border: 1px solid #ccc;">${analista}</td>
                         </tr>
                     `;
@@ -1304,13 +1265,13 @@
 
         // Junta os detalhamentos gerados sob um único título
         if (detalhamentosTemp.length > 0) {
-            blocoDetalhamento = `<br><p style="margin: 15px 0 5px 0; font-weight: bold; text-transform: uppercase; width: 100%; border-top: 1px solid black; padding: 10px 0 5px 0;">Detalhamento de horas por dia</p>` + detalhamentosTemp.join('');
+            blocoDetalhamento = `<br><p style="margin: 15px 0 5px 0; font-weight: bold; text-transform: uppercase; width: 100%; padding: 10px 0 5px 0;">Detalhamento de horas por dia:</p>` + detalhamentosTemp.join('');
         }
 
-        const totalFmt = totalHoras.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+        const totalFmt = totalHoras.toLocaleString('pt-BR', {minimumFractionDigits: 1, maximumFractionDigits: 1});
         const saudacao = obterSaudacao();
         const separadorObs = temMultiplasLinhas ? '<br>' : ' ';
-        const blocoObservacao = observacao ? `<br><p style="line-height: 1.5;"><strong>Observações:</strong>${separadorObs}${observacao}</p>` : '';
+        const blocoObservacao = observacao ? `<br><p style="line-height: 1.5;"><strong>OBSERVAÇÕES:</strong>${separadorObs}${observacao}</p>` : '';
         const textoAcaoDatas = (isRep && statusDatasGlobal) ? `<strong><p>${statusDatasGlobal}.</p></strong>` : '';
         
         let blocoGoLiveGlobal = '';
@@ -1319,20 +1280,21 @@
         }
 
         document.getElementById('areaTabela').innerHTML = `
-            <div id="resultadoCorpo" style="font-family: Verdana, sans-serif; font-size: 13px; color: #333;">
+            <div id="resultadoCorpo" style="font-family: Verdana, sans-serif; font-size: 12px; color: #333;">
                 <p>${saudacao},</p>
                 <p>Segue ${isRep ? 'replanejamento' : 'planejamento'} para o projeto:</p>
                 <p><strong>${codProjeto} ${nomeProjeto}</strong></p><br>
-                <table style="width: 100%; max-width: 650px; border-collapse: collapse;">
+                <table style="width: 100%; max-width: 650px; border-collapse: collapse; font-size: 11px;">
                     <thead><tr style="background-color: #002233; color: white;">
-                        <th style="padding: 10px; border: 1px solid #000;"></th> 
-                        <th style="padding: 10px; border: 1px solid #000; width: 70px;">INÍCIO</th>
-                        <th style="padding: 10px; border: 1px solid #000; width: 70px;">FIM</th>
-                        <th style="padding: 10px; border: 1px solid #000; width: 60px;">HORAS</th>
-                        <th style="padding: 10px; border: 1px solid #000; width: 110px;">ANALISTA</th>
+                        <th style="padding: 10px; border: 1px solid #000; width: 8%;">NÍVEL</th> 
+                        <th style="padding: 10px; border: 1px solid #000; width: 42%">DESCRIÇÃO</th> 
+                        <th style="padding: 10px; border: 1px solid #000; width: 12%;">INÍCIO</th>
+                        <th style="padding: 10px; border: 1px solid #000; width: 12%;">FIM</th>
+                        <th style="padding: 10px; border: 1px solid #000; width: 8%;">HORAS</th>
+                        <th style="padding: 10px; border: 1px solid #000; width: 18%;">ANALISTA</th>
                     </tr></thead>
                     <tbody>${linhasHTML}
-                        <tr><td colspan="3" style="text-align: right; font-weight: bold; padding: 10px; border: 1px solid #ccc; background-color: #fafafa;">TOTAL</td>
+                        <tr><td colspan="4" style="text-align: right; font-weight: bold; padding: 10px; border: 1px solid #ccc; background-color: #fafafa;">TOTAL</td>
                         <td style="text-align: center; font-weight: bold; padding: 10px; border: 1px solid #ccc; background-color: #fafafa;">${totalFmt}</td>
                         <td style="border: 1px solid #ccc; background-color: #fafafa;"></td></tr>
                     </tbody>
@@ -1376,22 +1338,100 @@
         }
     }
 
-    
-    
 
     // --- LÓGICA DE DETALHAMENTO DE HORAS E FERIADOS ---
+    
+    const FERIADOS_EXTRAS = ["20/11", "09/07"]; 
+
     let feriadosCacheados = {};
     let modalHorasState = {}; 
     let modalCurrentDate = new Date();
     let modalTaskStart = null;
     let modalTaskEnd = null;
 
+    // --- CONTADOR E DICA DO TAB NO MODAL ---
+    let contadorCliquesHora = 0;
+    let usouTabNesteModal = false;
+    let ultimoInputClicado = -1;
+    
+    function registrarCliqueHora(indexAtual) {
+        if (usouTabNesteModal) return;
+
+        // Verifica se clicou no campo imediatamente seguinte
+        if (indexAtual === ultimoInputClicado + 1) {
+            contadorCliquesHora++;
+        } else {
+            contadorCliquesHora = 1; 
+        }
+        
+        ultimoInputClicado = indexAtual;
+
+        if (contadorCliquesHora >= 5) {
+            document.getElementById('dicaTabModal').style.display = 'block';
+        }
+    }
+
+    function verificarTab(event) {
+        if (event.key === 'Tab') {
+            document.getElementById('dicaTabModal').style.display = 'none';
+            usouTabNesteModal = true; // Desativa a dica para as próximas vezes que clicar
+        }
+    }
+
+    // --- PREVIEW TOTAL NO MODAL DE CALENDÁRIO ---
+    function atualizarPreviewTotalHoras() {
+        let total = 0;
+        for (let key in modalHorasState) {
+            if (modalHorasState[key] > 0) {
+                let dAtual = stringParaData(key);
+                if (dAtual && dAtual >= modalTaskStart && dAtual <= modalTaskEnd) {
+                    total += modalHorasState[key];
+                }
+            }
+        }
+        
+        const idTarefa = document.getElementById('modalHorasTarefaId').value;
+        let totalDeclarado = 0;
+        if (idTarefa) {
+            const elTarefa = document.getElementById('item-' + idTarefa);
+            if (elTarefa) {
+                totalDeclarado = parseHoras(elTarefa.querySelector('.inp-horas').value);
+            }
+        }
+
+        const elTotal = document.getElementById('previewTotalHoras');
+        if (elTotal) {
+            const strTotal = total.toLocaleString('pt-BR', {maximumFractionDigits: 2});
+            const strDeclarado = totalDeclarado.toLocaleString('pt-BR', {maximumFractionDigits: 2});
+            
+            elTotal.innerHTML = `Total <strong>${strTotal}</strong> de <strong>${strDeclarado} horas</strong>`;
+            
+            if (total === totalDeclarado && totalDeclarado > 0) {
+                elTotal.style.color = "var(--az-escuro)";
+            } else {
+                elTotal.style.color = "var(--cinza)";
+            }
+        }
+    }
+
     function obterFeriadosNacionais(ano) {
         if (feriadosCacheados[ano]) return feriadosCacheados[ano];
+        
         let feriados = [
-            `01/01/${ano}`, `21/04/${ano}`, `01/05/${ano}`, `07/09/${ano}`,
-            `12/10/${ano}`, `02/11/${ano}`, `15/11/${ano}`, `25/12/${ano}`
+            `01/01/${ano}`, // Ano Novo
+            `21/04/${ano}`, // Tiradentes
+            `01/05/${ano}`, // Dia do Trabalho
+            `07/09/${ano}`, // Independência
+            `12/10/${ano}`, // Nossa Sra Aparecida
+            `02/11/${ano}`, // Finados
+            `15/11/${ano}`, // Proclamação da República
+            `20/11/${ano}`, // Consciência Negra (Novo Feriado Nacional)
+            `25/12/${ano}`  // Natal
         ];
+
+        // Adiciona os extras configurados no topo
+        FERIADOS_EXTRAS.forEach(f => feriados.push(`${f}/${ano}`));
+
         let a = ano % 19, b = Math.floor(ano / 100), c = ano % 100, d = Math.floor(b / 4), e = b % 4;
         let f = Math.floor((b + 8) / 25), g = Math.floor((b - f + 1) / 3), h = (19 * a + b - d - g + 15) % 30;
         let i = Math.floor(c / 4), k = c % 4, l = (32 + 2 * e + 2 * i - h - k) % 7;
@@ -1480,17 +1520,6 @@
         renderCalendario();
     }
 
-    function atualizarHoraDia(input) {
-        let val = input.value.trim();
-        let dataStr = input.dataset.dia;
-        if (val === "") {
-            delete modalHorasState[dataStr];
-        } else {
-            modalHorasState[dataStr] = parseHoras(val);
-        }
-        atualizarPreviewTotalHoras(); // Atualiza o preview ao digitar
-    }
-
     function renderCalendario() {
         const container = document.getElementById('calendarioHoras');
         const labelMesAno = document.getElementById('calMesAno');
@@ -1501,15 +1530,13 @@
         let mes = modalCurrentDate.getMonth();
         labelMesAno.textContent = `${meses[mes]} ${ano}`;
 
-        let headerDias = '<div class="cal-dias-semana"><div>D</div><div>S</div><div>T</div><div>Q</div><div>Q</div><div>S</div><div>S</div></div>';
-        container.innerHTML += headerDias;
+        container.innerHTML += '<div class="cal-dias-semana"><div>D</div><div>S</div><div>T</div><div>Q</div><div>Q</div><div>S</div><div>S</div></div>';
 
         let primeiroDiaMes = new Date(ano, mes, 1).getDay();
         let totalDiasMes = new Date(ano, mes + 1, 0).getDate();
         let feriados = obterFeriadosNacionais(ano);
-        let inputIndex = 0; // Variável para numerar os campos ativos
+        let inputIndex = 0;
 
-        // Preenche com caixas vazias até o dia 1 cair no dia da semana correto
         for (let i = 0; i < primeiroDiaMes; i++) {
             container.innerHTML += `<div class="cal-dia fora-mes"></div>`;
         }
@@ -1521,25 +1548,86 @@
             let isFeriado = feriados.includes(dataStr);
             let isFds = dtAtual.getDay() === 0 || dtAtual.getDay() === 6;
             let ehDescanso = isFds || isFeriado;
-            
             let foraPeriodo = dtAtual < modalTaskStart || dtAtual > modalTaskEnd;
             
-            // Nova checagem: Se está fora do período OU é descanso (fds/feriado), inativa o input
-            let inativo = foraPeriodo || ehDescanso; 
+            let valNumerico = modalHorasState[dataStr];
+            let temHoras = valNumerico !== undefined && valNumerico > 0;
             
-            let classeExtra = foraPeriodo ? 'fora-periodo' : (ehDescanso ? 'descanso' : '');
+            let classeExtra = [];
+            if (foraPeriodo) classeExtra.push('fora-periodo');
+            if (ehDescanso) classeExtra.push('descanso');
+            if (ehDescanso && temHoras) classeExtra.push('preenchido');
+
+            let placeholder = ehDescanso ? "-" : "";
+            let valDisplay = temHoras ? String(valNumerico).replace('.', ',') : '';
             
-            let val = modalHorasState[dataStr] !== undefined ? String(modalHorasState[dataStr]).replace('.', ',') : '';
-            
-            // O input agora fica disabled caso caia na regra do 'inativo'
-            let inputHTML = inativo ? '<input disabled>' : `<input type="text" data-dia="${dataStr}" value="${val}" oninput="atualizarHoraDia(this)" onmousedown="registrarCliqueHora(${inputIndex++})" onkeydown="verificarTab(event)" placeholder="">`;
+            let inputHTML = foraPeriodo ? 
+                '<input disabled>' : 
+                `<input type="text" data-dia="${dataStr}" value="${valDisplay}" 
+                    placeholder="${placeholder}"
+                    oninput="atualizarHoraDia(this)" 
+                    onmousedown="registrarCliqueHora(${inputIndex++})" 
+                    onkeydown="verificarTab(event)">`;
 
             container.innerHTML += `
-                <div class="cal-dia ${classeExtra}">
+                <div class="cal-dia ${classeExtra.join(' ')}">
                     <span>${dia}</span>
                     ${inputHTML}
                 </div>
             `;
+        }
+        verificarAvisoFeriado();
+    }
+
+    function atualizarHoraDia(input) {
+        let val = input.value.trim();
+        let dataStr = input.dataset.dia;
+        
+        if (val === "") {
+            delete modalHorasState[dataStr];
+        } else {
+            modalHorasState[dataStr] = parseHoras(val);
+        }
+
+        // Gerencia a classe de cor laranja dinamicamente
+        const pai = input.parentElement;
+        if (pai.classList.contains('descanso')) {
+            if (modalHorasState[dataStr] > 0) pai.classList.add('preenchido');
+            else pai.classList.remove('preenchido');
+        }
+
+        atualizarPreviewTotalHoras();
+        verificarAvisoFeriado();
+    }
+
+    function verificarAvisoFeriado() {
+        const aviso = document.getElementById('avisoFeriadoModal');
+        let temHoraEmDescanso = false;
+
+        for (let dataStr in modalHorasState) {
+            if (modalHorasState[dataStr] > 0) {
+                let dt = stringParaData(dataStr);
+                if (dt) {
+                    let feriados = obterFeriadosNacionais(dt.getFullYear());
+                    let isFds = dt.getDay() === 0 || dt.getDay() === 6;
+                    let isFeriado = feriados.includes(dataStr);
+                    
+                    if (isFds || isFeriado) {
+                        temHoraEmDescanso = true;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (temHoraEmDescanso) {
+            aviso.style.display = 'block';
+            document.getElementById('dicaTabModal').style.display = 'none'; 
+        } else {
+            aviso.style.display = 'none';
+            if (contadorCliquesHora >= 5 && !usouTabNesteModal) {
+                document.getElementById('dicaTabModal').style.display = 'block';
+            }
         }
     }
 
@@ -1571,7 +1659,6 @@
         for (let key in modalHorasState) {
             if (modalHorasState[key] >= 0) { 
                 let dAtual = stringParaData(key);
-                // SALVA APENAS OS DIAS QUE ESTÃO DENTRO DO PERÍODO DA TAREFA. Mata os "fantasmas".
                 if (dAtual && dAtual >= modalTaskStart && dAtual <= modalTaskEnd) {
                     detalhes.push({ data: key, horas: modalHorasState[key] });
                 }
@@ -1590,7 +1677,6 @@
         mostrarToast("🕒 Detalhes de horas salvos!");
     }
 
-
     function exportarCSV() {
         const itens = document.querySelectorAll('.item-lista');
         if (itens.length === 0) {
@@ -1598,18 +1684,15 @@
             return;
         }
 
-        // Cabeçalho do CSV. Se o seu PSA exigir nomes de colunas diferentes, é só alterar aqui.
-        // Estamos usando ponto e vírgula (;) para evitar conflito com números quebrados tipo 4,5h no Brasil.
+        // Cabeçalho do CSV
         let csvContent = "Nivel;Tipo;Descricao;Data Inicio;Data Fim;Horas;Analista\n";
 
         itens.forEach(el => {
-            // Pega o nível, verificando se está digitado ou no placeholder (para planejamento normal)
             let inpNivel = el.querySelector('.inp-nivel');
             let nivel = inpNivel ? (inpNivel.value.trim() || inpNivel.placeholder) : "";
             
             if (el.dataset.type === 'marco') {
                 let desc = el.querySelector('.inp-marco').value || "";
-                // Linha do Marco (deixamos as datas e horas vazias)
                 csvContent += `"${nivel}";"Marco";"${desc}";"";"";"";""\n`;
             } else if (el.dataset.type === 'tarefa') {
                 let desc = el.querySelector('.inp-tarefa').value || "";
@@ -1618,16 +1701,13 @@
                 let horas = el.querySelector('.inp-horas').value || "";
                 let analista = el.querySelector('.inp-analista').value || "";
                 
-                // Linha da Tarefa
                 csvContent += `"${nivel}";"Tarefa";"${desc}";"${inicio}";"${fim}";"${horas}";"${analista}"\n`;
             }
         });
 
-        // Adiciona um caractere especial (BOM) no início para forçar o Excel/PSA a ler os acentos corretamente em UTF-8
         let csvData = new Blob(["\ufeff" + csvContent], { type: 'text/csv;charset=utf-8;' });
         let csvUrl = URL.createObjectURL(csvData);
         
-        // Cria um link invisível e clica nele para baixar o arquivo
         let hiddenElement = document.createElement('a');
         hiddenElement.href = csvUrl;
         
@@ -1652,16 +1732,16 @@
         } else { 
             adicionarMarcoItem(); 
             adicionarNovaTarefa(); 
-            alternarTipoAcao(); // Chama para garantir que comece bloqueado
+            alternarTipoAcao(); 
         }
         
         Sortable.create(document.getElementById('listaItens'), { 
             handle: '.drag-handle', animation: 150, onEnd: gerarTabela 
         });
         
-        gerarTabela(); // Garante a atualização visual da mensagem de aviso na tabela
+        gerarTabela(); 
     };
     
-    </script>
+</script>
 </body>
 </html>
