@@ -60,8 +60,10 @@
             </div>
         
             <label for="tipoJustificativa">Justificativa:</label>
-            <select id="tipoJustificativa" onchange="mudarJustificativa(); gerarEmail()">
-                <option value="Padrao">Padrão (Termo de conclusão assinado...)</option>
+            <select id="tipoJustificativa" onchange="mudarJustificativa(); gerarEmail()">                
+                <!--option value="Selecione"></option-->
+                <option value="Padrao">Termo de conclusão assinado</option>
+                <option value="Unilateral">Faturamento unilateral</option>
                 <option value="Outras">Outras (digitar abaixo)</option>
             </select>
         
@@ -83,7 +85,7 @@
             </div>
 
             <div class="resultado">
-                <button class="btn-roxo btn-aux" onclick="copiarTexto('resultadoCorpo')">Copiar</button>
+                <button class="btn-roxo btn-aux" onclick="copiarTextoRico('resultadoCorpo')">Copiar</button>
                 <label>Mensagem</label>
                 <pre id="resultadoCorpo"></pre>
             </div>
@@ -102,183 +104,189 @@
 
 
     <script>
-        // --- FORÇAR A PÁGINA A IR PARA O TOPO AO ATUALIZAR ---
-        if (history.scrollRestoration) {
-            history.scrollRestoration = 'manual';
+    // --- FORÇAR A PÁGINA A IR PARA O TOPO AO ATUALIZAR ---
+    if (history.scrollRestoration) {
+        history.scrollRestoration = 'manual';
+    }
+    window.scrollTo(0, 0);
+    
+    const JUSTIFICATIVA_PADRAO = "Termo de conclusão assinado no repositório do projeto.";
+    const JUSTIFICATIVA_UNILATERAL = "Faturamento unilateral. Evidências de envio da MIT0062, há mais de 30 dias, disponível no repositório do fluig.";
+
+    function obterSaudacao() {
+    // Usamos 'en-US' apenas para garantir que retorne o número limpo (ex: "14"), sem o "h" do pt-BR
+    const horaString = new Date().toLocaleString("en-US", {
+        timeZone: "America/Sao_Paulo",
+        hour: "numeric",
+        hour12: false
+    });
+
+    const hora = parseInt(horaString, 10);
+
+    if (hora >= 5 && hora < 12) {
+        return "bom dia";
+    } else if (hora >= 12 && hora < 18) {
+        return "boa tarde";
+    } else {
+        return "boa noite"; // Correção aplicada aqui
+    }
+}
+
+    function preencherContrato() {
+        const codProjeto = document.getElementById('codProjeto').value;
+        if (codProjeto.length > 3) {
+            const codContratoPSA = codProjeto.slice(0, -3);
+            document.getElementById('codContratoPSA').value = codContratoPSA;
+        } else if (codProjeto.length === 0) {
+            document.getElementById('codContratoPSA').value = "";
         }
-        window.scrollTo(0, 0);
-        
-        const JUSTIFICATIVA_PADRAO = "Termo de conclusão assinado no repositório do projeto.";
+    }
 
-        function obterSaudacao() {
-            const hora = parseInt(new Date().toLocaleString("pt-BR", {
-                timeZone: "America/Sao_Paulo",
-                hour: "numeric",
-                hour12: false
-            }));
+    function mudarJustificativa() {
+        const tipoJustificativa = document.getElementById('tipoJustificativa').value;
+        const inputJustificativa = document.getElementById('justificativa');
+        const justificativaDiv = document.getElementById('justificativaManualDiv');
 
-            if (hora >= 5 && hora < 12) return "bom dia";
-            else if (hora >= 12 && hora < 18) return "boa tarde";
-            else return "bom dia/boa tarde";
+        // Lógica corrigida para não preencher a unilateral por padrão
+        if (tipoJustificativa === 'Selecione') {
+            justificativaDiv.style.display = 'none';
+            inputJustificativa.value = ""; 
+        } else if (tipoJustificativa === 'Padrao') {
+            justificativaDiv.style.display = 'none';
+            inputJustificativa.value = JUSTIFICATIVA_PADRAO;
+        } else if (tipoJustificativa === 'Unilateral') {
+            justificativaDiv.style.display = 'none';
+            inputJustificativa.value = JUSTIFICATIVA_UNILATERAL;
+        } else {
+            justificativaDiv.style.display = 'block';
+            // Limpa se o texto atual for um dos pré-definidos para permitir nova digitação
+            if (inputJustificativa.value === JUSTIFICATIVA_PADRAO || inputJustificativa.value === JUSTIFICATIVA_UNILATERAL) {
+                inputJustificativa.value = "";
+            }
+            inputJustificativa.focus();
         }
+        gerarEmail();
+    }
 
-        function preencherContrato() {
-            const codProjeto = document.getElementById('codProjeto').value;
-            if (codProjeto.length > 3) {
-                const codContratoPSA = codProjeto.slice(0, -3);
-                document.getElementById('codContratoPSA').value = codContratoPSA;
-            } else if (codProjeto.length === 0) {
-                document.getElementById('codContratoPSA').value = "";
-            }
-        }
+    function gerarEmail() {
+    const codProjeto = document.getElementById('codProjeto').value;
+    const nomeProjeto = document.getElementById('nomeProjeto').value;
+    const tipoAssunto = document.getElementById('tipoAssunto').value;
+    const codContratoPSA = document.getElementById('codContratoPSA').value;
+    const codCliente = document.getElementById('codCliente').value;
+    const justificativa = document.getElementById('justificativa').value;
 
-        function mudarJustificativa() {
-            const tipoJustificativa = document.getElementById('tipoJustificativa').value;
-            const inputJustificativa = document.getElementById('justificativa');
-            const justificativaDiv = document.getElementById('justificativaManualDiv');
+    let valorLiquido = document.getElementById('valorLiquido').value.trim();
+    if (valorLiquido && !valorLiquido.toUpperCase().startsWith("R$")) {
+        valorLiquido = `R$${valorLiquido}`;
+    }
 
-            if (tipoJustificativa === 'Padrao') {
-                justificativaDiv.style.display = 'none';
-                inputJustificativa.value = JUSTIFICATIVA_PADRAO;
-            } else {
-                justificativaDiv.style.display = 'block';
-                // Limpa se estiver com o texto padrão para facilitar a digitação
-                if (inputJustificativa.value === JUSTIFICATIVA_PADRAO) {
-                    inputJustificativa.value = "";
-                }
-                inputJustificativa.focus();
-            }
-            gerarEmail();
-        }
+    let assunto = '';
+    if (tipoAssunto === 'Faturamento') {
+        assunto = codProjeto ? `${codProjeto} - Solicitação de Faturamento` : '';
+    } else {
+        assunto = (codProjeto && nomeProjeto) ? `${codProjeto} - ${nomeProjeto}` : '';
+    }
 
-        function gerarEmail() {
-            const codProjeto = document.getElementById('codProjeto').value;
-            const nomeProjeto = document.getElementById('nomeProjeto').value;
-            const tipoAssunto = document.getElementById('tipoAssunto').value;
-            const tipoJustificativa = document.getElementById('tipoJustificativa').value;
-            const codContratoPSA = document.getElementById('codContratoPSA').value;
-            const codCliente = document.getElementById('codCliente').value;
+    const saudacao = obterSaudacao();
 
-            let valorLiquido = document.getElementById('valorLiquido').value.trim();
-            if (valorLiquido && !valorLiquido.toUpperCase().startsWith("R$")) {
-                valorLiquido = `R$${valorLiquido}`;
-            }
-
-            let justificativa;
-            if (tipoJustificativa === 'Padrao') {
-                justificativa = JUSTIFICATIVA_PADRAO;
-            } else {
-                justificativa = document.getElementById('justificativa').value;
-            }
-
-            let assunto = '';
-            if (tipoAssunto === 'Faturamento') {
-                assunto = codProjeto ? `${codProjeto} - Solicitação de Faturamento` : '';
-            } else {
-                assunto = (codProjeto && nomeProjeto) ? `${codProjeto} - ${nomeProjeto}` : '';
-            }
-
-            const saudacao = obterSaudacao();
-
-            const corpoEmail = `Olá, ${saudacao}!
+    // Usamos tags <b> para o negrito e \n para quebras de linha
+    const corpoEmail = `Olá, ${saudacao}!
 
 Favor proceder com o faturamento abaixo:
 
-Código do contrato PSA: ${codContratoPSA}
-Código do cliente: ${codCliente}
-Valor líquido: ${valorLiquido}
+<b>Código do contrato PSA:</b> ${codContratoPSA}
+<b>Código do cliente:</b> ${codCliente}
+<b>Valor líquido:</b> ${valorLiquido}
 
-Código do projeto: ${codProjeto}
-Nome do projeto: ${nomeProjeto}
+<b>Código do projeto:</b> ${codProjeto}
+<b>Nome do projeto:</b> ${nomeProjeto}
 
-Justificativa: ${justificativa}
-
+<b>Justificativa:</b> ${justificativa}
 
 Atenciosamente,`;
 
-            document.getElementById('resultadoAssunto').textContent = assunto;
-            document.getElementById('resultadoCorpo').textContent = corpoEmail;
+    document.getElementById('resultadoAssunto').textContent = assunto;
+    // IMPORTANTE: Aqui usamos innerHTML para interpretar o <b>
+    document.getElementById('resultadoCorpo').innerHTML = corpoEmail.replace(/\n/g, '<br>');
+}
+
+// Nova função para copiar mantendo o negrito para o E-mail
+async function copiarTextoRico(idElemento) {
+    const elemento = document.getElementById(idElemento);
+    const html = elemento.innerHTML;
+    const textoPuro = elemento.innerText;
+
+    try {
+        // O segredo está em passar o MIME type correto para o ClipboardItem
+        const blobHTML = new Blob([html], { type: "text/html" });
+        const blobText = new Blob([textoPuro], { type: "text/plain" });
+        const data = [new ClipboardItem({ 
+            "text/html": blobHTML, 
+            "text/plain": blobText 
+        })];
+        
+        await navigator.clipboard.write(data);
+        mostrarToast("E-mail com formatação copiado!");
+    } catch (err) {
+        console.error("Erro ao copiar formatado, tentando texto puro...", err);
+        copiarTexto(idElemento); 
+    }
+}
+
+    function mostrarToast(texto) {
+        var x = document.getElementById("toast");
+        let textoExibido = texto;
+        if (textoExibido.length > 40) {
+            textoExibido = textoExibido.substring(0, 40) + "...";
         }
+        x.textContent = `"${textoExibido}" copiado!`;
+        x.className = "show";
+        setTimeout(function () { x.className = x.className.replace("show", ""); }, 4000);
+    }
 
-        // --- FUNÇÕES NOVAS ---
+    function copiarTexto(idElemento) {
+        const texto = document.getElementById(idElemento).textContent;
+        if (!texto.trim()) return;
+        navigator.clipboard.writeText(texto).then(() => {
+            mostrarToast(texto);
+        }).catch(err => {
+            console.error('Erro ao copiar: ', err);
+        });
+    }
 
-        function mostrarToast(texto) {
-            var x = document.getElementById("toast");
+    function limparFormulario() {
+        const inputs = document.querySelectorAll('input[type="text"]');
+        inputs.forEach(input => input.value = '');
+        document.getElementById('tipoAssunto').selectedIndex = 0;
+        document.getElementById('tipoJustificativa').selectedIndex = 0;
+        mudarJustificativa();
+        gerarEmail();
+    }
 
-            // Se o texto for muito longo (ex: corpo do email), cortamos para não quebrar o layout
-            let textoExibido = texto;
-            if (textoExibido.length > 40) {
-                textoExibido = textoExibido.substring(0, 40) + "...";
-            }
+    function copiarString(texto) {
+        navigator.clipboard.writeText(texto).then(() => {
+            mostrarToast(texto);
+        });
+    }
 
-            // Define a mensagem dinâmica
-            x.textContent = `"${textoExibido}" copiado!`;
+    function abrirIndicadores() {
+        const codProjeto = document.getElementById('codProjeto').value;
+        const linkPlanilha = "https://docs.google.com/spreadsheets/d/19b-F8VDW_tJeJ2h4lM_owYeUDWt0upNsK_OR_bVe0aw/edit";
 
-            x.className = "show";
-            setTimeout(function () { x.className = x.className.replace("show", ""); }, 4000);
-        }
+        navigator.clipboard.writeText(codProjeto).then(() => {
+            mostrarToast(codProjeto ? codProjeto : "Vazio");
+            window.open(linkPlanilha, '_blank');
+        }).catch(err => {
+            window.open(linkPlanilha, '_blank');
+        });
+    }
 
-        function copiarTexto(idElemento) {
-            const texto = document.getElementById(idElemento).textContent;
-
-            if (!texto.trim()) return;
-
-            navigator.clipboard.writeText(texto).then(() => {
-                mostrarToast(texto); // Passa o texto para a notificação
-            }).catch(err => {
-                console.error('Erro ao copiar: ', err);
-                alert('Erro manual ao copiar.');
-            });
-        }
-
-        // Função para Limpar tudo
-        function limparFormulario() {
-            // Seleciona todos os inputs de texto e limpa
-            const inputs = document.querySelectorAll('input[type="text"]');
-            inputs.forEach(input => input.value = '');
-
-            // Reseta os selects para a primeira opção
-            document.getElementById('tipoAssunto').selectedIndex = 0;
-            document.getElementById('tipoJustificativa').selectedIndex = 0;
-
-            // Restaura a visualização da justificativa (esconde o manual)
-            mudarJustificativa();
-
-            // Atualiza o email (vai ficar em branco)
-            gerarEmail();
-        }
-
-        function copiarString(texto) {
-            navigator.clipboard.writeText(texto).then(() => {
-                mostrarToast(texto); // Passa o texto para a notificação
-            }).catch(err => {
-                console.error('Erro ao copiar: ', err);
-            });
-        }
-
-        function abrirIndicadores() {
-            const codProjeto = document.getElementById('codProjeto').value;
-            // COLOQUE O LINK DA SUA PLANILHA AQUI EMBAIXO:
-            const linkPlanilha = "https://docs.google.com/spreadsheets/d/19b-F8VDW_tJeJ2h4lM_owYeUDWt0upNsK_OR_bVe0aw/edit";
-
-            navigator.clipboard.writeText(codProjeto).then(() => {
-                // Se tiver código, mostra ele. Se estiver vazio, mostra mensagem genérica.
-                if (codProjeto) {
-                    mostrarToast(codProjeto);
-                } else {
-                    mostrarToast("Vazio");
-                }
-                window.open(linkPlanilha, '_blank');
-            }).catch(err => {
-                window.open(linkPlanilha, '_blank');
-            });
-        }
-
-        window.onload = function () {
-            mudarJustificativa();
-            gerarEmail();
-        };
-    </script>
+    window.onload = function () {
+        mudarJustificativa();
+        gerarEmail();
+    };
+</script>
 
 </body>
 
