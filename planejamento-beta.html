@@ -377,7 +377,7 @@
                 </div>
 
                 <div style="margin-top: 20px;"  class="input-item replanejamento-fields hidden" id="boxStatusDatas">
-                    <label for="selStatusDatasGlobal">Manter ou excluir demais tarefas?</label>
+                    <label for="selStatusDatasGlobal">Demais tarefas:</label>
                     <select id="selStatusDatasGlobal" onchange="limparErroAcaoDatas(); gerarTabela()">
                         <option value=""></option>
                         <option value="Manter demais tarefas">Manter demais tarefas</option>
@@ -1286,12 +1286,12 @@
                 <p><strong>${codProjeto} ${nomeProjeto}</strong></p><br>
                 <table style="width: 100%; max-width: 650px; border-collapse: collapse; font-size: 11px;">
                     <thead><tr style="background-color: #002233; color: white;">
-                        <th style="padding: 10px; border: 1px solid #000; width: 8%;">NÍVEL</th> 
-                        <th style="padding: 10px; border: 1px solid #000; width: 42%">DESCRIÇÃO</th> 
-                        <th style="padding: 10px; border: 1px solid #000; width: 12%;">INÍCIO</th>
-                        <th style="padding: 10px; border: 1px solid #000; width: 12%;">FIM</th>
-                        <th style="padding: 10px; border: 1px solid #000; width: 8%;">HORAS</th>
-                        <th style="padding: 10px; border: 1px solid #000; width: 18%;">ANALISTA</th>
+                        <th style="padding: 10px; border: 1px solid #000; ">NÍVEL</th> 
+                        <th style="padding: 10px; border: 1px solid #000; ">DESCRIÇÃO</th> 
+                        <th style="padding: 10px; border: 1px solid #000; ">INÍCIO</th>
+                        <th style="padding: 10px; border: 1px solid #000; ">FINAL</th>
+                        <th style="padding: 10px; border: 1px solid #000; ">HORAS</th>
+                        <th style="padding: 10px; border: 1px solid #000; ">ANALISTA</th>
                     </tr></thead>
                     <tbody>${linhasHTML}
                         <tr><td colspan="4" style="text-align: right; font-weight: bold; padding: 10px; border: 1px solid #ccc; background-color: #fafafa;">TOTAL</td>
