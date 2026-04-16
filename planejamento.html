@@ -153,7 +153,6 @@
             padding: 0;
         }
 
-
         @media (max-width: 370px) {
             .input-group {
                 flex-direction: row;
@@ -166,61 +165,108 @@
 
         }
 
-
-
-
-
         /* --- CALENDÁRIO DE DETALHAMENTO DE HORAS --- */
         .calendario-header {
-            display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 15px; font-weight: bold; color: var(--az-escuro);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            font-weight: bold;
+            color: var(--az-escuro);
+            width: 270px;
+            margin: 0 auto;
+            padding: 0 0 20px 0;
         }
         .calendario-header button { width: auto; padding: 5px 15px; font-size: 1.2em; }
         .calendario-grid {
-            display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px;
+            display: grid; 
+            grid-template-columns: repeat(7, 1fr); 
+            gap: 5px;
             font-size: 0.85em;
+            border-radius: 4px;
         }
         .cal-dias-semana { display: contents; }
         .cal-dias-semana div {
-            text-align: center; font-weight: bold; color: var(--roxo);
-            padding-bottom: 5px; border-bottom: 2px solid var(--roxo); margin-bottom: 5px;
+            text-align: center; 
+            font-weight: bold; 
+            color: var(--roxo);
+            padding-bottom: 5px; 
+            border-bottom: 2px solid var(--roxo); 
+            margin-bottom: 5px;
         }
         .cal-dia {
-            display: flex; flex-direction: column; align-items: center;
-            border: 1px solid var(--cinza); border-radius: 4px; padding: 5px 2px;
-            min-height: 45px; justify-content: space-between;
+            display: flex; 
+            flex-direction: column; 
+            align-items: center;
+            border-radius: 3px; 
+            padding: 5px 2px;
+            min-height: 45px; 
+            justify-content: space-between;
         }
         .cal-dia.fora-mes { border: none; background: transparent; }
-        .cal-dia.descanso { background-color: var(--cinza-claro); border-color: var(--laranja); color: var(--laranja); }
+        .cal-dia.descanso { background-color: var(--cinza-claro);  }
         .cal-dia.descanso input {
             color: var(--laranja);
-            border-color: var(--laranja);
             font-weight: bold;
-            background-color: #fffaf0; 
         }
-        .cal-dia.fora-periodo { opacity: 0.3; background: #eee; }
+        .cal-dia.fora-periodo { 
+            opacity: 0.3; 
+            background: var(--cinza-claro);            
+            border: 1px solid var(--cinza); 
+         }
         .cal-dia input {
             width: 80%; padding: 2px; text-align: center; margin: 0;
             border: 1px solid var(--az-claro); border-radius: 3px; font-size: 0.9em;
         }
         .cal-dia input:disabled { display: none; }
+
+        /* Estilo para quando um dia de descanso tem horas preenchidas */
+        .cal-dia.descanso.preenchido input {
+            background-color: #fff4e5 !important;
+            border-color: var(--laranja) !important;
+            color: var(--laranja) !important;
+            font-weight: bold;
+        }
+
+        /* Ajuste no alerta do rodapé para suportar duas mensagens */
+        #containerDicasModal {
+            min-height: 20px;
+            margin-bottom: 10px;
+        }
+
+        .aviso-feriado {
+            color: var(--laranja);
+            font-weight: bold;
+            font-size: 0.85em;
+            animation: fadeIn 0.3s;
+        }
+
         #modalHoras {
             padding: 15px;
             box-sizing: border-box;
-        }
-        
+        }        
+
         #modalHoras .modal-box {
-            margin: auto !important; /* Força a centralização, anulando margens antigas */
-            max-height: 90vh; /* Nunca ultrapassa a altura da tela */
+            margin: auto !important; 
+            max-height: 90vh; 
             display: flex;
             flex-direction: column;
             width: 100%;
+            max-width: 400px;
+            overflow: hidden; /* Fixa o rodapé e rola só o calendário */
         }
 
         #calendarioHoras {
-            overflow-y: auto; /* Adiciona rolagem interna se a tela for pequena */
-            flex-shrink: 1;
+            overflow-y: auto; 
+            flex-grow: 1; /* Ocupa o espaço disponível do modal */
             padding: 5px 2px;
+            min-height: 400px;
+        }
+
+        .modal-footer-fixo {
+            background: #fff;
+            margin-top: 10px;
+            flex-shrink: 0; /* Impede o rodapé de ser espremido */
         }
 
         .bloqueado {
@@ -331,7 +377,7 @@
                 </div>
 
                 <div style="margin-top: 20px;"  class="input-item replanejamento-fields hidden" id="boxStatusDatas">
-                    <label for="selStatusDatasGlobal">Manter ou excluir demais tarefas?</label>
+                    <label for="selStatusDatasGlobal">Demais tarefas:</label>
                     <select id="selStatusDatasGlobal" onchange="limparErroAcaoDatas(); gerarTabela()">
                         <option value=""></option>
                         <option value="Manter demais tarefas">Manter demais tarefas</option>
@@ -384,47 +430,64 @@
         <button><a href="planejamento.html" target="_blank" style="text-decoration: none;">Novo</a></button>
         <button onclick="document.getElementById('fileInput').click()">Abrir</button>
         <button onclick="baixarBackup()">Salvar</button> 
+        <button onclick="exportarCSV()" style="display: none;">Exportar CSV</button>
         <button onclick="limparTudo()">Limpar</button>
     </div>
 
     <div style="display: flex; align-items: center; gap: 8px; justify-content: center; margin:20px 0;">
         <input type="checkbox" id="chkAutoSave" onchange="toggleAutoSave()" style="cursor: pointer; width: 18px; height: 18px; accent-color: var(--az-claro);">
-        <div for="chkAutoSave" style="margin: 0; color: var(--branco); cursor: pointer;font-size: 0.9em;">Salvar automático</div>
+        <div for="chkAutoSave" style="margin: 0; color: var(--branco); font-size: 0.9em;">Salvar automático</div>
     </div>
 
     <div id="secaoTutorial" class="container tutorial">
         <h2>
         💡 Dicas</h2>
         <ul>
-            <li><mark class="mark-limao">Segure e arraste</mark> pelo ícone <strong class="azul-claro">☰</strong> para alterar a ordem.</li> 
-            <li>Ao digitar o nome do analista, uma lista de sugestões será aberta, mas você também pode digitar livremente.</li>
+            <li><mark class="mark-limao">Segure e arraste</mark> pelo ícone <strong class="azul-claro">☰</strong> para alterar a ordem.</li>
+            <li>Ao digitar o nome do analista, uma lista de sugestões aparecerá, mas você também pode digitar livremente.</li>
             <li>Em caso de replanejamento, informe o <strong>número de nível hierárquico</strong> correspondente do PSA.</li>
-            <li style="display: none;">Em caso de <mark class="mark-limao">dias com quantidades de horas diferentes</mark>, clique no botao "HORAS/DIA" para fazer esse detalhamento.</li>
+            <li>Para tarefas com <mark class="mark-limao">quantidades de horas diferentes por dia</mark>, clique no botão "HORAS/DIA" para fazer o detalhamento.</li>
             <li>Para deixar um texto em <strong>negrito</strong> nas observações, coloque a palavra entre asteriscos. Ex: *urgente*.</li>
             <li><strong>Terminou?</strong> Clique no botão azul <strong>"Copiar"</strong> e cole direto no seu e-mail.</li>
-            <li>Para <mark class="mark-limao">evitar erros</mark>, se possível, envie um print com a visão geral das tarefas no e-mail, do jeito que etiver.</li>
-            <li>Se a caixinha <mark class="mark-limao">"Salvar automático"</mark> estiver selecionada, o progresso do trabalho será sempre salvo no seu navegador. 
-                Fechou a guia sem querer? É só voltar e os dados estarão lá.</li>
-            <li>Também é possível <mark class="mark-limao">salvar</mark> seu planejamento em um arquivo <code>.json</code> e abrir depois para continuar seu preenchimento.</li>
-            <li>Sinta-se a vontade para editar a tabela ou corpo da mensagem no próprio e-mail, se preciso.</li>
+            <li><mark class="mark-limao">Para evitar erros</mark>, se possível, envie também um print da visão geral das tarefas no e-mail, do jeito que estiver no sistema.</li>
+            <li>Se a caixinha <mark class="mark-limao">"Salvar automático"</mark> estiver selecionada, o progresso será salvo no seu navegador. Fechou a guia sem querer? É só voltar e os dados estarão lá.</li>
+            <li>Também é possível <mark class="mark-limao">salvar seu planejamento</mark> em um arquivo <code>.json</code> e abrir depois para continuar o preenchimento.</li>
+            <li>Sinta-se à vontade para editar a tabela ou o corpo da mensagem diretamente no próprio e-mail, se necessário.</li>
         </ul>
     </div>
 
 
     
     <div id="modalHoras" class="modal-overlay">
-        <div class="modal-box" style="max-width: 400px;">
+        <div class="modal-box">
             <button class="btn-fechar-modal" onclick="fecharModalHoras()" title="Fechar">X</button>
             <br>
             <div class="calendario-header">
-                <button class="btn-azul btn-aux" onclick="mudarMes(-1)">&#10094;</button>
+                <button class="btn-aux" onclick="mudarMes(-1)">&#10094;</button>
                 <span id="calMesAno">MARÇO</span>
-                <button class="btn-azul btn-aux" onclick="mudarMes(1)">&#10095;</button>
+                <button class="btn-aux" onclick="mudarMes(1)">&#10095;</button>
             </div>
             <div id="calendarioHoras" class="calendario-grid"></div>
-            <button class="btn-roxo" style="margin-top: 20px; width: 100%; padding: 12px; font-size: 1em; flex-shrink: 0;" onclick="salvarDetalheHoras()">
-                Salvar e Fechar</button>
-            <input type="hidden" id="modalHorasTarefaId">
+
+            <div class="modal-footer-fixo">
+                <div id="containerDicasModal">
+                    <div id="dicaTabModal" style="display:none; color: var(--az-escuro); font-size: 0.85em; text-align: center; animation: fadeIn 0.3s;">
+                        💡 Use a tecla TAB para avançar os dias mais rápido!
+                    </div>
+                    <div id="avisoFeriadoModal" style="display:none; text-align: center;" class="aviso-feriado">
+                        ⚠️ Atenção: horas lançadas em dias de descanso
+                    </div>
+                </div>
+                <div id="previewTotalHoras" style="text-align: center; margin-bottom: 15px; color: var(--az-escuro); font-size: 1.1em;">Total de horas</div>
+
+                
+            <div style="display: flex; gap: 10px; width: 100%;">
+                <button class="btn-laranja" style="flex: 1; padding: 12px; font-size: 0.9em;" onclick="limparModalHoras()">Limpar</button>
+                <button class="btn-roxo" style="flex: 2; padding: 12px; font-size: 0.9em;" onclick="salvarDetalheHoras()">Salvar e Fechar</button>
+            </div>
+            
+                <input type="hidden" id="modalHorasTarefaId">
+            </div>
         </div>
     </div>
 
@@ -597,7 +660,8 @@
 
     function formatarDataFinal(valor) {
         if (!valor) return "";
-        return (valor.length === 10 && valor.includes('/')) ? valor.substring(0, 5) : valor;
+        // Pega o "DD/MM/" (0 a 6) e junta com o "YY" (8 a 10)
+        return (valor.length === 10 && valor.includes('/')) ? valor.substring(0, 6) + valor.substring(8, 10) : valor;
     }
 
     function parseHoras(valor) {
@@ -641,6 +705,19 @@
         if(selDatas) selDatas.style.borderColor = "var(--cinza)";
     }
 
+    // --- FORMATAÇÃO HORAS NO FORMULÁRIO ---
+    function formatarCampoHoras(input) {
+        let valor = input.value.trim();
+        if (valor === "") return;
+        let h = parseHoras(valor);
+        if (h > 0) {
+            input.value = h.toLocaleString('pt-BR', {maximumFractionDigits: 2}) + (h <= 1 ? " hora" : " horas");
+        } else {
+            input.value = "0 horas";
+        }
+        gerarTabela();
+    }
+
     function adicionarNovaTarefa() { criarElemento('tarefa'); }
     function adicionarMarcoItem() { criarElemento('marco'); }
 
@@ -666,7 +743,7 @@
 
                 <div class="input-group" style="margin-bottom:0; margin-top: 5px;">
                     <div class="input-item">
-                        <input type="text" class="inp-horas" placeholder="Horas" oninput="gerarTabela()">
+                        <input type="text" class="inp-horas" placeholder="Horas" oninput="gerarTabela()" onblur="formatarCampoHoras(this)">
                     </div>
                     <div class="input-item">
                         <input type="text" class="inp-analista" placeholder="Analista" oninput="gerenciarSugestoes(this)">
@@ -689,7 +766,7 @@
                         </div>
                     </div>
                     <button class="btn-laranja btn-aux" 
-                        style="height: 28px; display: none;" 
+                        style="height: 28px;" 
                         title="Detalhar horas por dia (opcional)" onclick="abrirModalHoras('${idUnico}')">Horas / Dia
                     </button>
                 </div>
@@ -750,22 +827,21 @@
     let pendingCopyId = null;
 
     function validarCopiar(actionType, id = null) {
-        const tipoAcao = document.getElementById('selTipoAcao').value;
-        if (tipoAcao === 'Replanejamento') {
-            // Verifica a seleção do dropdown "Manter/Excluir"
-            const acaoDatas = document.getElementById('selStatusDatasGlobal');
-            if (!acaoDatas.value) {
-                acaoDatas.style.borderColor = "var(--vermelho)";
-                pendingCopyAction = actionType;
-                pendingCopyId = id;
-                document.getElementById('modalAcaoDatas').style.display = 'flex';
-                return false; // Bloqueia a cópia para abrir o modal
-            } else {
-                acaoDatas.style.borderColor = "var(--cinza)";
-            }
-        }
-        return true;
-    }
+        const tipoAcao = document.getElementById('selTipoAcao').value;
+        if (tipoAcao === 'Replanejamento') {
+            const acaoDatas = document.getElementById('selStatusDatasGlobal');
+            if (!acaoDatas.value) {
+                acaoDatas.style.borderColor = "var(--vermelho)";
+                pendingCopyAction = actionType;
+                pendingCopyId = id;
+                document.getElementById('modalAcaoDatas').style.display = 'flex';
+                return false;
+            } else {
+                acaoDatas.style.borderColor = "var(--cinza)";
+            }
+        }
+        return true;
+    }
 
     function confirmarAcaoDatasModal(valor) {
         const selDatas = document.getElementById('selStatusDatasGlobal');
@@ -1015,21 +1091,21 @@
             if (el.dataset.type === 'marco') {
                 let titulo = el.querySelector('.inp-marco').value.toUpperCase();
                 let nivelInput = el.querySelector('.inp-nivel');
-                if (nivelInput) {
-                    nivelInput.style.border = ""; 
-                    nivelInput.style.backgroundColor = "";
-                }
+                
                 // Pega só o valor digitado se for Replanejamento
                 const nivel = nivelInput ? (isRep ? nivelInput.value.trim() : (nivelInput.value.trim() || nivelInput.placeholder)) : '';
                 
-                if (nivel && titulo) titulo = `${nivel} - ${titulo}`;
-                else if (nivel) titulo = nivel; 
+                // Remove estas duas linhas:
+                // if (nivel && titulo) titulo = `${nivel} - ${titulo}`;
+                // else if (nivel) titulo = nivel;
 
-                if(titulo.trim() !== "") {
+                // Altere a montagem do HTML para ter o <td> do nível separado:
+                if(titulo.trim() !== "" || nivel.trim() !== "") {
                     const hMarco = horasPorMarco[el.id] || 0;
-                    const hMarcoFmt = hMarco > 0 ? hMarco.toLocaleString('pt-BR', {minimumFractionDigits: 2}) : "";
+                    const hMarcoFmt = hMarco > 0 ? hMarco.toLocaleString('pt-BR', {minimumFractionDigits: 1, maximumFractionDigits: 1}) : "";
 
                     linhasHTML += `<tr>
+                        <td style="background-color: #f0f0f0; font-weight: bold; text-align: center; padding: 10px; border: 1px solid #ccc;">${nivel}</td>
                         <td colspan="3" style="background-color: #f0f0f0; font-weight: bold; text-align: left; padding: 10px; border: 1px solid #ccc;">${titulo}</td>
                         <td style="background-color: #f0f0f0; font-weight: bold; text-align: center; padding: 10px; border: 1px solid #ccc;">${hMarcoFmt}</td>
                         <td style="background-color: #f0f0f0; border: 1px solid #ccc;"></td>
@@ -1048,7 +1124,7 @@
                     nivelInput.style.backgroundColor = "";
                 }
                 // Pega só o valor digitado se for Replanejamento
-                const nivel = nivelInput ? (isRep ? nivelInput.value.trim() : (nivelInput.value.trim() || nivelInput.placeholder)) : '';              
+                const nivel = nivelInput ? (isRep ? nivelInput.value.trim() : (nivelInput.value.trim() || nivelInput.placeholder)) : '';             
 
                 const detalheInput = el.querySelector('.inp-detalhe-horas');
                 if (detalheInput && detalheInput.value) {
@@ -1075,99 +1151,89 @@
                             });
 
                             if (arrFiltrado.length > 0) {
-                                let majorityHour = 8; 
-                                let fMaxCount = -1;
-                                
-                                // Descobre a hora que mais se repete APENAS para decidir se agrupa no texto ou não
-                                for (let h in finalHourCounts) {
-                                    if (finalHourCounts[h] > fMaxCount) {
-                                        fMaxCount = finalHourCounts[h];
-                                        majorityHour = parseFloat(h);
+                                    let fmt = new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 2 });
+                                    let nomeTarefaDet = desc ? desc.charAt(0).toUpperCase() + desc.slice(1) : '';
+                                    let cabecalhoNivel = nivel ? (nomeTarefaDet ? `${nivel} - ${nomeTarefaDet}` : `${nivel}`) : nomeTarefaDet;
+                                    if (cabecalhoNivel) cabecalhoNivel = `<strong>${cabecalhoNivel}</strong>`;
+
+                                    let taskHtml = `<div style="margin: 15px 0 5px;">${cabecalhoNivel || ''}</div>`;
+
+                                    // 1. Descobre o primeiro Domingo antes do Início e o último Sábado após o Fim
+                                    let calStart = new Date(dtInicio);
+                                    calStart.setDate(calStart.getDate() - calStart.getDay());
+
+                                    let calEnd = new Date(dtFim);
+                                    if (calEnd.getDay() !== 6) {
+                                        calEnd.setDate(calEnd.getDate() + (6 - calEnd.getDay()));
                                     }
-                                }
 
-                                // VERIFICA SE DEVE AGRUPAR OU LISTAR DIRETO
-                                let useGrouping = true;
-                                let diasUteisTotais = arrFiltrado.length;
-                                
-                                if (diasUteisTotais <= 3) {
-                                    useGrouping = false; // Até 3 dias não vale a pena agrupar. Lista direto!
-                                } else if (fMaxCount <= 1) {
-                                    useGrouping = false; // Todos os dias são diferentes
-                                } else if (fMaxCount <= diasUteisTotais / 2) {
-                                    useGrouping = false; // Metade ou mais dos dias são exceções (ex: 8,7,7,8)
-                                }
+                                    // 2. Monta o cabeçalho da tabelinha (mesmo estilo da tabela principal)
+                                    taskHtml += `
+                                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 5px; text-align: center; font-family: Verdana, sans-serif; font-size: 12px;">
+                                        <thead>
+                                            <tr style="background-color: #eee; color: #000;">
+                                                <th style="padding: 5px; border: 1px solid #ccc; width: 14%;">D</th>
+                                                <th style="padding: 5px; border: 1px solid #ccc; width: 14%;">S</th>
+                                                <th style="padding: 5px; border: 1px solid #ccc; width: 14%;">T</th>
+                                                <th style="padding: 5px; border: 1px solid #ccc; width: 14%;">Q</th>
+                                                <th style="padding: 5px; border: 1px solid #ccc; width: 14%;">Q</th>
+                                                <th style="padding: 5px; border: 1px solid #ccc; width: 14%;">S</th>
+                                                <th style="padding: 5px; border: 1px solid #ccc; width: 14%;">S</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                    `;
 
-                                // Formatar o período (Ex: 02 a 13/03)
-                                let strPeriodo = "";
-                                if (inicio.substring(3, 5) === fim.substring(3, 5)) {
-                                    strPeriodo = `${inicio.substring(0, 2)} a ${fim.substring(0, 5)}`;
-                                } else {
-                                    strPeriodo = `${inicio.substring(0, 5)} a ${fim.substring(0, 5)}`;
-                                }
+                                    // 3. Loop preenchendo as semanas e os dias
+                                    let currDate = new Date(calStart);
+                                    while (currDate <= calEnd) {
+                                        let rowCell = "<tr>";
 
-                                let fmt = new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 2 });
-                                let cabecalhoNivel = nivel ? `${nivel}` : '';
-                                let taskHtml = '';
+                                        for (let i = 0; i < 7; i++) {
+                                            let diaStr = String(currDate.getDate()).padStart(2, '0');
+                                            let dataCompleta = String(currDate.getDate()).padStart(2, '0') + '/' +
+                                                               String(currDate.getMonth() + 1).padStart(2, '0') + '/' +
+                                                               currDate.getFullYear();
 
-                                if (useGrouping) {
-                                    // Identificar as exceções para o texto do e-mail
-                                    let excecoesTexto = [];
-                                    let dtTemp = new Date(dtInicio);
-                                    
-                                    while (dtTemp <= dtFim) {
-                                        let ano = dtTemp.getFullYear();
-                                        let feriados = obterFeriadosNacionais(ano);
-                                        let dataStr = String(dtTemp.getDate()).padStart(2, '0') + '/' + 
-                                                      String(dtTemp.getMonth() + 1).padStart(2, '0') + '/' + ano;
-                                        let dataCurta = dataStr.substring(0, 5);
-                                        
-                                        let isFds = dtTemp.getDay() === 0 || dtTemp.getDay() === 6;
-                                        let isFeriado = feriados.includes(dataStr);
-                                        let salvo = arrFiltrado.find(d => d.data === dataStr);
-                                        
-                                        if (salvo) {
-                                            if (salvo.horas !== majorityHour) {
-                                                excecoesTexto.push(`${dataCurta} - ${fmt.format(salvo.horas)}h`);
+                                            // Verifica se o dia no calendário está dentro do Início/Fim da tarefa
+                                            let foraDoPeriodo = currDate < dtInicio || currDate > dtFim;
+
+                                            // Busca as horas lançadas
+                                            let objHora = arrFiltrado.find(d => d.data === dataCompleta);
+                                            let horasLancadas = (objHora && objHora.horas > 0) ? objHora.horas : 0;
+
+                                            // i === 0 é Domingo, i === 6 é Sábado
+                                            let ehFimDeSemana = (i === 0 || i === 6);
+
+                                            // Aplica a regra: desabilitado se for fora do período, final de semana ou tiver 0 horas
+                                            let isDesabilitado = foraDoPeriodo || ehFimDeSemana || horasLancadas === 0;
+
+                                            let displayHora = "<strong>--</strong>";
+                                            if (!isDesabilitado) {
+                                                displayHora = `<strong>${fmt.format(horasLancadas)}h</strong>`;
                                             }
-                                        } else {
-                                            if (isFeriado) {
-                                                excecoesTexto.push(`${dataCurta} - feriado`);
-                                            } else if (!isFds && majorityHour !== 0) { 
-                                                excecoesTexto.push(`${dataCurta} - 0h`);
-                                            }
+
+                                            // Cores para os dias (cinza claro se estiver desabilitado)
+                                            let bgColor = isDesabilitado ? "#f9f9f9" : "#ffffff";
+                                            let colorText = isDesabilitado ? "#ccc" : "#333";
+
+                                            // Monta a célula única: dia (sem negrito) em cima, hora (com negrito) embaixo
+                                            rowCell += `<td style="padding: 4px; border: 1px solid #ccc; background-color: ${bgColor}; color: ${colorText}; line-height: 1.4;">
+                                                            <span style="font-weight: normal;">${diaStr}</span><br>
+                                                            ${displayHora}
+                                                        </td>`;
+
+                                            currDate.setDate(currDate.getDate() + 1);
                                         }
-                                        dtTemp.setDate(dtTemp.getDate() + 1);
+                                        
+                                        rowCell += "</tr>";
+                                        taskHtml += rowCell;
                                     }
 
-                                    // Montar o bloco HTML final do texto AGRUPADO
-                                    taskHtml = `<div style="margin-top: 13px;">${cabecalhoNivel ? cabecalhoNivel + ' - ' : ''}${strPeriodo} ${fmt.format(majorityHour)}h`;
-                                    if (excecoesTexto.length > 0) {
-                                        taskHtml += `, com exceção de:</div><div style="margin: 0px 0">`;
-                                        excecoesTexto.forEach(exc => {
-                                            taskHtml += `<div style="margin: 5px 0 5px 36px;">${exc}</div>`;
-                                        });
-                                        taskHtml += `</div>`;
-                                    } else {
-                                        taskHtml += `</div>`;
-                                    }
-                                } else {
-                                    // NOVA LÓGICA: Montar o bloco HTML listando UM A UM (sem o período)
-                                    if (cabecalhoNivel) {
-                                        taskHtml = `<div style="margin-top: 13px;">${cabecalhoNivel}</div><div style="margin: 0px 0">`;
-                                    } else {
-                                        taskHtml = `<div style="margin-top: 13px;"></div><div style="margin: 0px 0">`;
-                                    }
+                                    taskHtml += `</tbody></table>`;
+                                    taskHtml += `<div style="margin: 0px 0 20px 0; font-size: 13px;">Total: <strong>${fmt.format(totalHorasDetalhe)} horas</strong></div>`;
                                     
-                                    arrFiltrado.forEach(d => {
-                                        let dataCurta = d.data.substring(0, 5);
-                                        taskHtml += `<div style="margin: 2px 0 2px 36px;">${dataCurta} - ${fmt.format(d.horas)}h</div>`;
-                                    });
-                                    taskHtml += `</div>`;
-                                }
-
-                                taskHtml += `<div style="margin: 5px 0 20px 0;">Total de ${fmt.format(totalHorasDetalhe)} horas</div>`;
-                                detalhamentosTemp.push(taskHtml);
+                                    detalhamentosTemp.push(taskHtml);
                             }
                         }
                     } catch(e) {
@@ -1176,7 +1242,8 @@
                 }
 
                 if (desc) desc = desc.charAt(0).toUpperCase() + desc.slice(1);
-                if (nivel) desc = `<strong>${nivel}</strong> - ${desc}`;
+                // Remova esta linha que grudava o nível na descrição:
+                // if (nivel) desc = `<strong>${nivel}</strong> - ${desc}`;
 
                 const h = parseHoras(horasInput);
                 totalHoras += h;
@@ -1184,10 +1251,11 @@
                 if (desc || inicio || fim || h > 0 || analista) {
                     linhasHTML += `
                         <tr>
+                            <td style="text-align: center; font-weight: bold; padding: 8px; border: 1px solid #ccc;">${nivel}</td>
                             <td style="text-align: left; padding: 8px; border: 1px solid #ccc;">${desc}</td>
                             <td style="text-align: center; padding: 8px; border: 1px solid #ccc;">${formatarDataFinal(inicio)}</td>
                             <td style="text-align: center; padding: 8px; border: 1px solid #ccc;">${formatarDataFinal(fim)}</td>
-                            <td style="text-align: center; padding: 8px; border: 1px solid #ccc;">${h > 0 ? h.toLocaleString('pt-BR', {minimumFractionDigits: 2}) : ""}</td>
+                            <td style="text-align: center; padding: 8px; border: 1px solid #ccc;">${h > 0 ? h.toLocaleString('pt-BR', {minimumFractionDigits: 1, maximumFractionDigits: 1}) : ""}</td>
                             <td style="text-align: center; padding: 8px; border: 1px solid #ccc;">${analista}</td>
                         </tr>
                     `;
@@ -1197,13 +1265,13 @@
 
         // Junta os detalhamentos gerados sob um único título
         if (detalhamentosTemp.length > 0) {
-            blocoDetalhamento = `<br><p style="margin: 15px 0 5px 0; font-weight: bold;">Detalhamento de horas por dia:</p>` + detalhamentosTemp.join('');
+            blocoDetalhamento = `<br><p style="margin: 15px 0 5px 0; font-weight: bold; text-transform: uppercase; width: 100%; padding: 10px 0 5px 0;">Detalhamento de horas por dia:</p>` + detalhamentosTemp.join('');
         }
 
-        const totalFmt = totalHoras.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+        const totalFmt = totalHoras.toLocaleString('pt-BR', {minimumFractionDigits: 1, maximumFractionDigits: 1});
         const saudacao = obterSaudacao();
         const separadorObs = temMultiplasLinhas ? '<br>' : ' ';
-        const blocoObservacao = observacao ? `<br><p style="line-height: 1.5;"><strong>Observações:</strong>${separadorObs}${observacao}</p>` : '';
+        const blocoObservacao = observacao ? `<br><p style="line-height: 1.5;"><strong>OBSERVAÇÕES:</strong>${separadorObs}${observacao}</p>` : '';
         const textoAcaoDatas = (isRep && statusDatasGlobal) ? `<strong><p>${statusDatasGlobal}.</p></strong>` : '';
         
         let blocoGoLiveGlobal = '';
@@ -1212,20 +1280,21 @@
         }
 
         document.getElementById('areaTabela').innerHTML = `
-            <div id="resultadoCorpo" style="font-family: Verdana, sans-serif; font-size: 13px; color: #333;">
+            <div id="resultadoCorpo" style="font-family: Verdana, sans-serif; font-size: 12px; color: #333;">
                 <p>${saudacao},</p>
                 <p>Segue ${isRep ? 'replanejamento' : 'planejamento'} para o projeto:</p>
                 <p><strong>${codProjeto} ${nomeProjeto}</strong></p><br>
-                <table style="width: 100%; max-width: 650px; border-collapse: collapse;">
+                <table style="width: 100%; max-width: 650px; border-collapse: collapse; font-size: 11px;">
                     <thead><tr style="background-color: #002233; color: white;">
-                        <th style="padding: 10px; border: 1px solid #000;"></th> 
-                        <th style="padding: 10px; border: 1px solid #000; width: 70px;">INÍCIO</th>
-                        <th style="padding: 10px; border: 1px solid #000; width: 70px;">FIM</th>
-                        <th style="padding: 10px; border: 1px solid #000; width: 60px;">HORAS</th>
-                        <th style="padding: 10px; border: 1px solid #000; width: 110px;">ANALISTA</th>
+                        <th style="padding: 10px; border: 1px solid #000; ">NÍVEL</th> 
+                        <th style="padding: 10px; border: 1px solid #000; ">DESCRIÇÃO</th> 
+                        <th style="padding: 10px; border: 1px solid #000; ">INÍCIO</th>
+                        <th style="padding: 10px; border: 1px solid #000; ">FINAL</th>
+                        <th style="padding: 10px; border: 1px solid #000; ">HORAS</th>
+                        <th style="padding: 10px; border: 1px solid #000; ">ANALISTA</th>
                     </tr></thead>
                     <tbody>${linhasHTML}
-                        <tr><td colspan="3" style="text-align: right; font-weight: bold; padding: 10px; border: 1px solid #ccc; background-color: #fafafa;">TOTAL</td>
+                        <tr><td colspan="4" style="text-align: right; font-weight: bold; padding: 10px; border: 1px solid #ccc; background-color: #fafafa;">TOTAL</td>
                         <td style="text-align: center; font-weight: bold; padding: 10px; border: 1px solid #ccc; background-color: #fafafa;">${totalFmt}</td>
                         <td style="border: 1px solid #ccc; background-color: #fafafa;"></td></tr>
                     </tbody>
@@ -1269,22 +1338,100 @@
         }
     }
 
-    
-    
 
     // --- LÓGICA DE DETALHAMENTO DE HORAS E FERIADOS ---
+    
+    const FERIADOS_EXTRAS = ["20/11", "09/07"]; 
+
     let feriadosCacheados = {};
     let modalHorasState = {}; 
     let modalCurrentDate = new Date();
     let modalTaskStart = null;
     let modalTaskEnd = null;
 
+    // --- CONTADOR E DICA DO TAB NO MODAL ---
+    let contadorCliquesHora = 0;
+    let usouTabNesteModal = false;
+    let ultimoInputClicado = -1;
+    
+    function registrarCliqueHora(indexAtual) {
+        if (usouTabNesteModal) return;
+
+        // Verifica se clicou no campo imediatamente seguinte
+        if (indexAtual === ultimoInputClicado + 1) {
+            contadorCliquesHora++;
+        } else {
+            contadorCliquesHora = 1; 
+        }
+        
+        ultimoInputClicado = indexAtual;
+
+        if (contadorCliquesHora >= 5) {
+            document.getElementById('dicaTabModal').style.display = 'block';
+        }
+    }
+
+    function verificarTab(event) {
+        if (event.key === 'Tab') {
+            document.getElementById('dicaTabModal').style.display = 'none';
+            usouTabNesteModal = true; // Desativa a dica para as próximas vezes que clicar
+        }
+    }
+
+    // --- PREVIEW TOTAL NO MODAL DE CALENDÁRIO ---
+    function atualizarPreviewTotalHoras() {
+        let total = 0;
+        for (let key in modalHorasState) {
+            if (modalHorasState[key] > 0) {
+                let dAtual = stringParaData(key);
+                if (dAtual && dAtual >= modalTaskStart && dAtual <= modalTaskEnd) {
+                    total += modalHorasState[key];
+                }
+            }
+        }
+        
+        const idTarefa = document.getElementById('modalHorasTarefaId').value;
+        let totalDeclarado = 0;
+        if (idTarefa) {
+            const elTarefa = document.getElementById('item-' + idTarefa);
+            if (elTarefa) {
+                totalDeclarado = parseHoras(elTarefa.querySelector('.inp-horas').value);
+            }
+        }
+
+        const elTotal = document.getElementById('previewTotalHoras');
+        if (elTotal) {
+            const strTotal = total.toLocaleString('pt-BR', {maximumFractionDigits: 2});
+            const strDeclarado = totalDeclarado.toLocaleString('pt-BR', {maximumFractionDigits: 2});
+            
+            elTotal.innerHTML = `Total <strong>${strTotal}</strong> de <strong>${strDeclarado} horas</strong>`;
+            
+            if (total === totalDeclarado && totalDeclarado > 0) {
+                elTotal.style.color = "var(--az-escuro)";
+            } else {
+                elTotal.style.color = "var(--cinza)";
+            }
+        }
+    }
+
     function obterFeriadosNacionais(ano) {
         if (feriadosCacheados[ano]) return feriadosCacheados[ano];
+        
         let feriados = [
-            `01/01/${ano}`, `21/04/${ano}`, `01/05/${ano}`, `07/09/${ano}`,
-            `12/10/${ano}`, `02/11/${ano}`, `15/11/${ano}`, `25/12/${ano}`
+            `01/01/${ano}`, // Ano Novo
+            `21/04/${ano}`, // Tiradentes
+            `01/05/${ano}`, // Dia do Trabalho
+            `07/09/${ano}`, // Independência
+            `12/10/${ano}`, // Nossa Sra Aparecida
+            `02/11/${ano}`, // Finados
+            `15/11/${ano}`, // Proclamação da República
+            `20/11/${ano}`, // Consciência Negra (Novo Feriado Nacional)
+            `25/12/${ano}`  // Natal
         ];
+
+        // Adiciona os extras configurados no topo
+        FERIADOS_EXTRAS.forEach(f => feriados.push(`${f}/${ano}`));
+
         let a = ano % 19, b = Math.floor(ano / 100), c = ano % 100, d = Math.floor(b / 4), e = b % 4;
         let f = Math.floor((b + 8) / 25), g = Math.floor((b - f + 1) / 3), h = (19 * a + b - d - g + 15) % 30;
         let i = Math.floor(c / 4), k = c % 4, l = (32 + 2 * e + 2 * i - h - k) % 7;
@@ -1364,22 +1511,13 @@
         // Inicia o calendário no mês da data de início da tarefa
         modalCurrentDate = new Date(modalTaskStart.getFullYear(), modalTaskStart.getMonth(), 1);
         renderCalendario();
+        atualizarPreviewTotalHoras(); // Atualiza o preview ao abrir
         document.getElementById('modalHoras').style.display = 'flex';
     }
 
     function mudarMes(delta) {
         modalCurrentDate.setMonth(modalCurrentDate.getMonth() + delta);
         renderCalendario();
-    }
-
-    function atualizarHoraDia(input) {
-        let val = input.value.trim();
-        let dataStr = input.dataset.dia;
-        if (val === "") {
-            delete modalHorasState[dataStr];
-        } else {
-            modalHorasState[dataStr] = parseHoras(val);
-        }
     }
 
     function renderCalendario() {
@@ -1392,14 +1530,13 @@
         let mes = modalCurrentDate.getMonth();
         labelMesAno.textContent = `${meses[mes]} ${ano}`;
 
-        let headerDias = '<div class="cal-dias-semana"><div>D</div><div>S</div><div>T</div><div>Q</div><div>Q</div><div>S</div><div>S</div></div>';
-        container.innerHTML += headerDias;
+        container.innerHTML += '<div class="cal-dias-semana"><div>D</div><div>S</div><div>T</div><div>Q</div><div>Q</div><div>S</div><div>S</div></div>';
 
         let primeiroDiaMes = new Date(ano, mes, 1).getDay();
         let totalDiasMes = new Date(ano, mes + 1, 0).getDate();
         let feriados = obterFeriadosNacionais(ano);
+        let inputIndex = 0;
 
-        // Preenche com caixas vazias até o dia 1 cair no dia da semana correto
         for (let i = 0; i < primeiroDiaMes; i++) {
             container.innerHTML += `<div class="cal-dia fora-mes"></div>`;
         }
@@ -1411,30 +1548,106 @@
             let isFeriado = feriados.includes(dataStr);
             let isFds = dtAtual.getDay() === 0 || dtAtual.getDay() === 6;
             let ehDescanso = isFds || isFeriado;
-            
             let foraPeriodo = dtAtual < modalTaskStart || dtAtual > modalTaskEnd;
             
-            // Nova checagem: Se está fora do período OU é descanso (fds/feriado), inativa o input
-            let inativo = foraPeriodo || ehDescanso; 
+            let valNumerico = modalHorasState[dataStr];
+            let temHoras = valNumerico !== undefined && valNumerico > 0;
             
-            let classeExtra = foraPeriodo ? 'fora-periodo' : (ehDescanso ? 'descanso' : '');
+            let classeExtra = [];
+            if (foraPeriodo) classeExtra.push('fora-periodo');
+            if (ehDescanso) classeExtra.push('descanso');
+            if (ehDescanso && temHoras) classeExtra.push('preenchido');
+
+            let placeholder = ehDescanso ? "-" : "";
+            let valDisplay = temHoras ? String(valNumerico).replace('.', ',') : '';
             
-            let val = modalHorasState[dataStr] !== undefined ? String(modalHorasState[dataStr]).replace('.', ',') : '';
-            
-            // O input agora fica disabled caso caia na regra do 'inativo'
-            let inputHTML = inativo ? '<input disabled>' : `<input type="text" data-dia="${dataStr}" value="${val}" oninput="atualizarHoraDia(this)" placeholder="">`;
+            let inputHTML = foraPeriodo ? 
+                '<input disabled>' : 
+                `<input type="text" data-dia="${dataStr}" value="${valDisplay}" 
+                    placeholder="${placeholder}"
+                    oninput="atualizarHoraDia(this)" 
+                    onmousedown="registrarCliqueHora(${inputIndex++})" 
+                    onkeydown="verificarTab(event)">`;
 
             container.innerHTML += `
-                <div class="cal-dia ${classeExtra}">
-                    <span style="font-weight: ${ehDescanso ? 'bold' : 'normal'};">${dia}</span>
+                <div class="cal-dia ${classeExtra.join(' ')}">
+                    <span>${dia}</span>
                     ${inputHTML}
                 </div>
             `;
+        }
+        verificarAvisoFeriado();
+    }
+
+    function atualizarHoraDia(input) {
+        let val = input.value.trim();
+        let dataStr = input.dataset.dia;
+        
+        if (val === "") {
+            delete modalHorasState[dataStr];
+        } else {
+            modalHorasState[dataStr] = parseHoras(val);
+        }
+
+        // Gerencia a classe de cor laranja dinamicamente
+        const pai = input.parentElement;
+        if (pai.classList.contains('descanso')) {
+            if (modalHorasState[dataStr] > 0) pai.classList.add('preenchido');
+            else pai.classList.remove('preenchido');
+        }
+
+        atualizarPreviewTotalHoras();
+        verificarAvisoFeriado();
+    }
+
+    function verificarAvisoFeriado() {
+        const aviso = document.getElementById('avisoFeriadoModal');
+        let temHoraEmDescanso = false;
+
+        for (let dataStr in modalHorasState) {
+            if (modalHorasState[dataStr] > 0) {
+                let dt = stringParaData(dataStr);
+                if (dt) {
+                    let feriados = obterFeriadosNacionais(dt.getFullYear());
+                    let isFds = dt.getDay() === 0 || dt.getDay() === 6;
+                    let isFeriado = feriados.includes(dataStr);
+                    
+                    if (isFds || isFeriado) {
+                        temHoraEmDescanso = true;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (temHoraEmDescanso) {
+            aviso.style.display = 'block';
+            document.getElementById('dicaTabModal').style.display = 'none'; 
+        } else {
+            aviso.style.display = 'none';
+            if (contadorCliquesHora >= 5 && !usouTabNesteModal) {
+                document.getElementById('dicaTabModal').style.display = 'block';
+            }
         }
     }
 
     function fecharModalHoras() {
         document.getElementById('modalHoras').style.display = 'none';
+        
+        // Reseta a dica caso a pessoa tenha fechado o modal sem usar o Tab
+        const dica = document.getElementById('dicaTabModal');
+        if (dica) dica.style.display = 'none';
+        contadorCliquesHora = 0;
+        ultimoInputClicado = -1;
+        usouTabNesteModal = false; // Zera a memória do Tab para a próxima vez que abrir o modal
+    }
+
+    function limparModalHoras() {
+        if (confirm("Tem certeza que deseja limpar todas as horas deste calendário?")) {
+            modalHorasState = {}; // Zera as horas salvas na memória do modal
+            renderCalendario(); // Atualiza a tela
+            atualizarPreviewTotalHoras(); // Zera o contador visual
+        }
     }
 
     function salvarDetalheHoras() {
@@ -1446,7 +1659,6 @@
         for (let key in modalHorasState) {
             if (modalHorasState[key] >= 0) { 
                 let dAtual = stringParaData(key);
-                // SALVA APENAS OS DIAS QUE ESTÃO DENTRO DO PERÍODO DA TAREFA. Mata os "fantasmas".
                 if (dAtual && dAtual >= modalTaskStart && dAtual <= modalTaskEnd) {
                     detalhes.push({ data: key, horas: modalHorasState[key] });
                 }
@@ -1465,6 +1677,50 @@
         mostrarToast("🕒 Detalhes de horas salvos!");
     }
 
+    function exportarCSV() {
+        const itens = document.querySelectorAll('.item-lista');
+        if (itens.length === 0) {
+            mostrarToast("⚠️ Nada para exportar.");
+            return;
+        }
+
+        // Cabeçalho do CSV
+        let csvContent = "Nivel;Tipo;Descricao;Data Inicio;Data Fim;Horas;Analista\n";
+
+        itens.forEach(el => {
+            let inpNivel = el.querySelector('.inp-nivel');
+            let nivel = inpNivel ? (inpNivel.value.trim() || inpNivel.placeholder) : "";
+            
+            if (el.dataset.type === 'marco') {
+                let desc = el.querySelector('.inp-marco').value || "";
+                csvContent += `"${nivel}";"Marco";"${desc}";"";"";"";""\n`;
+            } else if (el.dataset.type === 'tarefa') {
+                let desc = el.querySelector('.inp-tarefa').value || "";
+                let inicio = el.querySelector('.inp-inicio').value || "";
+                let fim = el.querySelector('.inp-fim').value || "";
+                let horas = el.querySelector('.inp-horas').value || "";
+                let analista = el.querySelector('.inp-analista').value || "";
+                
+                csvContent += `"${nivel}";"Tarefa";"${desc}";"${inicio}";"${fim}";"${horas}";"${analista}"\n`;
+            }
+        });
+
+        let csvData = new Blob(["\ufeff" + csvContent], { type: 'text/csv;charset=utf-8;' });
+        let csvUrl = URL.createObjectURL(csvData);
+        
+        let hiddenElement = document.createElement('a');
+        hiddenElement.href = csvUrl;
+        
+        let codProjeto = document.getElementById('txtCodProjeto').value || "Novo";
+        hiddenElement.download = `Importacao_PSA_${codProjeto}.csv`;
+        
+        document.body.appendChild(hiddenElement);
+        hiddenElement.click();
+        document.body.removeChild(hiddenElement);
+        
+        mostrarToast("📊 CSV gerado com sucesso!");
+    }
+
 
     window.onload = function() {
         verificarPrimeiraVisita();
@@ -1476,16 +1732,16 @@
         } else { 
             adicionarMarcoItem(); 
             adicionarNovaTarefa(); 
-            alternarTipoAcao(); // Chama para garantir que comece bloqueado
+            alternarTipoAcao(); 
         }
         
         Sortable.create(document.getElementById('listaItens'), { 
             handle: '.drag-handle', animation: 150, onEnd: gerarTabela 
         });
         
-        gerarTabela(); // Garante a atualização visual da mensagem de aviso na tabela
+        gerarTabela(); 
     };
     
-    </script>
+</script>
 </body>
 </html>
