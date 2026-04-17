@@ -167,18 +167,16 @@
                     const exibirCod = cod ? cod : "[Cód. Projeto]";
                     const exibirNome = nome ? nome : "[Nome do Projeto]";
                     
-                    projetosFormatados += `${exibirCod} - ${exibirNome}\n`;
+                    // Coloca apenas o código em negrito
+                    projetosFormatados += `<strong>${exibirCod}</strong> - ${exibirNome}\n`;
                 }
             }
 
-            // Lógica do Assunto atualizada com o hífen
+            // Lógica do Assunto: Removido o "Diversos Projetos"
             let assunto = 'Alteração de item contábil';
             if (qtdProjetosPreenchidos === 1 && (primeiroCodigo || primeiroNome)) {
-                // Usa o array com filter para garantir que o hífen só apareça se houver as duas informações
                 let infoProjeto = [primeiroCodigo, primeiroNome].filter(Boolean).join(' - ');
                 assunto = `Alteração de item contábil - ${infoProjeto}`;
-            } else if (qtdProjetosPreenchidos > 1) {
-                assunto = `Alteração de item contábil - Diversos Projetos`;
             }
 
             const saudacao = obterSaudacao();
@@ -186,10 +184,10 @@
 
             // Se nada for digitado, mostra uma estrutura base
             if (qtdProjetosPreenchidos === 0) {
-                 projetosFormatados = "[Cód. Projeto] - [Nome do Projeto]\n";
+                 projetosFormatados = "<strong>[Cód. Projeto]</strong> - [Nome do Projeto]\n";
             }
 
-            // Corpo do e-mail atualizado com espaçamentos e <strong> (negrito)
+            // Corpo do e-mail com <strong> no item contábil
             const corpoEmail = `Olá, ${saudacao}!
 
 Solicito a alteração do item contábil ${pluralTexto} para <strong>${novoItem}</strong>:
@@ -199,7 +197,6 @@ ${projetosFormatados}
 Atenciosamente,`;
 
             document.getElementById('resultadoAssunto').textContent = assunto;
-            // Mudamos de .textContent para .innerHTML para que o negrito (<strong>) seja renderizado
             document.getElementById('resultadoCorpo').innerHTML = corpoEmail; 
         }
 
@@ -211,24 +208,40 @@ Atenciosamente,`;
             setTimeout(function () { x.className = x.className.replace("show", ""); }, 4000);
         }
 
-        // Função de copiar modificada para copiar o texto com formatação (negrito)
+        // Função de copiar modificada para não levar os estilos (borda) da tag <pre>
         function copiarTexto(idElemento) {
-            const elemento = document.getElementById(idElemento);
+            const elementoOriginal = document.getElementById(idElemento);
+            
+            // Cria um elemento oculto temporário apenas com o conteúdo HTML
+            const divTemp = document.createElement('div');
+            divTemp.innerHTML = elementoOriginal.innerHTML;
+            divTemp.style.position = 'absolute';
+            divTemp.style.left = '-9999px'; // Tira da tela
+            divTemp.style.whiteSpace = 'pre-wrap'; // Mantém as quebras de linha
+            divTemp.style.fontFamily = 'Arial, sans-serif';
+            divTemp.style.fontSize = 'small'; // ou '12px', '10pt', dependendo da sua preferência
+
+            document.body.appendChild(divTemp);
+
             const selecao = window.getSelection();
             const range = document.createRange();
             
-            range.selectNodeContents(elemento);
+            // Seleciona o elemento oculto em vez da tag <pre>
+            range.selectNodeContents(divTemp);
             selecao.removeAllRanges();
             selecao.addRange(range);
 
             try {
                 document.execCommand('copy');
-                mostrarToast(elemento.textContent);
+                mostrarToast(elementoOriginal.textContent);
             } catch (err) {
                 console.error('Erro ao copiar: ', err);
                 alert('Erro manual ao copiar.');
             }
+            
+            // Limpa tudo
             selecao.removeAllRanges();
+            document.body.removeChild(divTemp);
         }
 
         function limparFormulario() {
