@@ -499,7 +499,7 @@
 
         /* Resultados */
         .resultado {
-            padding: 10px;
+            padding: 20px;
             background-color: var(--cinza-claro);
             margin: 20px 0;
         }
