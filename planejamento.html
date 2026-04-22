@@ -1206,8 +1206,8 @@
                                             // i === 0 é Domingo, i === 6 é Sábado
                                             let ehFimDeSemana = (i === 0 || i === 6);
 
-                                            // Aplica a regra: desabilitado se for fora do período, final de semana ou tiver 0 horas
-                                            let isDesabilitado = foraDoPeriodo || ehFimDeSemana || horasLancadas === 0;
+                                            // NOVA REGRA: Fica desabilitado APENAS se não houver horas preenchidas
+                                            let isDesabilitado = (horasLancadas === 0);
 
                                             let displayHora = "<strong>--</strong>";
                                             if (!isDesabilitado) {
@@ -1342,7 +1342,7 @@
 
     // --- LÓGICA DE DETALHAMENTO DE HORAS E FERIADOS ---
     
-    const FERIADOS_EXTRAS = ["20/11", "09/07"]; 
+    const FERIADOS_EXTRAS = ["23/04", "23/04"]; 
 
     let feriadosCacheados = {};
     let modalHorasState = {}; 
@@ -1384,10 +1384,7 @@
         let total = 0;
         for (let key in modalHorasState) {
             if (modalHorasState[key] > 0) {
-                let dAtual = stringParaData(key);
-                if (dAtual && dAtual >= modalTaskStart && dAtual <= modalTaskEnd) {
-                    total += modalHorasState[key];
-                }
+                total += modalHorasState[key]; // Soma sem limitar ao período
             }
         }
         
@@ -1456,29 +1453,20 @@
         modalTaskStart = stringParaData(el.querySelector('.inp-inicio').value);
         modalTaskEnd = stringParaData(el.querySelector('.inp-fim').value);
 
-        if (!modalTaskStart || !modalTaskEnd || modalTaskEnd < modalTaskStart) {
-            mostrarToast("⚠️ Preencha datas de início e fim válidas primeiro");
-            return;
-        }
-
         document.getElementById('modalHorasTarefaId').value = id;
         
         modalHorasState = {};
         let arr = [];
         try { arr = JSON.parse(el.querySelector('.inp-detalhe-horas').value || "[]"); } catch(e){}
 
-        // Checa se existe QUALQUER dado salvo que esteja dentro da data de Início e Fim atual
         let hasValidSavedData = false;
         arr.forEach(d => {
-            let dAtual = stringParaData(d.data);
-            if (dAtual && dAtual >= modalTaskStart && dAtual <= modalTaskEnd) {
-                hasValidSavedData = true;
-            }
-            modalHorasState[d.data] = d.horas; // Carrega na memória mesmo assim
+            if (d.horas > 0) hasValidSavedData = true;
+            modalHorasState[d.data] = d.horas; // Carrega tudo na memória
         });
 
-        if (!hasValidSavedData) {
-            // Se NÃO tem dados válidos para o novo período, calcula a média do zero
+        // Só distribui as médias se a tarefa JÁ tiver um Início e Fim previamente informados
+        if (!hasValidSavedData && modalTaskStart && modalTaskEnd) {
             const inputHoras = el.querySelector('.inp-horas').value;
             const totalHorasTask = parseHoras(inputHoras);
             let diasUteis = [];
@@ -1509,10 +1497,10 @@
             }
         }
 
-        // Inicia o calendário no mês da data de início da tarefa
-        modalCurrentDate = new Date(modalTaskStart.getFullYear(), modalTaskStart.getMonth(), 1);
+        // Se tiver Início, abre no mês dele. Se não, abre no mês atual.
+        modalCurrentDate = modalTaskStart ? new Date(modalTaskStart.getFullYear(), modalTaskStart.getMonth(), 1) : new Date();
         renderCalendario();
-        atualizarPreviewTotalHoras(); // Atualiza o preview ao abrir
+        atualizarPreviewTotalHoras();
         document.getElementById('modalHoras').style.display = 'flex';
     }
 
@@ -1549,7 +1537,7 @@
             let isFeriado = feriados.includes(dataStr);
             let isFds = dtAtual.getDay() === 0 || dtAtual.getDay() === 6;
             let ehDescanso = isFds || isFeriado;
-            let foraPeriodo = dtAtual < modalTaskStart || dtAtual > modalTaskEnd;
+            let foraPeriodo = false; // Removida a trava. O calendário inteiro fica editável.
             
             let valNumerico = modalHorasState[dataStr];
             let temHoras = valNumerico !== undefined && valNumerico > 0;
@@ -1657,20 +1645,41 @@
         if (!el) return fecharModalHoras();
 
         let detalhes = [];
+        let minDate = null;
+        let maxDate = null;
+
         for (let key in modalHorasState) {
-            if (modalHorasState[key] >= 0) { 
+            if (modalHorasState[key] > 0) { 
                 let dAtual = stringParaData(key);
-                if (dAtual && dAtual >= modalTaskStart && dAtual <= modalTaskEnd) {
+                if (dAtual) {
                     detalhes.push({ data: key, horas: modalHorasState[key] });
+                    // Descobre a primeira e a última data preenchidas
+                    if (!minDate || dAtual < minDate) minDate = dAtual;
+                    if (!maxDate || dAtual > maxDate) maxDate = dAtual;
                 }
             }
         }
 
-        // Ordena pela data para aparecer bonitinho no corpo do email
+        // Ordena pela data
         detalhes.sort((a, b) => {
             let da = stringParaData(a.data), db = stringParaData(b.data);
             return da - db;
         });
+
+        // Atualiza a tarefa com as novas datas de limite automaticamente
+        if (minDate && maxDate) {
+            const formatDt = d => String(d.getDate()).padStart(2, '0') + '/' + String(d.getMonth() + 1).padStart(2, '0') + '/' + d.getFullYear();
+            
+            let inpInicio = el.querySelector('.inp-inicio');
+            inpInicio.value = formatDt(minDate);
+            sincronizarDatas(inpInicio); // Atualiza os limites do datepicker
+
+            let inpFim = el.querySelector('.inp-fim');
+            inpFim.value = formatDt(maxDate);
+            
+            let pickerFim = el.querySelector('.inp-fim').parentElement.querySelector('.inp-date-picker');
+            if (pickerFim) pickerFim.value = maxDate.toISOString().split('T')[0];
+        }
 
         el.querySelector('.inp-detalhe-horas').value = JSON.stringify(detalhes);
         fecharModalHoras();
