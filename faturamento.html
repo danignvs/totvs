@@ -217,9 +217,11 @@ async function copiarTextoRico(idElemento) {
     const html = elemento.innerHTML;
     const textoPuro = elemento.innerText;
 
+    const htmlFormatado = `<div style="margin: 0 !important; padding: 0 !important; text-indent: 0 !important; font-family: Arial, sans-serif;">${html}</div>`;
+
     try {
         // O segredo está em passar o MIME type correto para o ClipboardItem
-        const blobHTML = new Blob([html], { type: "text/html" });
+        const blobHTML = new Blob([htmlFormatado], { type: "text/html" });
         const blobText = new Blob([textoPuro], { type: "text/plain" });
         const data = [new ClipboardItem({ 
             "text/html": blobHTML, 
@@ -227,7 +229,7 @@ async function copiarTextoRico(idElemento) {
         })];
         
         await navigator.clipboard.write(data);
-        mostrarToast("E-mail com formatação copiado!");
+        mostrarToast("E-mail copiado!");
     } catch (err) {
         console.error("Erro ao copiar formatado, tentando texto puro...", err);
         copiarTexto(idElemento); 
