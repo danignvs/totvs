@@ -1,503 +1,314 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora de Horas</title>
-    
-    <link rel="stylesheet" href="style.css">
-
+    <title>Calculadora de Horas Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Ajustes específicos de layout para esta tela (Sempre em coluna) */
-        .container {
-            display: flex !important;
-            flex-direction: column !important;
-            gap: 20px; 
+        :root {
+            --az-escuro: #1e293b;
+            --az-claro: #0ea5e9;
+            --laranja: #f59e0b;
+            --cinza: #e2e8f0;
         }
 
-        .container-formulario, .container-resultado { 
-            width: 100%; 
-            min-width: 300px;
+        body {
+            background-color: #f1f5f9;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            color: var(--az-escuro);
         }
 
-        .container-resultado { 
-            margin-top: 0 !important; 
-        }
-
-        /* --- ESTILOS EXCLUSIVOS DO CALENDÁRIO --- */
-        .calendario-wrapper {
-            background-color: var(--cinza-claro);
-            padding: 20px;
-            border-radius: 8px;
-            border: 1px solid var(--cinza);
-        }
-
-        .calendario-header { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            margin-bottom: 15px; 
-            font-weight: bold; 
-            color: var(--az-escuro); 
-            width: 270px; 
-            margin: 0 auto; 
-            padding: 0 0 20px 0; 
-        }
-
-        .calendario-header button { 
-            width: auto; 
-            padding: 5px 15px; 
-            font-size: 1.2em; 
-            background: transparent; 
-            color: var(--az-claro); 
-            border: none;
-            cursor: pointer;
-        }
-
-        .calendario-header button:hover { 
-            background: rgba(0, 219, 255, 0.1); 
-        }
-        
         .calendario-grid { 
             display: grid; 
-            grid-template-columns: repeat(7, 1fr); 
-            gap: 5px; 
-            font-size: 0.85em; 
-        }
-
-        .cal-dias-semana { display: contents; }
-        
-        .cal-dias-semana div { 
-            text-align: center; 
-            font-weight: bold; 
-            color: var(--roxo); 
-            padding-bottom: 5px; 
-            border-bottom: 2px solid var(--roxo); 
-            margin-bottom: 5px; 
+            grid-template-columns: repeat(7, minmax(0, 1fr)); 
+            gap: 4px; 
+            width: 100%;
+            max-width: 300px;
+            margin: 0 auto;
         }
 
         .cal-dia { 
             display: flex; 
             flex-direction: column; 
             align-items: center; 
-            border-radius: 3px; 
-            padding: 5px 2px; 
-            min-height: 45px; 
-            justify-content: space-between; 
-        }
-
-        .cal-dia.fora-mes { border: none; background: transparent; }
-        .cal-dia.descanso { background-color: var(--cinza); opacity: 0.6; }
-        .cal-dia.fora-periodo { opacity: 0.3; background: var(--cinza); border: 1px solid #aaa; }
-        
-        .cal-dia input { 
-            width: 80%; 
             padding: 4px 2px; 
+            min-height: 46px; 
+            border-radius: 6px;
+            background: white;
+            border: 1px solid var(--cinza);
+            transition: all 0.2s;
+        }
+
+        .cal-dia span { font-size: 0.6rem; font-weight: 600; margin-bottom: 2px; }
+
+        .cal-dia input { 
+            width: 85%; 
+            padding: 1px; 
             text-align: center; 
-            margin: 0; 
-            border: 1px solid var(--az-claro); 
-            border-radius: 3px; 
-            font-size: 0.9em; 
-            font-weight: bold; 
+            border: 1px solid transparent;
+            background: #f1f5f9;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 700;
         }
 
-        .cal-dia input:disabled { display: none; }
-        
-        .cal-dia.descanso.preenchido input { 
-            background-color: #fff4e5 !important; 
-            border-color: var(--laranja) !important; 
-            color: var(--laranja) !important; 
+        .cal-dia input:focus { border-color: var(--az-claro); outline: none; background: white; }
+        .cal-dia.fora-mes { visibility: hidden; }
+        .cal-dia.descanso { background-color: #f1f5f9; color: #94a3b8; }
+        .cal-dia.fora-periodo { opacity: 0.3; pointer-events: none; }
+        .cal-dia.preenchido-descanso { background-color: #fef3c7; border-color: var(--laranja); }
+        .cal-dia.preenchido-descanso input { color: #b45309; }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 99px;
+            font-size: 0.75rem;
+            font-weight: 700;
         }
 
-        /* --- MENSAGENS E CONTADOR --- */
-        #containerDicas {
-            min-height: 20px;
-            margin-top: 15px;
+        .calendarios-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            width: 100%;
         }
 
-        .aviso-feriado { 
-            color: var(--laranja); 
-            font-weight: bold; 
-            font-size: 0.85em; 
-            text-align: center; 
-            animation: fadeIn 0.3s; 
+        @media (min-width: 768px), (orientation: landscape) {
+            .calendarios-container {
+                flex-direction: row !important;
+                justify-content: center;
+                gap: 3rem;
+            }
+            .mes-wrapper {
+                flex: 0 1 300px;
+            }
+            .mes-proximo { display: block !important; }
         }
 
-        #previewTotalHoras { 
-            text-align: center; 
-            margin-top: 15px; 
-            font-size: 1.2em;
-            transition: color 0.3s ease;
-        }
-
-        @keyframes fadeIn { 
-            from { opacity: 0; transform: translateY(10px); } 
-            to { opacity: 1; transform: translateY(0); } 
+        @media (max-width: 767px) and (orientation: portrait) {
+            .mes-proximo { display: none !important; }
+            .calendarios-container { align-items: center; }
         }
     </style>
 </head>
-<body>
+<body class="p-2 md:p-6">
 
-    <h1><strong class="azul-claro">Calculadora</strong> de Horas</h1>
+    <div class="max-w-6xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-200">
+        <header class="bg-slate-900 p-4 text-white flex justify-between items-center">
+            <h1 class="text-lg font-bold italic"><span class="text-sky-400">Calculadora</span> de Horas</h1>
+            <div id="statusIndicator" class="status-badge bg-slate-700 text-slate-300 uppercase tracking-tighter">Aguardando</div>
+        </header>
 
-    <div class="container container-azul" style="max-width: 350px;">
-        
-        <section class="container-formulario" style="width: 100%;">        
-
-            <div class="input-group">
-                <div class="input-item custom-date-wrapper">
-                    <label for="txtHoras"></label>
-                    <input type="text" id="txtHoras" placeholder="Total de Horas" oninput="gerarDistribuicao()">
-                </div>
-                <div class="input-item custom-date-wrapper">
-                    <label for="txtInicio"></label>
-                    <input type="text" id="txtInicio" class="inp-date-text" placeholder="Início" maxlength="10" oninput="mascaraData(this)">
-                    <span class="calendar-icon">📅</span>
-                    <input type="date" class="inp-date-picker" onchange="atualizarDataPicker(this, 'txtInicio')">
-                </div>
-                <div class="input-item custom-date-wrapper">
-                    <label for="txtFim"></label>
-                    <input type="text" id="txtFim" class="inp-date-text" placeholder="Conclusão" maxlength="10" oninput="mascaraData(this)">
-                    <span class="calendar-icon">📅</span>
-                    <input type="date" class="inp-date-picker" onchange="atualizarDataPicker(this, 'txtFim')">
-                </div>
-            </div>
-
-            <div style="display: flex; gap: 10px; margin-top: 20px;">
-                <button class="btn-laranja" onclick="limparCalendario()">Limpar</button>
-                </div>
-        </section>
-
-        <section class="container-resultado">
-            <div class="calendario-wrapper">
-                <div class="calendario-header">
-                    <button onclick="mudarMes(-1)">&#10094;</button>
-                    <span id="calMesAno">MÊS ANO</span>
-                    <button onclick="mudarMes(1)">&#10095;</button>
-                </div>
-                
-                <div id="calendarioHoras" class="calendario-grid"></div>
-                
-                <div id="containerDicas">
-                    <div id="dicaTabModal" style="display:none; color: var(--az-escuro); font-size: 0.85em; text-align: center; animation: fadeIn 0.3s;">
-                        💡 Use a tecla TAB para avançar os dias mais rápido!
+        <div class="p-4 grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <aside class="lg:col-span-3 space-y-4">
+                <div class="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-1 gap-3">
+                    <div>
+                        <label class="text-[10px] font-bold uppercase text-slate-500 mb-1 block">Total Alvo</label>
+                        <input type="number" id="txtHoras" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-sm" oninput="gerarDistribuicao()">
                     </div>
-                    <div id="avisoFeriadoModal" style="display:none;" class="aviso-feriado">
-                        ⚠️ Atenção: horas lançadas em dias de descanso
+                    <div>
+                        <label class="text-[10px] font-bold uppercase text-slate-500 mb-1 block">Início</label>
+                        <input type="date" id="txtInicio" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-sm" onchange="gerarDistribuicao()">
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold uppercase text-slate-500 mb-1 block">Fim</label>
+                        <input type="date" id="txtFim" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-sm" onchange="gerarDistribuicao()">
                     </div>
                 </div>
-                
-                <div id="previewTotalHoras"></div>
-            </div>
-        </section>
 
+                <div class="p-3 bg-sky-50 rounded-xl border border-sky-100 text-xs text-sky-800 space-y-1">
+                    <div class="flex justify-between"><span>Lançado:</span> <span id="resumoLancado" class="font-bold">0,00h</span></div>
+                    <div class="flex justify-between"><span>Restante:</span> <span id="resumoRestante" class="font-bold">0,00h</span></div>
+                </div>
+
+                <div class="flex gap-2 lg:flex-col">
+                    <button onclick="copiarTabela()" class="flex-1 bg-slate-800 text-white p-2 rounded-lg font-bold text-xs hover:bg-slate-700">Copiar</button>
+                    <button onclick="limparTudo()" class="flex-1 text-slate-400 p-2 text-[10px] hover:text-red-500">Limpar</button>
+                </div>
+            </aside>
+
+            <main class="lg:col-span-9 border-t lg:border-t-0 pt-4 lg:pt-0">
+                <div class="flex items-center justify-between mb-4 px-2">
+                    <button onclick="mudarMes(-1)" class="p-2 hover:bg-slate-100 rounded-full text-slate-400 font-bold">❮</button>
+                    <h2 id="calMesAno" class="font-black text-slate-700 uppercase tracking-tight text-sm">Mês</h2>
+                    <button onclick="mudarMes(1)" class="p-2 hover:bg-slate-100 rounded-full text-slate-400 font-bold">❯</button>
+                </div>
+
+                <div id="calendariosWrapper" class="calendarios-container">
+                    <!-- Gerado JS -->
+                </div>
+                
+                <div id="avisoFeriado" class="hidden mt-4 p-2 bg-amber-50 border border-amber-200 text-amber-700 text-[10px] rounded-lg text-center">
+                    ⚠️ Horas em fins de semana ou feriados detectadas.
+                </div>
+            </main>
+        </div>
     </div>
 
-<script>
-    let currentDate = new Date();
-    let horasState = {};
-    let dataInicioGlobal = null;
-    let dataFimGlobal = null;
+    <script>
+        let currentDate = new Date();
+        currentDate.setDate(1);
+        let horasState = {};
+        const FERIADOS_FIXOS = ["01/01", "21/04", "01/05", "07/09", "12/10", "02/11", "15/11", "20/11", "25/12", "09/07"];
 
-    // --- CONTROLE DA DICA DO TAB ---
-    let contadorCliquesHora = 0;
-    let usouTabNesteModal = false;
-    let ultimoInputClicado = -1;
-
-    function registrarCliqueHora(indexAtual) {
-        if (usouTabNesteModal) return;
-
-        if (indexAtual === ultimoInputClicado + 1) {
-            contadorCliquesHora++;
-        } else {
-            contadorCliquesHora = 1; 
+        function getFeriados(ano) {
+            let feriados = FERIADOS_FIXOS.map(f => `${f}/${ano}`);
+            let a = ano % 19, b = Math.floor(ano / 100), c = ano % 100, d = Math.floor(b / 4), e = b % 4;
+            let g = Math.floor((b + 8) / 25), h = (19 * a + b - d - Math.floor((b - g + 1) / 3) + 15) % 30;
+            let i = Math.floor(c / 4), k = c % 4, l = (32 + 2 * e + 2 * i - h - k) % 7;
+            let m = Math.floor((a + 11 * h + 22 * l) / 451), mes = Math.floor((h + l - 7 * m + 114) / 31), dia = ((h + l - 7 * m + 114) % 31) + 1;
+            let pascoa = new Date(ano, mes - 1, dia);
+            const fmt = (d) => `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${ano}`;
+            return [...feriados, fmt(new Date(pascoa.getTime() - 47*86400000)), fmt(new Date(pascoa.getTime() - 2*86400000)), fmt(new Date(pascoa.getTime() + 60*86400000))];
         }
-        
-        ultimoInputClicado = indexAtual;
 
-        if (contadorCliquesHora >= 5) {
-            document.getElementById('dicaTabModal').style.display = 'block';
-        }
-    }
-
-    function verificarTab(event) {
-        if (event.key === 'Tab') {
-            document.getElementById('dicaTabModal').style.display = 'none';
-            usouTabNesteModal = true; 
-        }
-    }
-
-    // --- UTILS DE DATA E HORA ---
-    function mascaraData(input) {
-        let v = input.value.replace(/\D/g, "");
-        if (v.length > 8) v = v.substring(0, 8);
-        if (v.length > 2) v = v.substring(0, 2) + "/" + v.substring(2);
-        if (v.length > 5) v = v.substring(0, 5) + "/" + v.substring(5);
-        input.value = v;
-        
-        // Se a data estiver completa (10 caracteres) ou se o usuário apagar tudo, atualiza ao vivo
-        if(v.length === 10 || v.length === 0) {
-            gerarDistribuicao();
-        }
-    }
-
-    function atualizarDataPicker(picker, textInputId) {
-        if (!picker.value) return;
-        const [ano, mes, dia] = picker.value.split('-');
-        document.getElementById(textInputId).value = `${dia}/${mes}/${ano}`;
-        // Atualiza ao vivo após escolher no picker
-        gerarDistribuicao();
-    }
-
-    function stringParaData(dataStr) {
-        if (!dataStr || dataStr.length !== 10) return null;
-        const partes = dataStr.split('/');
-        const dia = parseInt(partes[0], 10);
-        const mes = parseInt(partes[1], 10) - 1; 
-        const ano = parseInt(partes[2], 10);
-        const data = new Date(ano, mes, dia);
-        return (data.getFullYear() === ano && data.getMonth() === mes && data.getDate() === dia) ? data : null;
-    }
-
-    function parseHoras(valor) {
-        if (!valor) return 0;
-        let limpo = valor.toString().replace(',', '.').replace(/[^0-9.]/g, '');
-        return isNaN(parseFloat(limpo)) ? 0 : parseFloat(limpo);
-    }
-
-    // --- FERIADOS ---
-    const FERIADOS_EXTRAS = ["20/11", "09/07"]; 
-    let feriadosCacheados = {};
-
-    function obterFeriadosNacionais(ano) {
-        if (feriadosCacheados[ano]) return feriadosCacheados[ano];
-        
-        let feriados = [
-            `01/01/${ano}`, `21/04/${ano}`, `01/05/${ano}`, `07/09/${ano}`, 
-            `12/10/${ano}`, `02/11/${ano}`, `15/11/${ano}`, `20/11/${ano}`, `25/12/${ano}`
-        ];
-        FERIADOS_EXTRAS.forEach(f => feriados.push(`${f}/${ano}`));
-
-        let a = ano % 19, b = Math.floor(ano / 100), c = ano % 100, d = Math.floor(b / 4), e = b % 4;
-        let f = Math.floor((b + 8) / 25), g = Math.floor((b - f + 1) / 3), h = (19 * a + b - d - g + 15) % 30;
-        let i = Math.floor(c / 4), k = c % 4, l = (32 + 2 * e + 2 * i - h - k) % 7;
-        let m = Math.floor((a + 11 * h + 22 * l) / 451), mes = Math.floor((h + l - 7 * m + 114) / 31);
-        let dia = ((h + l - 7 * m + 114) % 31) + 1;
-        
-        let pascoa = new Date(ano, mes - 1, dia);
-        let formata = (dt) => String(dt.getDate()).padStart(2, '0') + '/' + String(dt.getMonth() + 1).padStart(2, '0') + '/' + ano;
-        
-        let carnaval = new Date(pascoa); carnaval.setDate(pascoa.getDate() - 47);
-        let sextaSanta = new Date(pascoa); sextaSanta.setDate(pascoa.getDate() - 2);
-        let corpusChristi = new Date(pascoa); corpusChristi.setDate(pascoa.getDate() + 60);
-        
-        feriados.push(formata(carnaval), formata(sextaSanta), formata(corpusChristi));
-        feriadosCacheados[ano] = feriados;
-        return feriados;
-    }
-
-    // --- LÓGICA DO CALENDÁRIO ---
-    function gerarDistribuicao() {
-        let horasPrevistas = parseHoras(document.getElementById('txtHoras').value);
-        let dtInStr = document.getElementById('txtInicio').value;
-        let dtFimStr = document.getElementById('txtFim').value;
-        
-        dataInicioGlobal = dtInStr.length === 10 ? stringParaData(dtInStr) : null;
-        dataFimGlobal = dtFimStr.length === 10 ? stringParaData(dtFimStr) : null;
-
-        horasState = {}; // Limpa estado anterior ao recalcular automaticamente
-
-        if (dataInicioGlobal && dataFimGlobal && dataFimGlobal >= dataInicioGlobal) {
-            currentDate = new Date(dataInicioGlobal.getFullYear(), dataInicioGlobal.getMonth(), 1);
-            
-            // Distribuir horas úteis
-            if (horasPrevistas > 0) {
-                let diasUteis = [];
-                let dtTemp = new Date(dataInicioGlobal);
-
-                while (dtTemp <= dataFimGlobal) {
-                    let ano = dtTemp.getFullYear();
-                    let feriados = obterFeriadosNacionais(ano);
-                    let dataStr = String(dtTemp.getDate()).padStart(2, '0') + '/' + String(dtTemp.getMonth() + 1).padStart(2, '0') + '/' + ano;
-
-                    let isFds = dtTemp.getDay() === 0 || dtTemp.getDay() === 6;
-                    let isFeriado = feriados.includes(dataStr);
-
-                    if (!isFds && !isFeriado) diasUteis.push(dataStr);
-                    dtTemp.setDate(dtTemp.getDate() + 1);
-                }
-
-                if (diasUteis.length > 0) {
-                    let mediaHoras = horasPrevistas / diasUteis.length;
-                    let horasPreencher = (mediaHoras > 6) ? 8 : 4; 
-                    diasUteis.forEach(dia => horasState[dia] = horasPreencher);
+        function gerarDistribuicao() {
+            const totalAlvo = parseFloat(document.getElementById('txtHoras').value) || 0;
+            const dtInStr = document.getElementById('txtInicio').value;
+            const dtFimStr = document.getElementById('txtFim').value;
+            if (dtInStr && dtFimStr && totalAlvo > 0) {
+                const d1 = new Date(dtInStr + "T12:00:00"), d2 = new Date(dtFimStr + "T12:00:00");
+                if (d2 >= d1) {
+                    let diasUteis = [];
+                    let temp = new Date(d1);
+                    while (temp <= d2) {
+                        const ds = temp.getDay();
+                        const fers = getFeriados(temp.getFullYear());
+                        const str = `${String(temp.getDate()).padStart(2, '0')}/${String(temp.getMonth() + 1).padStart(2, '0')}/${temp.getFullYear()}`;
+                        if (ds !== 0 && ds !== 6 && !fers.includes(str)) diasUteis.push(str);
+                        temp.setDate(temp.getDate() + 1);
+                    }
+                    if (diasUteis.length > 0) {
+                        horasState = {};
+                        const media = totalAlvo / diasUteis.length;
+                        diasUteis.forEach(d => horasState[d] = parseFloat(media.toFixed(2)));
+                    }
                 }
             }
-        }
-
-        renderCalendario();
-    }
-
-    function mudarMes(delta) {
-        currentDate.setMonth(currentDate.getMonth() + delta);
-        renderCalendario();
-    }
-
-    function renderCalendario() {
-        const container = document.getElementById('calendarioHoras');
-        container.innerHTML = '<div class="cal-dias-semana"><div>D</div><div>S</div><div>T</div><div>Q</div><div>Q</div><div>S</div><div>S</div></div>';
-        
-        const meses = ["JANEIRO", "FEVEREIRO", "MARÇO", "ABRIL", "MAIO", "JUNHO", "JULHO", "AGOSTO", "SETEMBRO", "OUTUBRO", "NOVEMBRO", "DEZEMBRO"];
-        let ano = currentDate.getFullYear();
-        let mes = currentDate.getMonth();
-        document.getElementById('calMesAno').textContent = `${meses[mes]} ${ano}`;
-
-        let primeiroDiaMes = new Date(ano, mes, 1).getDay();
-        let totalDiasMes = new Date(ano, mes + 1, 0).getDate();
-        let feriados = obterFeriadosNacionais(ano);
-        let inputIndex = 0;
-
-        for (let i = 0; i < primeiroDiaMes; i++) {
-            container.innerHTML += `<div class="cal-dia fora-mes"></div>`;
-        }
-
-        for (let dia = 1; dia <= totalDiasMes; dia++) {
-            let dtAtual = new Date(ano, mes, dia);
-            let dataStr = String(dia).padStart(2, '0') + '/' + String(mes + 1).padStart(2, '0') + '/' + ano;
-            
-            let isFeriado = feriados.includes(dataStr);
-            let isFds = dtAtual.getDay() === 0 || dtAtual.getDay() === 6;
-            let ehDescanso = isFds || isFeriado;
-            
-            // Fora do periodo apenas se o usuário preencheu datas válidas
-            let foraPeriodo = false;
-            if (dataInicioGlobal && dataFimGlobal) {
-                foraPeriodo = dtAtual < dataInicioGlobal || dtAtual > dataFimGlobal;
-            }
-
-            let valNumerico = horasState[dataStr];
-            let temHoras = valNumerico !== undefined && valNumerico > 0;
-            
-            let classeExtra = [];
-            if (foraPeriodo) classeExtra.push('fora-periodo');
-            if (ehDescanso) classeExtra.push('descanso');
-            if (ehDescanso && temHoras) classeExtra.push('preenchido');
-
-            let valDisplay = temHoras ? String(valNumerico).replace('.', ',') : '';
-            
-            let inputHTML = foraPeriodo ? 
-                '<input disabled>' : 
-                `<input type="text" data-dia="${dataStr}" value="${valDisplay}" 
-                    placeholder="${ehDescanso ? '-' : ''}"
-                    oninput="atualizarHora(this)"
-                    onmousedown="registrarCliqueHora(${inputIndex++})" 
-                    onkeydown="verificarTab(event)">`;
-
-            container.innerHTML += `
-                <div class="cal-dia ${classeExtra.join(' ')}">
-                    <span>${dia}</span>
-                    ${inputHTML}
-                </div>
-            `;
-        }
-        atualizarTotais();
-    }
-
-    function atualizarHora(input) {
-        let val = input.value.trim();
-        let dataStr = input.dataset.dia;
-        
-        if (val === "") {
-            delete horasState[dataStr];
-        } else {
-            horasState[dataStr] = parseHoras(val);
-        }
-
-        const pai = input.parentElement;
-        if (pai.classList.contains('descanso')) {
-            if (horasState[dataStr] > 0) pai.classList.add('preenchido');
-            else pai.classList.remove('preenchido');
-        }
-        atualizarTotais();
-    }
-
-    function atualizarTotais() {
-        let totalNoCalendario = 0;
-        let temFeriadoPreenchido = false;
-
-        for (let key in horasState) {
-            if (horasState[key] > 0) {
-                // Soma total
-                let dt = stringParaData(key);
-                if (!dataInicioGlobal || !dataFimGlobal || (dt >= dataInicioGlobal && dt <= dataFimGlobal)) {
-                    totalNoCalendario += horasState[key];
-                }
-
-                // Checa feriados
-                if (dt) {
-                    let feriados = obterFeriadosNacionais(dt.getFullYear());
-                    let isFds = dt.getDay() === 0 || dt.getDay() === 6;
-                    if (isFds || feriados.includes(key)) temFeriadoPreenchido = true;
-                }
-            }
-        }
-
-        // --- Lógica do Aviso e Dica ---
-        const avisoFeriado = document.getElementById('avisoFeriadoModal');
-        const dicaTab = document.getElementById('dicaTabModal');
-
-        if (temFeriadoPreenchido) {
-            avisoFeriado.style.display = 'block';
-            dicaTab.style.display = 'none'; 
-        } else {
-            avisoFeriado.style.display = 'none';
-            if (contadorCliquesHora >= 5 && !usouTabNesteModal) {
-                dicaTab.style.display = 'block';
-            }
-        }
-
-        // --- Lógica de Cor do Totalizador ---
-        let horasPrevistas = parseHoras(document.getElementById('txtHoras').value);
-        let elTotal = document.getElementById('previewTotalHoras');
-
-        const strTotal = totalNoCalendario.toLocaleString('pt-BR', {maximumFractionDigits: 2});
-        const strDeclarado = horasPrevistas.toLocaleString('pt-BR', {maximumFractionDigits: 2});
-        
-        elTotal.innerHTML = `Total <strong>${strTotal}</strong> de <strong>${strDeclarado} horas</strong>`;
-        
-        // Se bater com o previsto e o previsto for maior que zero, fica ativo (azul). Se não, fica inativo (cinza).
-        if (totalNoCalendario === horasPrevistas && horasPrevistas > 0) {
-            elTotal.style.color = "var(--az-escuro)";
-        } else {
-            elTotal.style.color = "var(--cinza)";
-        }
-    }
-
-    function limparCalendario() {
-        if(confirm("Tem certeza que deseja limpar tudo?")) {
-            document.getElementById('txtHoras').value = "";
-            document.getElementById('txtInicio').value = "";
-            document.getElementById('txtFim').value = "";
-            dataInicioGlobal = null;
-            dataFimGlobal = null;
-            horasState = {};
-            
-            // Zera o tab hint
-            contadorCliquesHora = 0;
-            ultimoInputClicado = -1;
-            usouTabNesteModal = false;
-            document.getElementById('dicaTabModal').style.display = 'none';
-
             renderCalendario();
         }
-    }
 
-    // Inicializa a tela
-    window.onload = function() {
-        currentDate.setDate(1);
-        renderCalendario();
-    };
+        function mudarMes(n) {
+            currentDate.setMonth(currentDate.getMonth() + n);
+            renderCalendario();
+        }
 
-</script>
+        function renderCalendario() {
+            const wrapper = document.getElementById('calendariosWrapper');
+            const tit = document.getElementById('calMesAno');
+            const mesesNomes = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+            
+            wrapper.innerHTML = '';
+            const m1 = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+            const m2 = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1);
+            const isWide = window.innerWidth >= 768 || window.matchMedia("(orientation: landscape)").matches;
+
+            tit.innerText = isWide ? `${mesesNomes[m1.getMonth()]} - ${mesesNomes[m2.getMonth()]} / ${m1.getFullYear()}` : `${mesesNomes[m1.getMonth()]} ${m1.getFullYear()}`;
+
+            [m1, m2].forEach((baseDate, idx) => {
+                const mesWrapper = document.createElement('div');
+                mesWrapper.className = `mes-wrapper ${idx === 1 ? 'mes-proximo' : ''}`;
+                
+                const mesHeader = document.createElement('div');
+                mesHeader.className = 'text-center font-bold text-slate-400 text-[10px] mb-3 uppercase tracking-widest';
+                mesHeader.innerText = `${mesesNomes[baseDate.getMonth()]} ${baseDate.getFullYear()}`;
+                mesWrapper.appendChild(mesHeader);
+
+                const grid = document.createElement('div');
+                grid.className = 'calendario-grid';
+                ["D","S","T","Q","Q","S","S"].forEach(d => {
+                    const h = document.createElement('div');
+                    h.className = 'text-center text-[8px] font-black text-slate-300 pb-1';
+                    h.innerText = d;
+                    grid.appendChild(h);
+                });
+
+                const ano = baseDate.getFullYear(), mes = baseDate.getMonth();
+                const primeiroDia = new Date(ano, mes, 1).getDay();
+                const ultimoDia = new Date(ano, mes + 1, 0).getDate();
+                const feriados = getFeriados(ano);
+                const dtIn = document.getElementById('txtInicio').value ? new Date(document.getElementById('txtInicio').value + "T12:00:00") : null;
+                const dtFim = document.getElementById('txtFim').value ? new Date(document.getElementById('txtFim').value + "T12:00:00") : null;
+
+                for (let i = 0; i < primeiroDia; i++) grid.appendChild(Object.assign(document.createElement('div'), {className: 'cal-dia fora-mes'}));
+
+                for (let d = 1; d <= ultimoDia; d++) {
+                    const dateObj = new Date(ano, mes, d, 12);
+                    const dateStr = `${String(d).padStart(2, '0')}/${String(mes + 1).padStart(2, '0')}/${ano}`;
+                    const isFds = dateObj.getDay() === 0 || dateObj.getDay() === 6;
+                    const isFeriado = feriados.includes(dateStr);
+                    const fora = (dtIn && dateObj < dtIn) || (dtFim && dateObj > dtFim);
+                    
+                    const div = document.createElement('div');
+                    div.className = `cal-dia ${isFds || isFeriado ? 'descanso' : ''} ${fora ? 'fora-periodo' : ''}`;
+                    const hVal = horasState[dateStr] || "";
+                    if ((isFds || isFeriado) && hVal > 0) div.classList.add('preenchido-descanso');
+
+                    div.innerHTML = `<span>${d}</span><input type="number" step="0.1" value="${hVal}" oninput="updateHora('${dateStr}', this.value)" placeholder="${isFds || isFeriado ? '-' : '0'}">`;
+                    grid.appendChild(div);
+                }
+                mesWrapper.appendChild(grid);
+                wrapper.appendChild(mesWrapper);
+            });
+            atualizarCalculos();
+        }
+
+        window.onresize = renderCalendario;
+
+        function updateHora(data, val) {
+            const num = parseFloat(val);
+            if (isNaN(num) || num <= 0) delete horasState[data];
+            else horasState[data] = num;
+            atualizarCalculos();
+        }
+
+        function atualizarCalculos() {
+            const alvo = parseFloat(document.getElementById('txtHoras').value) || 0;
+            let total = 0, alerta = false;
+            Object.keys(horasState).forEach(k => {
+                total += horasState[k];
+                const [d, m, a] = k.split('/').map(Number);
+                const dobj = new Date(a, m - 1, d, 12);
+                if (dobj.getDay() === 0 || dobj.getDay() === 6 || getFeriados(a).includes(k)) alerta = true;
+            });
+
+            document.getElementById('resumoLancado').innerText = total.toFixed(2).replace('.', ',') + 'h';
+            document.getElementById('resumoRestante').innerText = Math.max(0, alvo - total).toFixed(2).replace('.', ',') + 'h';
+            document.getElementById('avisoFeriado').classList.toggle('hidden', !alerta);
+
+            const badge = document.getElementById('statusIndicator');
+            if (alvo === 0) { badge.innerText = "SEM ALVO"; badge.className = "status-badge bg-slate-700 text-slate-300"; }
+            else if (Math.abs(total - alvo) < 0.01) { badge.innerText = "FECHOU!"; badge.className = "status-badge bg-green-500 text-white"; }
+            else { 
+                badge.innerText = total > alvo ? `+${(total - alvo).toFixed(2)}H` : `-${(alvo - total).toFixed(2)}H`;
+                badge.className = total > alvo ? "status-badge bg-red-500 text-white" : "status-badge bg-amber-500 text-white";
+            }
+        }
+
+        function copiarTabela() {
+            const keys = Object.keys(horasState).sort((a, b) => {
+                const [d1, m1, y1] = a.split('/').map(Number), [d2, m2, y2] = b.split('/').map(Number);
+                return new Date(y1, m1, d1) - new Date(y2, m2, d2);
+            });
+            if (keys.length === 0) return;
+            let t = "Data\tHoras\n";
+            keys.forEach(k => t += `${k}\t${horasState[k].toFixed(2).replace('.', ',')}\n`);
+            const el = document.createElement('textarea'); el.value = t; document.body.appendChild(el); el.select();
+            document.execCommand('copy'); document.body.removeChild(el); alert("Copiado com sucesso!");
+        }
+
+        function limparTudo() {
+            if(confirm("Deseja limpar todos os dados?")) {
+                document.getElementById('txtHoras').value = "";
+                document.getElementById('txtInicio').value = "";
+                document.getElementById('txtFim').value = "";
+                horasState = {}; renderCalendario();
+            }
+        }
+        window.onload = renderCalendario;
+    </script>
 </body>
 </html>
+
