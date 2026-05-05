@@ -13,6 +13,7 @@
             display: flex !important;
             flex-direction: column !important;
             gap: 20px; 
+            width: 90%;
         }
 
         .container-formulario, .container-resultado { 
@@ -20,15 +21,14 @@
             min-width: 300px;
         }
 
-        .container-resultado { 
-            margin-top: 0 !important; 
-        }
-
         /* Container Principal Expansível */
         #containerPrincipal {
-            max-width: 350px;
             margin: 0 auto;
             transition: max-width 0.3s ease;
+        }
+
+        .resultado {
+            background-color: var(--branco);
         }
 
         /* --- ESTILOS EXCLUSIVOS DO CALENDÁRIO --- */
@@ -159,9 +159,23 @@
             transition: color 0.3s ease;
         }
 
-        @keyframes fadeIn { 
-            from { opacity: 0; transform: translateY(10px); } 
-            to { opacity: 1; transform: translateY(0); } 
+        /* --- ÁREA DE TEXTO COPIAR --- */
+        .bloco-resultado-texto {
+            margin-top: 30px;
+            border-top: 1px dashed var(--cinza);
+            padding-top: 20px;
+        }
+
+        .topo-resultado {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .topo-resultado label {
+            font-weight: bold;
+            color: var(--az-escuro);
         }
 
         /* RESPONSIVIDADE PARA DOIS MESES */
@@ -182,11 +196,15 @@
             }
         }
 
-        @media (max-width: 767px) {
+        @media (max-width: 800px) {
             .mes-proximo {
                 display: none;
             }
+            .container {
+                width: 94%;
+            }
         }
+        
     </style>
 </head>
 <body>
@@ -206,21 +224,22 @@
                     <label for="txtInicio"></label>
                     <input type="text" id="txtInicio" class="inp-date-text" placeholder="Início" maxlength="10" oninput="mascaraData(this)">
                     <span class="calendar-icon">📅</span>
-                    <!-- Adicionado ID pickerInicio -->
                     <input type="date" id="pickerInicio" class="inp-date-picker" onchange="atualizarDataPicker(this, 'txtInicio')">
                 </div>
                 <div class="input-item custom-date-wrapper">
                     <label for="txtFim"></label>
                     <input type="text" id="txtFim" class="inp-date-text" placeholder="Conclusão" maxlength="10" oninput="mascaraData(this)">
                     <span class="calendar-icon">📅</span>
-                    <!-- Adicionado ID pickerFim -->
                     <input type="date" id="pickerFim" class="inp-date-picker" onchange="atualizarDataPicker(this, 'txtFim')">
                 </div>
+            
+                <div class="input-item" style="flex: 0;">
+                    <label></label>
+                    <button class="btn-laranja btn-aux" onclick="limparCalendario()">Limpar</button> 
+                </div>
+            
             </div>
 
-            <div style="display: flex; gap: 10px; margin-top: 20px;">
-                <button class="btn-laranja" onclick="limparCalendario()">Limpar</button>
-            </div>
         </section>
 
         <section class="container-resultado">
@@ -243,10 +262,24 @@
                 </div>
                 
                 <div id="previewTotalHoras"></div>
+
+                <div class="bloco-resultado-texto">
+                    <div class="topo">
+                        <label>Planejamento Diário:</label>
+                        <button class="btn-roxo btn-aux" onclick="copiarTabelaDetalhamento()">Copiar</button>
+                    </div>
+
+                    <div id="areaTabelaDetalhamento" class="tabela-container resultado">
+                        <div class="mensagem-vazia">Preencha o calendário para gerar o detalhamento de horas...</div>
+                    </div>
+                </div>
+
             </div>
         </section>
 
     </div>
+
+    <div id="toast">Copiado!</div>
 
 <script>
     let currentDate = new Date();
@@ -258,7 +291,126 @@
     let usouTabNesteModal = false;
     let ultimoInputClicado = -1;
 
-    function registrarCliqueHora(indexAtual) {
+    // --- TOAST NOTIFICATION ---
+    const mostrarToast = (txt) => {
+        const x = document.getElementById("toast");
+        x.textContent = txt; 
+        x.classList.add("show");
+        setTimeout(() => { x.classList.remove("show"); }, 3000);
+    };
+
+    // --- COPY FUNCTION: COPIA O HTML DA TABELA ---
+    const copiarTabelaDetalhamento = () => {
+        const areaTabela = document.getElementById('areaTabelaDetalhamento');
+        
+        // Valida se há conteúdo real na tabela verificando se existe a tag <table>
+        if (!areaTabela.querySelector('table')) {
+            alert("Não há dados preenchidos para copiar.");
+            return;
+        }
+
+        const range = document.createRange();
+        range.selectNode(areaTabela);
+        window.getSelection().removeAllRanges();
+        window.getSelection().addRange(range);
+        
+        try {
+            document.execCommand('copy');
+            mostrarToast("Tabela copiada com sucesso!");
+        } catch(err) {
+            console.error(err);
+            mostrarToast("Erro ao copiar.");
+        }
+        
+        window.getSelection().removeAllRanges();
+    };
+
+    // --- GERA O HTML DA TABELA DE DETALHAMENTO (SUBSTITUTO DO TEXTAREA) ---
+    const atualizarTabelaDetalhamento = () => {
+        const areaTabela = document.getElementById('areaTabelaDetalhamento');
+        
+        // Pega as datas com horas > 0 e ordena cronologicamente
+        const datasOrdenadas = Object.keys(horasState)
+            .filter(k => horasState[k] > 0)
+            .sort((a, b) => stringParaData(a) - stringParaData(b));
+
+        if (datasOrdenadas.length === 0) {
+            areaTabela.innerHTML = '<div class="mensagem-vazia">Nenhuma hora distribuída ainda.</div>';
+            return;
+        }
+
+        // Determinar Início e Fim do Grid Visual Baseado no Input
+        const dtInicio = stringParaData(datasOrdenadas[0]);
+        const dtFim = stringParaData(datasOrdenadas[datasOrdenadas.length - 1]);
+
+        let calStart = new Date(dtInicio);
+        calStart.setDate(calStart.getDate() - calStart.getDay()); // Recua para Domingo
+
+        let calEnd = new Date(dtFim);
+        if (calEnd.getDay() !== 6) {
+            calEnd.setDate(calEnd.getDate() + (6 - calEnd.getDay())); // Avança para Sábado
+        }
+
+        let totalHoras = 0;
+        
+        // Estrutura inicial da tabela
+        let htmlTabela = `
+            <table class="tabela-detalhamento" style="font-family: Verdana, sans-serif; font-size: 12px; width: 100%; border-collapse: collapse; text-align: center;">
+                <thead>
+                    <tr style="background-color: #eee;">
+                        <th style="padding: 5px; border: 1px solid #ccc; width: 14%;">D</th>
+                        <th style="padding: 5px; border: 1px solid #ccc; width: 14%;">S</th>
+                        <th style="padding: 5px; border: 1px solid #ccc; width: 14%;">T</th>
+                        <th style="padding: 5px; border: 1px solid #ccc; width: 14%;">Q</th>
+                        <th style="padding: 5px; border: 1px solid #ccc; width: 14%;">Q</th>
+                        <th style="padding: 5px; border: 1px solid #ccc; width: 14%;">S</th>
+                        <th style="padding: 5px; border: 1px solid #ccc; width: 14%;">S</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+
+        let currDate = new Date(calStart);
+        while (currDate <= calEnd) {
+            if (currDate.getDay() === 0) htmlTabela += '<tr>';
+
+            let dataStr = String(currDate.getDate()).padStart(2, '0') + '/' + 
+                          String(currDate.getMonth() + 1).padStart(2, '0') + '/' + 
+                          currDate.getFullYear();
+
+            let horas = horasState[dataStr] || 0;
+            let temHoras = horas > 0;
+            if (temHoras) totalHoras += horas;
+
+            // Define estilos em linha para funcionar quando colar no E-mail (Outlook/Gmail perdem as classes)
+            let bgColor = temHoras ? "#ffffff" : "#eeeeee";
+            let colorTxt = temHoras ? "#002233" : "#ccc";
+            let txtHoras = temHoras ? `<strong>${horas.toLocaleString('pt-BR', {minimumFractionDigits: 1, maximumFractionDigits: 2})}h</strong>` : '--';
+
+            htmlTabela += `
+                <td class="${temHoras ? 'dia-preenchido' : 'dia-desabilitado'}" style="padding: 5px; border: 1px solid #ccc; background-color: ${bgColor}; color: ${colorTxt}; line-height: 1.4;">
+                    <span class="dia-numero" style="font-weight: normal;">${currDate.getDate()}</span><br>
+                    <span class="dia-horas">${txtHoras}</span>
+                </td>
+            `;
+
+            if (currDate.getDay() === 6) htmlTabela += '</tr>';
+            currDate.setDate(currDate.getDate() + 1);
+        }
+
+        htmlTabela += `
+                </tbody>
+            </table>
+            <div style="text-align: right; margin-top: 10px; font-family: Verdana, sans-serif; font-size: 13px;">
+                Total Diário: <strong>${totalHoras.toLocaleString('pt-BR', {minimumFractionDigits: 1, maximumFractionDigits: 2})} horas</strong>
+            </div>
+        `;
+
+        areaTabela.innerHTML = htmlTabela;
+    };
+
+
+    const registrarCliqueHora = (indexAtual) => {
         if (usouTabNesteModal) return;
         if (indexAtual === ultimoInputClicado + 1) {
             contadorCliquesHora++;
@@ -269,16 +421,16 @@
         if (contadorCliquesHora >= 5) {
             document.getElementById('dicaTabModal').style.display = 'block';
         }
-    }
+    };
 
-    function verificarTab(event) {
+    const verificarTab = (event) => {
         if (event.key === 'Tab') {
             document.getElementById('dicaTabModal').style.display = 'none';
             usouTabNesteModal = true; 
         }
-    }
+    };
 
-    function mascaraData(input) {
+    const mascaraData = (input) => {
         let v = input.value.replace(/\D/g, "");
         if (v.length > 8) v = v.substring(0, 8);
         if (v.length > 2) v = v.substring(0, 2) + "/" + v.substring(2);
@@ -286,7 +438,6 @@
         input.value = v;
         
         if(v.length === 10 || v.length === 0) {
-            // Lógica para bloquear os dias no calendário da Data Final
             if (input.id === 'txtInicio') {
                 let dt = stringParaData(v);
                 let pickerFim = document.getElementById('pickerFim');
@@ -301,22 +452,20 @@
             }
             gerarDistribuicao();
         }
-    }
+    };
 
-    function atualizarDataPicker(picker, textInputId) {
+    const atualizarDataPicker = (picker, textInputId) => {
         if (!picker.value) return;
         const [ano, mes, dia] = picker.value.split('-');
         document.getElementById(textInputId).value = `${dia}/${mes}/${ano}`;
         
-        // Se escolheu a data de início no calendário, bloqueia no calendário de conclusão
         if (textInputId === 'txtInicio') {
             document.getElementById('pickerFim').min = picker.value;
         }
-
         gerarDistribuicao();
-    }
+    };
 
-    function stringParaData(dataStr) {
+    const stringParaData = (dataStr) => {
         if (!dataStr || dataStr.length !== 10) return null;
         const partes = dataStr.split('/');
         const dia = parseInt(partes[0], 10);
@@ -324,18 +473,18 @@
         const ano = parseInt(partes[2], 10);
         const data = new Date(ano, mes, dia);
         return (data.getFullYear() === ano && data.getMonth() === mes && data.getDate() === dia) ? data : null;
-    }
+    };
 
-    function parseHoras(valor) {
+    const parseHoras = (valor) => {
         if (!valor) return 0;
         let limpo = valor.toString().replace(',', '.').replace(/[^0-9.]/g, '');
         return isNaN(parseFloat(limpo)) ? 0 : parseFloat(limpo);
-    }
+    };
 
     const FERIADOS_EXTRAS = ["20/11", "09/07"]; 
     let feriadosCacheados = {};
 
-    function obterFeriadosNacionais(ano) {
+    const obterFeriadosNacionais = (ano) => {
         if (feriadosCacheados[ano]) return feriadosCacheados[ano];
         let feriados = [`01/01/${ano}`, `21/04/${ano}`, `01/05/${ano}`, `07/09/${ano}`, `12/10/${ano}`, `02/11/${ano}`, `15/11/${ano}`, `20/11/${ano}`, `25/12/${ano}`];
         FERIADOS_EXTRAS.forEach(f => feriados.push(`${f}/${ano}`));
@@ -352,9 +501,9 @@
         feriados.push(formata(carnaval), formata(sextaSanta), formata(corpusChristi));
         feriadosCacheados[ano] = feriados;
         return feriados;
-    }
+    };
 
-    function gerarDistribuicao() {
+    const gerarDistribuicao = () => {
         let horasPrevistas = parseHoras(document.getElementById('txtHoras').value);
         let dtInStr = document.getElementById('txtInicio').value;
         let dtFimStr = document.getElementById('txtFim').value;
@@ -362,7 +511,6 @@
         dataInicioGlobal = dtInStr.length === 10 ? stringParaData(dtInStr) : null;
         dataFimGlobal = dtFimStr.length === 10 ? stringParaData(dtFimStr) : null;
 
-        // Se o usuário tentar "burlar" digitando a data manualmente menor que o início, apaga silenciosamente
         if (dataInicioGlobal && dataFimGlobal && dataFimGlobal < dataInicioGlobal) {
             document.getElementById('txtFim').value = "";
             document.getElementById('pickerFim').value = "";
@@ -393,14 +541,14 @@
             }
         }
         renderCalendario();
-    }
+    };
 
-    function mudarMes(delta) {
+    const mudarMes = (delta) => {
         currentDate.setMonth(currentDate.getMonth() + delta);
         renderCalendario();
-    }
+    };
 
-    function renderCalendario() {
+    const renderCalendario = () => {
         const wrapper = document.getElementById('calendariosWrapper');
         wrapper.innerHTML = '';
         const meses = ["JANEIRO", "FEVEREIRO", "MARÇO", "ABRIL", "MAIO", "JUNHO", "JULHO", "AGOSTO", "SETEMBRO", "OUTUBRO", "NOVEMBRO", "DEZEMBRO"];
@@ -467,9 +615,9 @@
             wrapper.appendChild(mesWrapper);
         });
         atualizarTotais();
-    }
+    };
 
-    function atualizarHora(input) {
+    const atualizarHora = (input) => {
         let val = input.value.trim();
         let dataStr = input.dataset.dia;
         if (val === "") {
@@ -483,9 +631,9 @@
             else pai.classList.remove('preenchido');
         }
         atualizarTotais();
-    }
+    };
 
-    function atualizarTotais() {
+    const atualizarTotais = () => {
         let totalNoCalendario = 0;
         let temFeriadoPreenchido = false;
         for (let key in horasState) {
@@ -522,16 +670,19 @@
         } else {
             elTotal.style.color = "var(--cinza)";
         }
-    }
 
-    function limparCalendario() {
+        // Chama a nossa nova função que gera a tabela HTML!
+        atualizarTabelaDetalhamento();
+    };
+
+    const limparCalendario = () => {
         if(confirm("Tem certeza que deseja limpar tudo?")) {
             document.getElementById('txtHoras').value = "";
             document.getElementById('txtInicio').value = "";
             document.getElementById('txtFim').value = "";
             document.getElementById('pickerInicio').value = "";
             document.getElementById('pickerFim').value = "";
-            document.getElementById('pickerFim').removeAttribute('min'); // Limpa a trava do min
+            document.getElementById('pickerFim').removeAttribute('min'); 
             dataInicioGlobal = null;
             dataFimGlobal = null;
             horasState = {};
@@ -541,9 +692,48 @@
             document.getElementById('dicaTabModal').style.display = 'none';
             renderCalendario();
         }
-    }
+    };
 
-    window.onload = function() {
+    // --- ATALHO: SETAS PARA CIMA/BAIXO PARA ALTERAR HORAS ---
+    let inputSendoHovered = null;
+
+    // Detecta quando o mouse entra em um input de horas
+    document.addEventListener('mouseover', (e) => {
+        // Seleciona o input principal de Total de Horas ou os inputs de dias do calendário (ignorando os desabilitados)
+        if (e.target.matches('#txtHoras, .cal-dia input:not([disabled])')) {
+            inputSendoHovered = e.target;
+        }
+    });
+
+    // Detecta quando o mouse sai do input
+    document.addEventListener('mouseout', (e) => {
+        if (e.target === inputSendoHovered) {
+            inputSendoHovered = null;
+        }
+    });
+
+    // Intercepta as teclas direcionais globalmente
+    document.addEventListener('keydown', (e) => {
+        // Se o mouse não estiver em cima de um campo válido, não faz nada
+        if (!inputSendoHovered) return;
+
+        if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+            e.preventDefault(); // Evita a rolagem indesejada da página
+            
+            let valorAtual = parseHoras(inputSendoHovered.value);
+            let novoValor = e.key === 'ArrowUp' ? valorAtual + 1 : valorAtual - 1;
+            
+            if (novoValor < 0) novoValor = 0; // Trava no zero para evitar horas negativas
+            
+            // Formata e injeta o novo valor
+            inputSendoHovered.value = novoValor > 0 ? novoValor.toString().replace('.', ',') : '';
+            
+            // Simula a digitação para invocar suas funções automáticas (atualizarHora ou gerarDistribuicao)
+            inputSendoHovered.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+    });
+
+    window.onload = () => {
         currentDate.setDate(1);
         renderCalendario();
     };
