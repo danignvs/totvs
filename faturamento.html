@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
-    <title>Gerador de Email de Faturamento</title>
+    <title>Gerador de Email/Ticket de Faturamento</title>
     <link rel="stylesheet" href="style.css">
 
     <style>
@@ -13,16 +13,42 @@
 </head>
 
 <body>
-    <!--h1></h1-->
+    <h1 class="azul-claro">Faturamento</h1>
 
     <div class="container container-azul">
 
         <section class="container-formulario">
         
             <div class="topo">
-                <h2>Faturamento</h2>                
+                <h2></h2>                
             </div>
         
+            <br>
+
+            <div class="input-group">
+                <div class="input-item" style="width: 100%;">
+                    <label for="formatoSaida">Formato:</label>
+                    <select id="formatoSaida" onchange="gerarEmail()">
+                        <option value="Ticket" selected>Ticket (Sem saudação/despedida)</option>
+                        <option value="Email">E-mail (Com saudação/despedida)</option>
+                    </select>
+                </div>
+            </div>
+        
+            <div class="input-group">
+                <div class="input-item">
+                    <label for="nomeProjeto">Nome do projeto:</label>
+                    <input type="text" id="nomeProjeto" placeholder="" oninput="gerarEmail()">
+                </div>
+                <div class="input-item">
+                    <label for="tipoAssunto">Assunto:</label>
+                    <select id="tipoAssunto" onchange="gerarEmail()">
+                        <option value="Faturamento">Solicitação de faturamento</option>
+                        <option value="Projeto">Nome do projeto</option>
+                    </select>
+                </div>
+            </div>
+
             <div class="input-group">
                 <div class="input-item">
                     <label for="codProjeto">Cód. projeto:</label>
@@ -45,23 +71,8 @@
                 </div>
             </div>
         
-            <div class="input-group">
-                <div class="input-item">
-                    <label for="nomeProjeto">Nome do projeto:</label>
-                    <input type="text" id="nomeProjeto" placeholder="" oninput="gerarEmail()">
-                </div>
-                <div class="input-item">
-                    <label for="tipoAssunto">Assunto:</label>
-                    <select id="tipoAssunto" onchange="gerarEmail()">
-                        <option value="Faturamento">Solicitação de faturamento</option>
-                        <option value="Projeto">Nome do projeto</option>
-                    </select>
-                </div>
-            </div>
-        
             <label for="tipoJustificativa">Justificativa:</label>
             <select id="tipoJustificativa" onchange="mudarJustificativa(); gerarEmail()">                
-                <!--option value="Selecione"></option-->
                 <option value="Padrao">Termo de conclusão assinado</option>
                 <option value="Unilateral">Faturamento unilateral</option>
                 <option value="Outras">Outras (digitar abaixo)</option>
@@ -74,18 +85,16 @@
         </section>
 
         <section class="container-resultado">
-            <h3 class="roxo"><span class="azul">E-mail</span> gerado</h3>
-
-
+            <h3>Resultado</h3>
 
             <div class="resultado">
-                <button class="btn-roxo btn-aux" onclick="copiarTexto('resultadoAssunto')">Copiar</button>
+                <button class="btn-azul btn-aux" onclick="copiarTexto('resultadoAssunto')">Copiar</button>
                 <label>Assunto</label>
                 <pre id="resultadoAssunto"></pre>
             </div>
 
             <div class="resultado">
-                <button class="btn-roxo btn-aux" onclick="copiarTextoRico('resultadoCorpo')">Copiar</button>
+                <button class="btn-azul btn-aux" onclick="copiarTextoRico('resultadoCorpo')">Copiar</button>
                 <label>Mensagem</label>
                 <pre id="resultadoCorpo"></pre>
             </div>
@@ -114,23 +123,22 @@
     const JUSTIFICATIVA_UNILATERAL = "Faturamento unilateral. Evidências de envio da MIT0062, há mais de 30 dias, disponível no repositório do fluig.";
 
     function obterSaudacao() {
-    // Usamos 'en-US' apenas para garantir que retorne o número limpo (ex: "14"), sem o "h" do pt-BR
-    const horaString = new Date().toLocaleString("en-US", {
-        timeZone: "America/Sao_Paulo",
-        hour: "numeric",
-        hour12: false
-    });
+        const horaString = new Date().toLocaleString("en-US", {
+            timeZone: "America/Sao_Paulo",
+            hour: "numeric",
+            hour12: false
+        });
 
-    const hora = parseInt(horaString, 10);
+        const hora = parseInt(horaString, 10);
 
-    if (hora >= 5 && hora < 12) {
-        return "bom dia";
-    } else if (hora >= 12 && hora < 18) {
-        return "boa tarde";
-    } else {
-        return "boa noite"; // Correção aplicada aqui
+        if (hora >= 5 && hora < 12) {
+            return "bom dia";
+        } else if (hora >= 12 && hora < 18) {
+            return "boa tarde";
+        } else {
+            return "boa noite"; 
+        }
     }
-}
 
     function preencherContrato() {
         const codProjeto = document.getElementById('codProjeto').value;
@@ -147,7 +155,6 @@
         const inputJustificativa = document.getElementById('justificativa');
         const justificativaDiv = document.getElementById('justificativaManualDiv');
 
-        // Lógica corrigida para não preencher a unilateral por padrão
         if (tipoJustificativa === 'Selecione') {
             justificativaDiv.style.display = 'none';
             inputJustificativa.value = ""; 
@@ -159,7 +166,6 @@
             inputJustificativa.value = JUSTIFICATIVA_UNILATERAL;
         } else {
             justificativaDiv.style.display = 'block';
-            // Limpa se o texto atual for um dos pré-definidos para permitir nova digitação
             if (inputJustificativa.value === JUSTIFICATIVA_PADRAO || inputJustificativa.value === JUSTIFICATIVA_UNILATERAL) {
                 inputJustificativa.value = "";
             }
@@ -169,72 +175,67 @@
     }
 
     function gerarEmail() {
-    const codProjeto = document.getElementById('codProjeto').value;
-    const nomeProjeto = document.getElementById('nomeProjeto').value;
-    const tipoAssunto = document.getElementById('tipoAssunto').value;
-    const codContratoPSA = document.getElementById('codContratoPSA').value;
-    const codCliente = document.getElementById('codCliente').value;
-    const justificativa = document.getElementById('justificativa').value;
+        const formatoSaida = document.getElementById('formatoSaida').value;
+        const codProjeto = document.getElementById('codProjeto').value;
+        const nomeProjeto = document.getElementById('nomeProjeto').value;
+        const tipoAssunto = document.getElementById('tipoAssunto').value;
+        const codContratoPSA = document.getElementById('codContratoPSA').value;
+        const codCliente = document.getElementById('codCliente').value;
+        const justificativa = document.getElementById('justificativa').value;
 
-    let valorLiquido = document.getElementById('valorLiquido').value.trim();
-    if (valorLiquido && !valorLiquido.toUpperCase().startsWith("R$")) {
-        valorLiquido = `R$${valorLiquido}`;
+        let valorLiquido = document.getElementById('valorLiquido').value.trim();
+        if (valorLiquido && !valorLiquido.toUpperCase().startsWith("R$")) {
+            valorLiquido = `R$${valorLiquido}`;
+        }
+
+        let assunto = '';
+        if (tipoAssunto === 'Faturamento') {
+            assunto = codProjeto ? `${codProjeto} - Solicitação de Faturamento` : '';
+        } else {
+            assunto = (codProjeto && nomeProjeto) ? `${codProjeto} - ${nomeProjeto}` : '';
+        }
+
+        const saudacao = obterSaudacao();
+        let corpoEmail = "";
+
+        // Adiciona saudação apenas se for E-mail
+        if (formatoSaida === 'Email') {
+            corpoEmail += `Olá, ${saudacao}!\n\n`;
+        }
+
+        corpoEmail += `Favor proceder com o faturamento abaixo:\n\n<b>Código do contrato PSA:</b> ${codContratoPSA}\n<b>Código do cliente:</b> ${codCliente}\n<b>Valor líquido:</b> ${valorLiquido}\n\n<b>Código do projeto:</b> ${codProjeto}\n<b>Nome do projeto:</b> ${nomeProjeto}\n\n<b>Justificativa:</b> ${justificativa}`;
+
+        // Adiciona despedida apenas se for E-mail
+        if (formatoSaida === 'Email') {
+            corpoEmail += `\n\nAtenciosamente,`;
+        }
+
+        document.getElementById('resultadoAssunto').textContent = assunto;
+        document.getElementById('resultadoCorpo').innerHTML = corpoEmail.replace(/\n/g, '<br>');
     }
 
-    let assunto = '';
-    if (tipoAssunto === 'Faturamento') {
-        assunto = codProjeto ? `${codProjeto} - Solicitação de Faturamento` : '';
-    } else {
-        assunto = (codProjeto && nomeProjeto) ? `${codProjeto} - ${nomeProjeto}` : '';
+    async function copiarTextoRico(idElemento) {
+        const elemento = document.getElementById(idElemento);
+        const html = elemento.innerHTML;
+        const textoPuro = elemento.innerText;
+
+        const htmlFormatado = `<div style="margin: 0 !important; padding: 0 !important; text-indent: 0 !important; font-family: Arial, sans-serif;">${html}</div>`;
+
+        try {
+            const blobHTML = new Blob([htmlFormatado], { type: "text/html" });
+            const blobText = new Blob([textoPuro], { type: "text/plain" });
+            const data = [new ClipboardItem({ 
+                "text/html": blobHTML, 
+                "text/plain": blobText 
+            })];
+            
+            await navigator.clipboard.write(data);
+            mostrarToast("Texto copiado!");
+        } catch (err) {
+            console.error("Erro ao copiar formatado, tentando texto puro...", err);
+            copiarTexto(idElemento); 
+        }
     }
-
-    const saudacao = obterSaudacao();
-
-    // Usamos tags <b> para o negrito e \n para quebras de linha
-    const corpoEmail = `Olá, ${saudacao}!
-
-Favor proceder com o faturamento abaixo:
-
-<b>Código do contrato PSA:</b> ${codContratoPSA}
-<b>Código do cliente:</b> ${codCliente}
-<b>Valor líquido:</b> ${valorLiquido}
-
-<b>Código do projeto:</b> ${codProjeto}
-<b>Nome do projeto:</b> ${nomeProjeto}
-
-<b>Justificativa:</b> ${justificativa}
-
-Atenciosamente,`;
-
-    document.getElementById('resultadoAssunto').textContent = assunto;
-    // IMPORTANTE: Aqui usamos innerHTML para interpretar o <b>
-    document.getElementById('resultadoCorpo').innerHTML = corpoEmail.replace(/\n/g, '<br>');
-}
-
-// Nova função para copiar mantendo o negrito para o E-mail
-async function copiarTextoRico(idElemento) {
-    const elemento = document.getElementById(idElemento);
-    const html = elemento.innerHTML;
-    const textoPuro = elemento.innerText;
-
-    const htmlFormatado = `<div style="margin: 0 !important; padding: 0 !important; text-indent: 0 !important; font-family: Arial, sans-serif;">${html}</div>`;
-
-    try {
-        // O segredo está em passar o MIME type correto para o ClipboardItem
-        const blobHTML = new Blob([htmlFormatado], { type: "text/html" });
-        const blobText = new Blob([textoPuro], { type: "text/plain" });
-        const data = [new ClipboardItem({ 
-            "text/html": blobHTML, 
-            "text/plain": blobText 
-        })];
-        
-        await navigator.clipboard.write(data);
-        mostrarToast("E-mail copiado!");
-    } catch (err) {
-        console.error("Erro ao copiar formatado, tentando texto puro...", err);
-        copiarTexto(idElemento); 
-    }
-}
 
     function mostrarToast(texto) {
         var x = document.getElementById("toast");
@@ -260,6 +261,7 @@ async function copiarTextoRico(idElemento) {
     function limparFormulario() {
         const inputs = document.querySelectorAll('input[type="text"]');
         inputs.forEach(input => input.value = '');
+        document.getElementById('formatoSaida').selectedIndex = 0; // Restaura o Ticket como padrão
         document.getElementById('tipoAssunto').selectedIndex = 0;
         document.getElementById('tipoJustificativa').selectedIndex = 0;
         mudarJustificativa();
@@ -288,7 +290,7 @@ async function copiarTextoRico(idElemento) {
         mudarJustificativa();
         gerarEmail();
     };
-</script>
+    </script>
 
 </body>
 
