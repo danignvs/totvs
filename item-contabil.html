@@ -42,6 +42,16 @@
 
             <br>
             
+            <div class="input-group">
+                <div class="input-item" style="width: 100%;">
+                    <label for="formatoSaida">Formato:</label>
+                    <select id="formatoSaida" onchange="gerarEmail()">
+                        <option value="Ticket" selected>Ticket (Sem saudação/despedida)</option>
+                        <option value="Email">E-mail (Com saudação/despedida)</option>
+                    </select>
+                </div>
+            </div>
+
             <div id="projetosContainer">
                 <div class="projeto-row">
                     <div class="input-group">
@@ -57,8 +67,6 @@
                 </div>
             </div>
 
-            
-            
             <br>
 
             <div class="input-group">
@@ -73,16 +81,16 @@
         </section>
 
         <section class="container-resultado">
-            <h3 class="roxo"><span class="azul">E-mail</span> gerado</h3>
+            <h3 class="roxo"><span class="azul">Mensagem</span> gerada</h3>
 
             <div class="resultado">
-                <button class="btn-roxo btn-aux" onclick="copiarTexto('resultadoAssunto')">Copiar</button>
+                <button class="btn-roxo btn-aux" onclick="copiarTextoSimples('resultadoAssunto')">Copiar</button>
                 <label>Assunto</label>
                 <pre id="resultadoAssunto"></pre>
             </div>
 
             <div class="resultado">
-                <button class="btn-roxo btn-aux" onclick="copiarTexto('resultadoCorpo')">Copiar</button>
+                <button class="btn-roxo btn-aux" onclick="copiarTextoRico('resultadoCorpo')">Copiar</button>
                 <label>Mensagem</label>
                 <pre id="resultadoCorpo"></pre>
             </div>
@@ -102,7 +110,7 @@
         window.scrollTo(0, 0);
 
         function obterSaudacao() {
-            const hora = parseInt(new Date().toLocaleString("pt-BR", {
+            const hora = parseInt(new Date().toLocaleString("en-US", {
                 timeZone: "America/Sao_Paulo",
                 hour: "numeric",
                 hour12: false
@@ -110,7 +118,7 @@
 
             if (hora >= 5 && hora < 12) return "bom dia";
             else if (hora >= 12 && hora < 18) return "boa tarde";
-            else return "bom dia/boa tarde";
+            else return "boa noite";
         }
 
         function adicionarProjeto() {
@@ -144,6 +152,7 @@
         }
 
         function gerarEmail() {
+            const formatoSaida = document.getElementById('formatoSaida').value;
             const novoItem = document.getElementById('novoItem').value;
             const codigos = document.querySelectorAll('.codProjeto');
             const nomes = document.querySelectorAll('.nomeProjeto');
@@ -179,7 +188,6 @@
                 assunto = `Alteração de item contábil - ${infoProjeto}`;
             }
 
-            const saudacao = obterSaudacao();
             const pluralTexto = qtdProjetosPreenchidos > 1 ? "dos projetos abaixo" : "do projeto abaixo";
 
             // Se nada for digitado, mostra uma estrutura base
@@ -187,17 +195,18 @@
                  projetosFormatados = "<strong>[Cód. Projeto]</strong> - [Nome do Projeto]\n";
             }
 
-            // Corpo do e-mail com <strong> no item contábil
-            const corpoEmail = `Olá, ${saudacao}!
+            let corpoEmail = `Solicito a alteração do item contábil ${pluralTexto} para <strong>${novoItem}</strong>:\n\n${projetosFormatados}`;
 
-Solicito a alteração do item contábil ${pluralTexto} para <strong>${novoItem}</strong>:
-
-${projetosFormatados}
-
-Atenciosamente,`;
+            // Adiciona saudação e despedida apenas se for E-mail
+            if (formatoSaida === 'Email') {
+                const saudacao = obterSaudacao();
+                corpoEmail = `Olá, ${saudacao}!\n\n` + corpoEmail + `\nAtenciosamente,`;
+            }
 
             document.getElementById('resultadoAssunto').textContent = assunto;
-            document.getElementById('resultadoCorpo').innerHTML = corpoEmail; 
+            
+            // Converte as quebras de linha em tags <br> para funcionar com innerHTML
+            document.getElementById('resultadoCorpo').innerHTML = corpoEmail.replace(/\n/g, '<br>'); 
         }
 
         function mostrarToast(texto) {
@@ -208,43 +217,43 @@ Atenciosamente,`;
             setTimeout(function () { x.className = x.className.replace("show", ""); }, 4000);
         }
 
-        // Função de copiar modificada para não levar os estilos (borda) da tag <pre>
-        function copiarTexto(idElemento) {
-            const elementoOriginal = document.getElementById(idElemento);
-            
-            // Cria um elemento oculto temporário apenas com o conteúdo HTML
-            const divTemp = document.createElement('div');
-            divTemp.innerHTML = elementoOriginal.innerHTML;
-            divTemp.style.position = 'absolute';
-            divTemp.style.left = '-9999px'; // Tira da tela
-            divTemp.style.whiteSpace = 'pre-wrap'; // Mantém as quebras de linha
-            divTemp.style.fontFamily = 'Arial, sans-serif';
-            divTemp.style.fontSize = 'small'; // ou '12px', '10pt', dependendo da sua preferência
+        // Função para copiar o assunto sem formatar
+        function copiarTextoSimples(idElemento) {
+            const texto = document.getElementById(idElemento).textContent;
+            if (!texto.trim()) return;
+            navigator.clipboard.writeText(texto).then(() => {
+                mostrarToast(texto);
+            }).catch(err => {
+                console.error('Erro ao copiar: ', err);
+            });
+        }
 
-            document.body.appendChild(divTemp);
+        // Função principal para copiar mantendo quebras de linha e negrito corretos em qualquer sistema
+        async function copiarTextoRico(idElemento) {
+            const elemento = document.getElementById(idElemento);
+            const html = elemento.innerHTML;
+            const textoPuro = elemento.innerText; // innerText preserva as quebras naturalmente
 
-            const selecao = window.getSelection();
-            const range = document.createRange();
-            
-            // Seleciona o elemento oculto em vez da tag <pre>
-            range.selectNodeContents(divTemp);
-            selecao.removeAllRanges();
-            selecao.addRange(range);
+            const htmlFormatado = `<div style="margin: 0 !important; padding: 0 !important; text-indent: 0 !important; font-family: Arial, sans-serif;">${html}</div>`;
 
             try {
-                document.execCommand('copy');
-                mostrarToast(elementoOriginal.textContent);
+                const blobHTML = new Blob([htmlFormatado], { type: "text/html" });
+                const blobText = new Blob([textoPuro], { type: "text/plain" });
+                const data = [new ClipboardItem({ 
+                    "text/html": blobHTML, 
+                    "text/plain": blobText 
+                })];
+                
+                await navigator.clipboard.write(data);
+                mostrarToast("Mensagem copiada!");
             } catch (err) {
-                console.error('Erro ao copiar: ', err);
-                alert('Erro manual ao copiar.');
+                console.error("Erro ao copiar formatado, tentando cópia simples...", err);
+                copiarTextoSimples(idElemento); 
             }
-            
-            // Limpa tudo
-            selecao.removeAllRanges();
-            document.body.removeChild(divTemp);
         }
 
         function limparFormulario() {
+            document.getElementById('formatoSaida').selectedIndex = 0; // Restaura Ticket
             document.getElementById('novoItem').selectedIndex = 0;
             const container = document.getElementById('projetosContainer');
             container.innerHTML = `
