@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Confirmação de Planejamento</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/x-icon" href="favicons/resp.ico">
+</head>
+
+<body>
+    <h1><span class="azul-claro">Confirmação </span>de Planejamento</h1>
+    <div class="container container-azul">
+
+        <section class="container-formulario">
+        
+            <div class="topo">
+                <h2></h2>                
+            </div>
+            <br>
+        
+            <div class="input-group">
+                <div class="input-item">
+                    <label for="destinatario">Destinatário:</label>
+                    <select id="destinatario" onchange="gerarEmail()">
+                        <option value="Re">Re</option>
+                        <option value="Petter">Petter</option>
+                        <option value="Wive">Wive</option>
+                        <option value="Aline">Aline</option>
+                    </select>
+                </div>
+                
+                <div class="input-item">
+                    <label for="tipoAcao">Ação realizada:</label>
+                    <select id="tipoAcao" onchange="gerarEmail()">
+                        <option value="Planejamento">Planejamento</option>
+                        <option value="Replanejamento">Replanejamento</option>
+                    </select>
+                </div>
+            </div>
+
+        </section>
+
+        <section class="container-resultado">
+            <h3>Resultado</h3>
+
+            <div class="resultado">
+                <button class="btn-azul btn-aux" onclick="copiarTextoRico('resultadoCorpo')">Copiar</button>
+                <label>Mensagem</label>
+                <pre id="resultadoCorpo"></pre>
+            </div>
+        </section>
+
+        <section class="botoes-de-acao">
+            <button class="btn-roxo" onclick="copiarTextoRico('resultadoCorpo')">Copiar E-mail</button>
+            <button class="btn-laranja" onclick="limparFormulario()">Limpar</button>
+
+            <div id="toast">Copiado para a área de transferência!</div>
+        </section>
+    </div>  
+
+
+    <script>
+    // --- FORÇAR A PÁGINA A IR PARA O TOPO AO ATUALIZAR ---
+    if (history.scrollRestoration) {
+        history.scrollRestoration = 'manual';
+    }
+    window.scrollTo(0, 0);
+
+    function obterSaudacao() {
+        const horaString = new Date().toLocaleString("en-US", {
+            timeZone: "America/Sao_Paulo",
+            hour: "numeric",
+            hour12: false
+        });
+
+        const hora = parseInt(horaString, 10);
+
+        if (hora >= 5 && hora < 12) {
+            return "Bom dia";
+        } else if (hora >= 12 && hora < 18) {
+            return "Boa tarde";
+        } else {
+            return "Boa noite"; 
+        }
+    }
+
+    function gerarEmail() {
+        const destinatario = document.getElementById('destinatario').value;
+        const tipoAcao = document.getElementById('tipoAcao').value;
+        const saudacao = obterSaudacao();
+
+        const corpoEmail = `${saudacao}, ${destinatario}
+
+${tipoAcao} realizado conforme solicitado.
+
+Att,`;
+
+        document.getElementById('resultadoCorpo').innerHTML = corpoEmail.replace(/\n/g, '<br>');
+    }
+
+    async function copiarTextoRico(idElemento) {
+        const elemento = document.getElementById(idElemento);
+        const html = elemento.innerHTML;
+        const textoPuro = elemento.innerText;
+
+        const htmlFormatado = `<div style="margin: 0 !important; padding: 0 !important; text-indent: 0 !important; font-family: Arial, sans-serif;">${html}</div>`;
+
+        try {
+            const blobHTML = new Blob([htmlFormatado], { type: "text/html" });
+            const blobText = new Blob([textoPuro], { type: "text/plain" });
+            const data = [new ClipboardItem({ 
+                "text/html": blobHTML, 
+                "text/plain": blobText 
+            })];
+            
+            await navigator.clipboard.write(data);
+            mostrarToast("E-mail copiado!");
+        } catch (err) {
+            console.error("Erro ao copiar formatado, tentando texto puro...", err);
+            copiarTexto(idElemento); 
+        }
+    }
+
+    function mostrarToast(texto) {
+        var x = document.getElementById("toast");
+        let textoExibido = texto;
+        if (textoExibido.length > 40) {
+            textoExibido = textoExibido.substring(0, 40) + "...";
+        }
+        x.textContent = `"${textoExibido}" copiado!`;
+        x.className = "show";
+        setTimeout(function () { x.className = x.className.replace("show", ""); }, 4000);
+    }
+
+    function copiarTexto(idElemento) {
+        const texto = document.getElementById(idElemento).textContent;
+        if (!texto.trim()) return;
+        navigator.clipboard.writeText(texto).then(() => {
+            mostrarToast(texto);
+        }).catch(err => {
+            console.error('Erro ao copiar: ', err);
+        });
+    }
+
+    function limparFormulario() {
+        document.getElementById('destinatario').selectedIndex = 0;
+        document.getElementById('tipoAcao').selectedIndex = 0;
+        gerarEmail();
+    }
+
+    window.onload = function () {
+        gerarEmail();
+    };
+    </script>
+
+</body>
+</html>
