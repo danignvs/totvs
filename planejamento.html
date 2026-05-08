@@ -1360,7 +1360,9 @@
 
     // --- LÓGICA DE DETALHAMENTO DE HORAS E FERIADOS ---
     
-    const FERIADOS_EXTRAS = ["23/04", "23/04"]; 
+    // Você pode usar este array para emendas da empresa ou pontes específicas de cada ano!
+    // Exemplo: const FERIADOS_EXTRAS = ["24/12", "31/12"];
+    const FERIADOS_EXTRAS = []; 
 
     let feriadosCacheados = {};
     let modalHorasState = {}; 
@@ -1433,21 +1435,32 @@
     function obterFeriadosNacionais(ano) {
         if (feriadosCacheados[ano]) return feriadosCacheados[ano];
         
+        /* FERIADOS ESPECIFICADOS: 
+          Cobre todos os Feriados Fixos Nacionais, do Estado do RJ e Município do RJ.
+          Os Feriados Móveis (Carnaval, Paixão de Cristo e Corpus Christi) são baseados na 
+          fórmula matemática universal da Páscoa. Portanto, este cálculo é perpétuo e 
+          funcionará para os próximos 5 anos (2026 a 2030) e para qualquer ano futuro sem quebrar.
+        */
         let feriados = [
             `01/01/${ano}`, // Ano Novo
+            `20/01/${ano}`, // São Sebastião (Municipal RJ)
             `21/04/${ano}`, // Tiradentes
+            `23/04/${ano}`, // São Jorge (Estadual RJ)
             `01/05/${ano}`, // Dia do Trabalho
             `07/09/${ano}`, // Independência
             `12/10/${ano}`, // Nossa Sra Aparecida
             `02/11/${ano}`, // Finados
             `15/11/${ano}`, // Proclamação da República
-            `20/11/${ano}`, // Consciência Negra (Novo Feriado Nacional)
+            `20/11/${ano}`, // Consciência Negra / Zumbi
             `25/12/${ano}`  // Natal
         ];
 
-        // Adiciona os extras configurados no topo
-        FERIADOS_EXTRAS.forEach(f => feriados.push(`${f}/${ano}`));
+        // Adiciona dinamicamente qualquer feriado/emenda extra que você configurar lá no topo
+        if (typeof FERIADOS_EXTRAS !== 'undefined' && FERIADOS_EXTRAS.length > 0) {
+            FERIADOS_EXTRAS.forEach(f => feriados.push(`${f}/${ano}`));
+        }
 
+        // Algoritmo de Meeus/Jones/Butcher para encontrar a Páscoa do ano atual
         let a = ano % 19, b = Math.floor(ano / 100), c = ano % 100, d = Math.floor(b / 4), e = b % 4;
         let f = Math.floor((b + 8) / 25), g = Math.floor((b - f + 1) / 3), h = (19 * a + b - d - g + 15) % 30;
         let i = Math.floor(c / 4), k = c % 4, l = (32 + 2 * e + 2 * i - h - k) % 7;
@@ -1457,11 +1470,19 @@
         let pascoa = new Date(ano, mes - 1, dia);
         let formata = (dt) => String(dt.getDate()).padStart(2, '0') + '/' + String(dt.getMonth() + 1).padStart(2, '0') + '/' + ano;
         
+        // Feriados móveis calculados a partir da Páscoa
+        let segundaCarnaval = new Date(pascoa); segundaCarnaval.setDate(pascoa.getDate() - 48);
         let carnaval = new Date(pascoa); carnaval.setDate(pascoa.getDate() - 47);
         let sextaSanta = new Date(pascoa); sextaSanta.setDate(pascoa.getDate() - 2);
         let corpusChristi = new Date(pascoa); corpusChristi.setDate(pascoa.getDate() + 60);
         
-        feriados.push(formata(carnaval), formata(sextaSanta), formata(corpusChristi));
+        feriados.push(
+            formata(segundaCarnaval), 
+            formata(carnaval), 
+            formata(sextaSanta), 
+            formata(corpusChristi)
+        );
+        
         feriadosCacheados[ano] = feriados;
         return feriados;
     }
