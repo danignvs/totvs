@@ -30,8 +30,8 @@
                 <div class="input-item">
                     <label for="formatoSaida">Formato:</label>
                     <select id="formatoSaida">
-                        <option value="Ticket" selected>Ticket (Sem saudação/despedida)</option>
-                        <option value="Email">E-mail (Com saudação/despedida)</option>
+                        <option value="Ticket" selected>Ticket</option>
+                        <option value="Email">E-mail</option>
                     </select>
                 </div>
             </div>
@@ -228,7 +228,7 @@
                 corpoEmail += `Olá, ${obterSaudacao()}!\n\n`;
             }
 
-            corpoEmail += `Favor proceder com o faturamento abaixo:\n\n<b>Código do contrato PSA:</b> ${vals.codContrato}\n<b>Código do cliente:</b> ${vals.codCliente}\n<b>Valor líquido:</b> ${valorLiq}\n\n<b>Código do projeto:</b> ${vals.codProjeto}\n<b>Nome do projeto:</b> ${vals.nomeProjeto}\n\n<b>Justificativa:</b> ${vals.justificativa}`;
+            corpoEmail += `Favor proceder com o faturamento abaixo:\n\nCódigo do contrato PSA: ${vals.codContrato}\nCódigo do cliente: ${vals.codCliente}\nValor líquido: ${valorLiq}\n\nCódigo do projeto: ${vals.codProjeto}\nNome do projeto: ${vals.nomeProjeto}\n\nJustificativa: ${vals.justificativa}`;
 
             if (vals.formato === 'Email') {
                 corpoEmail += `\n\nAtenciosamente,`;
