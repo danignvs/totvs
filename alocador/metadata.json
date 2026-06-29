@@ -1,6 +1,0 @@
-{
-  "name": "Alocador de Projetos",
-  "description": "Distribuição e alocação automatizada de projetos para analistas, respeitando disponibilidade, feriados do Rio de Janeiro e do Brasil, com exportação fácil para planilhas.",
-  "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
-}
