@@ -9,7 +9,7 @@
             --roxo2: #833ad1;
             --roxo-bg: #f3e9ff;
             --branco: #ffffff;
-            --cinza-claro: #eeeeee;
+            --cinza-claro: #f6f6f6;
             --cinza: #c5c5c5;
             --cinza-escuro: #666666;
             --bg-fundo: #002233;
@@ -71,7 +71,7 @@
 
         .container {
             max-width: 1200px;
-            width: 95%;
+            width: 90%;
             margin: auto;
             background: var(--branco);
             padding: 30px;
@@ -677,6 +677,7 @@
 
             .container {
                 padding: 3%;
+                width: 94%;
                 border-radius: 0;
                 box-shadow: none;
                 border-top: none;
