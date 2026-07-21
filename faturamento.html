@@ -104,7 +104,7 @@
         <section class="botoes-de-acao">
             <a style="text-decoration: none;" href="https://suporte.interno.totvs.io/hc/pt-br/requests/new?ticket_form_id=43090375254931&tf_43653456041107=peso_4&tf_43093105543571=CST_PMO+Local_Gest%C3%A3o+de+Projetos_Solicita%C3%A7%C3%A3o+de+Faturamento+-+Projeto&isLeaf=level4&tf_43093056156819=01KQMPRJP2AGE5BP7D362CCRW9&tf_undefined=portal_cst_brasil&pais=Brasil&tf_49875679614355=pais_brasil&level1=PMO+Local&level2=Gest%C3%A3o+de+Projetos&level3=Solicita%C3%A7%C3%A3o+de+Faturamento+-+Projeto"
             target="_blank"><button class="btn-roxo">Ticket</button></a>
-            <button class="btn-roxo" id="btnCopiarStatus">Copiar Status</button>
+            <button class="btn-roxo" id="btnCopiarStatus">Status</button>
             <button class="btn-verde" id="btnIndicadores">Indicadores</button>
             <button class="btn-laranja" id="btnLimpar">Limpar</button>
             
@@ -319,7 +319,17 @@
         document.getElementById('btnCopiarMensagem').addEventListener('click', () => copiarTextoRico('resultadoCorpo'));
         
         document.getElementById('btnCopiarStatus').addEventListener('click', () => {
-            const txt = 'TERMO ANEXO - Faturamento Solicitado';
+            // Gera a data atual no formato DD/MM/YY (ex: 21/07/26)
+            const dataFormatada = new Intl.DateTimeFormat('pt-BR', {
+                day: '2-digit',
+                month: '2-digit',
+                year: '2-digit'
+            }).format(new Date());
+            
+            // Monta o texto final
+            const txt = `${dataFormatada} - Faturamento Solicitado`;
+            
+            // Copia para a área de transferência e mostra o toast
             navigator.clipboard.writeText(txt).then(() => mostrarToast(txt));
         });
         
