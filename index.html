@@ -184,7 +184,7 @@
             border-radius: 16px 16px 0 0;
         }
 
-        .card-fat::before { background: var(--accent-cyan); }
+        .card-azul::before { background: var(--accent-cyan); }
         .card-cont::before { background: var(--accent-purple); }
         .card-plan::before { background: var(--accent-green); }
         .card-calc::before { background: var(--accent-orange); }
@@ -237,8 +237,8 @@
             text-transform: uppercase;
         }
 
-        .btn-cyan { background: rgba(0, 219, 255, 0.1); color: var(--accent-cyan); border: 1px solid var(--accent-cyan); }
-        .btn-cyan:hover { background: var(--accent-cyan); color: #000; }
+        .btn-azul { background: rgba(0, 219, 255, 0.1); color: var(--accent-cyan); border: 1px solid var(--accent-cyan); }
+        .btn-azul:hover { background: var(--accent-cyan); color: #000; }
 
         .btn-purple { background: rgba(164, 77, 255, 0.1); color: var(--accent-purple); border: 1px solid var(--accent-purple); }
         .btn-purple:hover { background: var(--accent-purple); color: #fff; }
@@ -454,6 +454,9 @@
             <a href="item-contabil.html">Item Contábil</a>
             <a href="planejamento.html">Planejamento</a>
             <a href="planejamento-calculadora.html">Calculadora de Horas</a>
+            <a href="https://planejador-hospitalidade.vercel.app/" target="_blank">Alocador de Recursos</a>
+            <a href="https://layout-email.vercel.app/" target="_blank">Layout de E-mail</a>
+            <a href="https://fretado.vercel.app/" target="_blank">Horários de Fretado</a>
         </div>
     </nav>
 
@@ -470,7 +473,7 @@
     <main class="tools-container">
         
         <!-- Ferramenta 1: Faturamento -->
-        <article class="tool-card card-fat">
+        <article class="tool-card card-azul">
             <h2 class="tool-title">Faturamento</h2>
             <p class="tool-desc">
                 Um gerador inteligente que monta templates perfeitos para tickets e e-mails de faturamento. Ele processa códigos de projeto para gerar o contrato PSA automaticamente e adapta saudações de acordo com o horário.
@@ -480,11 +483,11 @@
                 <li>Validação e autocompletar de Contratos PSA.</li>
                 <li>Regras para "Faturamento Unilateral".</li>
             </ul>
-            <a href="faturamento.html" class="btn-acessar btn-cyan">Abrir Ferramenta</a>
+            <a href="faturamento.html" class="btn-acessar btn-azul">Abrir Ferramenta</a>
         </article>
 
         <!-- Ferramenta 2: Item Contábil -->
-        <article class="tool-card card-cont">
+        <article class="tool-card card-azul">
             <h2 class="tool-title">Item Contábil</h2>
             <p class="tool-desc">
                 Permite a inclusão rápida de múltiplos projetos simultâneos para solicitação de alteração contábil. Ele consolida códigos e nomes em uma única mensagem elegante e formatada.
@@ -494,11 +497,11 @@
                 <li>Formatação automática em negrito (Rich Text).</li>
                 <li>Ajuste automático de Assunto.</li>
             </ul>
-            <a href="item-contabil.html" class="btn-acessar btn-purple">Abrir Ferramenta</a>
+            <a href="item-contabil.html" class="btn-acessar btn-azul">Abrir Ferramenta</a>
         </article>
 
         <!-- Ferramenta 3: Planejamento -->
-        <article class="tool-card card-plan">
+        <article class="tool-card card-azul">
             <h2 class="tool-title">Planejamento</h2>
             <p class="tool-desc">
                 Uma robusta plataforma de escopo. Permite criar marcos, tarefas, atribuir horas e responsáveis. Possui recurso de arrastar-e-soltar e controle hierárquico automatizado (WBS).
@@ -508,11 +511,11 @@
                 <li>Detalhamento interno de horas por dia útil.</li>
                 <li>Gera tabela HTML pronta para o E-mail.</li>
             </ul>
-            <a href="planejamento.html" class="btn-acessar btn-green">Abrir Ferramenta</a>
+            <a href="planejamento.html" class="btn-acessar btn-azul">Abrir Ferramenta</a>
         </article>
 
         <!-- Ferramenta 4: Calculadora de Horas -->
-        <article class="tool-card card-calc">
+        <article class="tool-card card-azul">
             <h2 class="tool-title">Calculadora de Horas</h2>
             <p class="tool-desc">
                 O motor que divide horas brutas em dias úteis reais. Ele entende a matemática da Páscoa para calcular feriados móveis brasileiros até 2030, blindando o cronograma.
@@ -522,7 +525,49 @@
                 <li>Avisos visuais caso exceda 8h/dia.</li>
                 <li>Tira um "Print" invisível da tabela em imagem.</li>
             </ul>
-            <a href="planejamento-calculadora.html" class="btn-acessar btn-orange">Abrir Ferramenta</a>
+            <a href="planejamento-calculadora.html" class="btn-acessar btn-azul">Abrir Ferramenta</a>
+        </article>
+
+        <!-- Ferramenta 5: Alocador de recursos -->
+        <article class="tool-card card-azul">
+            <h2 class="tool-title">Alocador de Recursos</h2>
+            <p class="tool-desc">
+                Ideal para grandes volumes, distribui projetos pelas horas disponíveis dos analistas usando dados do PSA do Dynamics. Evita sobrecarga da equipe balanceando a capacidade.
+            </p>
+            <ul class="tool-features">
+                <li>Reconhece feriados e pula finais de semana.</li>
+                <li>Notifica picos de mais de 8 horas no dia.</li>
+                <li>Distribuição inteligente em cenários de poucas horas.</li>
+            </ul>
+            <a href="https://planejador-hospitalidade.vercel.app/" class="btn-acessar btn-azul" target="_blank">Abrir Ferramenta</a>
+        </article>
+
+        <!-- Ferramenta 6: Layout de Email -->
+        <article class="tool-card card-azul">
+            <h2 class="tool-title">Layout de E-mail</h2>
+            <p class="tool-desc">
+                Gerador de conteúdo em blocos para o Gmail, garantindo que toda comunicação siga a identidade visual da empresa de forma padronizada.
+            </p>
+            <ul class="tool-features">
+                <li>Copie e cole diretamente no corpo do e-mail.</li>
+                <li>Trabalha com blocos de edição pré-estilizados.</li>
+                <li>Salve o trabalho para carregar e editar depois.</li>
+            </ul>
+            <a href="https://layout-email.vercel.app/" class="btn-acessar btn-azul" target="_blank">Abrir Ferramenta</a>
+        </article>
+
+        <!-- Ferramenta 7: Fretado -->
+        <article class="tool-card card-azul">
+            <h2 class="tool-title">Horários de Fretado</h2>
+            <p class="tool-desc">
+                Resolve a dificuldade de leitura das planilhas de linhas, organizando horários por dias, períodos e destinos em uma interface responsiva focada no celular.
+            </p>
+            <ul class="tool-features">
+                <li>Navegação mobile rápida e otimizada.</li>
+                <li>Filtro avançado (Destino, Dia e Período).</li>
+                <li>Agendamento de notificações no desktop.</li>
+            </ul>
+            <a href="https://fretado.vercel.app/" class="btn-acessar btn-azul" target="_blank">Abrir Ferramenta</a>
         </article>
 
     </main>
