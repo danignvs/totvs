@@ -3,19 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portfólio - Daniela Genovese</title>
-    
+    <title>Portfólio de Automações — Daniela Genovese</title>
+
     <style>
-        /* ==========================================
-           TEMA DA CAPA (DARK MODE CORPORATIVO)
-           ========================================== */
         :root {
             --bg-dark: #0f172a;
             --bg-card: #1e293b;
+            --bg-card-2: #162235;
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
-            
-            /* Cores oficiais do seu projeto */
+
             --accent-cyan: #00DBFF;
             --accent-purple: #A44DFF;
             --accent-green: #01cdab;
@@ -24,68 +21,109 @@
             --accent-pink: #ff009e;
             --accent-lime: #d9ff65;
             --az-escuro: #002233;
+
+            --border: rgba(255,255,255,.08);
+            --shadow: 0 24px 70px rgba(0,0,0,.28);
+        }
+
+        @font-face {
+            font-family: 'TOTVS';
+            src: url('https://raw.githubusercontent.com/danignvs/totvs/main/fontes/TOTVS-Regular.ttf') format('truetype');
+            font-weight: 400;
+        }
+
+        @font-face {
+            font-family: 'TOTVS';
+            src: url('https://raw.githubusercontent.com/danignvs/totvs/main/fontes/TOTVS-Bold.ttf') format('truetype');
+            font-weight: 700;
+        }
+
+        @font-face {
+            font-family: 'TOTVS';
+            src: url('https://raw.githubusercontent.com/danignvs/totvs/main/fontes/TOTVS-Light.ttf') format('truetype');
+            font-weight: 300;
         }
 
         * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
-            /* Fonte oficial da identidade visual */
-            font-family: Verdana, Geneva, Tahoma, sans-serif;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 90px;
         }
 
         body {
-            background-color: var(--bg-dark);
+            background:
+                radial-gradient(circle at 10% 0%, rgba(0,219,255,.08), transparent 28%),
+                radial-gradient(circle at 90% 20%, rgba(164,77,255,.08), transparent 30%),
+                var(--bg-dark);
             color: var(--text-main);
-            overflow-x: hidden;
+            font-family: Verdana, Geneva, Tahoma, sans-serif;
             line-height: 1.6;
+            overflow-x: hidden;
         }
 
-        /* --- MENU SANDUÍCHE --- */
+        a {
+            color: inherit;
+        }
+
+        /* NAV */
         .navbar {
             position: fixed;
-            top: 0; width: 100%;
-            background: rgba(15, 23, 42, 0.9);
-            backdrop-filter: blur(10px);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 40px;
+            inset: 0 0 auto 0;
+            height: 76px;
             z-index: 1000;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 40px;
+            background: rgba(15,23,42,.88);
+            border-bottom: 1px solid var(--border);
+            backdrop-filter: blur(14px);
         }
 
         .logo {
             font-weight: 800;
-            font-size: 1.1rem;
             letter-spacing: 1px;
             text-transform: uppercase;
+            font-size: 1rem;
         }
 
-        .logo span { color: var(--accent-cyan); }
+        .logo span {
+            color: var(--accent-cyan);
+        }
 
         .hamburger {
-            font-size: 2rem;
-            cursor: pointer;
+            border: 0;
+            background: transparent;
             color: var(--text-main);
-            transition: color 0.3s;
+            font-size: 1.9rem;
+            cursor: pointer;
+            width: auto;
+            padding: 4px 8px;
         }
-        .hamburger:hover { color: var(--accent-cyan); }
+
+        .hamburger:hover {
+            color: var(--accent-cyan);
+        }
 
         .nav-menu {
             position: fixed;
-            top: 75px;
-            right: -300px;
-            width: 250px;
-            background: var(--bg-card);
-            border-radius: 0 0 0 15px;
-            box-shadow: -5px 5px 20px rgba(0,0,0,0.5);
-            transition: right 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            top: 76px;
+            right: -310px;
+            width: 290px;
             display: flex;
             flex-direction: column;
-            padding: 20px 0;
-            border-left: 1px solid rgba(255,255,255,0.05);
-            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding: 14px 0;
+            background: rgba(30,41,59,.98);
+            border-left: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            border-radius: 0 0 0 16px;
+            box-shadow: -15px 20px 45px rgba(0,0,0,.35);
+            transition: right .3s ease;
         }
 
         .nav-menu.active {
@@ -93,508 +131,791 @@
         }
 
         .nav-menu a {
-            text-decoration: none;
+            padding: 14px 28px;
             color: var(--text-muted);
-            padding: 15px 30px;
-            font-weight: 600;
-            font-size: 0.9rem;
-            transition: all 0.3s;
+            text-decoration: none;
+            font-size: .88rem;
+            font-weight: 700;
             border-left: 3px solid transparent;
+            transition: .2s;
         }
 
         .nav-menu a:hover {
             color: var(--text-main);
-            background: rgba(255,255,255,0.02);
-            border-left: 3px solid var(--accent-cyan);
+            background: rgba(255,255,255,.03);
+            border-left-color: var(--accent-cyan);
         }
 
-        /* --- HERO SECTION (CAPA) --- */
+        /* HERO */
         .hero {
-            padding: 150px 20px 80px 20px;
-            text-align: center;
-            max-width: 900px;
+            min-height: 76vh;
+            max-width: 1180px;
             margin: 0 auto;
+            padding: 150px 30px 90px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
         }
 
-        .tag-azul {
-            display: inline-block;
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            margin-bottom: 22px;
+            padding: 7px 14px;
+            border: 1px solid rgba(0,219,255,.22);
+            border-radius: 999px;
             color: var(--accent-cyan);
-            font-size: 0.85rem;
+            background: rgba(0,219,255,.07);
+            font-size: .75rem;
             font-weight: 800;
-            letter-spacing: 2px;
+            letter-spacing: 1.5px;
             text-transform: uppercase;
-            margin-bottom: 15px;
-            background: rgba(0, 219, 255, 0.1);
-            padding: 5px 15px;
-            border-radius: 20px;
-            border: 1px solid rgba(0, 219, 255, 0.2);
         }
-        
+
+        .eyebrow::before {
+            content: "";
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--accent-cyan);
+            box-shadow: 0 0 14px var(--accent-cyan);
+        }
+
         .hero h1 {
-            font-size: 2.8rem;
-            font-weight: 800;
-            margin-bottom: 20px;
-            line-height: 1.2;
+            max-width: 900px;
+            font-size: clamp(2.7rem, 7vw, 5.8rem);
+            line-height: .98;
+            letter-spacing: -3px;
             text-transform: uppercase;
-            background: -webkit-linear-gradient(45deg, var(--accent-cyan), var(--accent-purple));
+            margin-bottom: 28px;
+            background: linear-gradient(100deg, var(--accent-cyan), var(--accent-purple));
             -webkit-background-clip: text;
             background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-        .hero h1 span { color: var(--accent-cyan); }
 
         .hero p {
-            font-size: 1rem;
+            max-width: 760px;
             color: var(--text-muted);
-            max-width: 570px;
-            margin: 0 auto;
-            line-height: 1.7;
+            font-size: 1.05rem;
         }
 
-        /* --- DESTAQUE DAS FERRAMENTAS --- */
-        .tools-container {
-            max-width: 1200px;
-            margin: 0 auto 60px auto;
-            padding: 0 20px;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
-            gap: 40px;
+        .hero-stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 38px;
+        }
+
+        .stat {
+            padding: 10px 15px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: rgba(255,255,255,.025);
+            color: #cbd5e1;
+            font-size: .78rem;
+            font-weight: 700;
+        }
+
+        .stat strong {
+            color: var(--accent-cyan);
+            margin-right: 5px;
+        }
+
+        /* SECTION */
+        .section {
+            width: 100%;
+            max-width: 1180px;
+            margin: 0 auto;
+            padding: 80px 30px;
+        }
+
+        .section-heading {
+            margin-bottom: 40px;
+        }
+
+        .section-kicker {
+            color: var(--accent-cyan);
+            font-size: .75rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .section-heading h2 {
+            font-size: clamp(2rem, 4vw, 3.3rem);
+            text-transform: uppercase;
+            line-height: 1.05;
+        }
+
+        .section-heading p {
+            max-width: 700px;
+            margin-top: 12px;
+            color: var(--text-muted);
+        }
+
+        /* TOOL FULL WIDTH */
+        .tools {
+            display: flex;
+            flex-direction: column;
+            gap: 26px;
         }
 
         .tool-card {
-            background: var(--bg-card);
-            border-radius: 4px;
-            padding: 40px;
             position: relative;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            display: flex;
-            flex-direction: column;
+            display: grid;
+            grid-template-columns: minmax(0, 0.90fr) minmax(360px, 1.10fr);
+            min-height: 430px;
+            overflow: hidden;
+            background: linear-gradient(135deg, rgba(30,41,59,.98), rgba(22,34,53,.96));
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            box-shadow: 0 10px 40px rgba(0,0,0,.16);
+            transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
         }
 
         .tool-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            transform: translateY(-5px);
+            box-shadow: var(--shadow);
+            border-color: rgba(0,219,255,.16);
         }
 
         .tool-card::before {
             content: "";
             position: absolute;
-            top: 0; left: 0; width: 100%; height: 4px;
-            border-radius: 16px 16px 0 0;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 5px;
+            background: var(--accent-cyan);
         }
 
-        .card-azul::before { background: var(--accent-cyan); }
-        .card-cont::before { background: var(--accent-purple); }
-        .card-plan::before { background: var(--accent-green); }
-        .card-calc::before { background: var(--accent-orange); }
+        .tool-card:nth-child(2)::before { background: var(--accent-purple); }
+        .tool-card:nth-child(3)::before { background: var(--accent-green); }
+        .tool-card:nth-child(4)::before { background: var(--accent-orange); }
+        .tool-card:nth-child(5)::before { background: var(--accent-cyan); }
+        .tool-card:nth-child(6)::before { background: var(--accent-purple); }
+        .tool-card:nth-child(7)::before { background: var(--accent-green); }
 
-        .tool-icon { font-size: 3rem; margin-bottom: 20px; }
-        
-        .tool-title {
-            font-size: 1.5rem;
-            margin-bottom: 15px;
-            color: var(--text-main);
-            text-transform: uppercase;
+        .tool-info {
+            padding: 46px 48px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .tool-number {
+            color: var(--accent-cyan);
+            font-size: .72rem;
             font-weight: 800;
+            letter-spacing: 2px;
+            margin-bottom: 14px;
+        }
+
+        .tool-card:nth-child(2) .tool-number { color: var(--accent-purple); }
+        .tool-card:nth-child(3) .tool-number { color: var(--accent-green); }
+        .tool-card:nth-child(4) .tool-number { color: var(--accent-orange); }
+
+        .tool-title {
+            font-size: clamp(1.65rem, 3vw, 2.5rem);
+            line-height: 1.05;
+            text-transform: uppercase;
+            margin-bottom: 18px;
         }
 
         .tool-desc {
+            max-width: 650px;
             color: var(--text-muted);
-            margin-bottom: 25px;
-            font-size: 0.95rem;
-            line-height: 1.7;
-            flex-grow: 1;
+            font-size: .95rem;
+            margin-bottom: 24px;
         }
 
         .tool-features {
             list-style: none;
-            margin-bottom: 30px;
+            margin-bottom: 28px;
         }
+
         .tool-features li {
-            font-size: 0.85rem;
+            position: relative;
+            padding-left: 22px;
+            margin-bottom: 9px;
             color: #cbd5e1;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
+            font-size: .83rem;
         }
+
         .tool-features li::before {
-            content: '✓';
+            content: "✓";
+            position: absolute;
+            left: 0;
             color: var(--accent-cyan);
-            margin-right: 10px;
-            font-weight: bold;
+            font-weight: 900;
         }
 
         .btn-acessar {
-            display: inline-block;
-            padding: 12px 25px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            align-self: flex-start;
+            min-width: 190px;
+            padding: 12px 20px;
+            border: 1px solid var(--accent-cyan);
             border-radius: 8px;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 0.9rem;
-            text-align: center;
-            transition: all 0.3s;
-            text-transform: uppercase;
-        }
-
-        .btn-azul { background: rgba(0, 219, 255, 0.1); color: var(--accent-cyan); border: 1px solid var(--accent-cyan); }
-        .btn-azul:hover { background: var(--accent-cyan); color: #000; }
-
-        .btn-purple { background: rgba(164, 77, 255, 0.1); color: var(--accent-purple); border: 1px solid var(--accent-purple); }
-        .btn-purple:hover { background: var(--accent-purple); color: #fff; }
-
-        .btn-green { background: rgba(1, 205, 171, 0.1); color: var(--accent-green); border: 1px solid var(--accent-green); }
-        .btn-green:hover { background: var(--accent-green); color: #000; }
-
-        .btn-orange { background: rgba(255, 137, 0, 0.1); color: var(--accent-orange); border: 1px solid var(--accent-orange); }
-        .btn-orange:hover { background: var(--accent-orange); color: #fff; }
-
-
-        /* ==========================================
-           DIVISOR E SEÇÃO DO DESIGN SYSTEM / CSS
-           ========================================== */
-        
-        .section-divider {
-            max-width: 1200px;
-            margin: 0 auto;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .title-uikit {
-            text-align: center;
-            padding: 40px 0 20px 0;
-            font-size: 1.7em;
-            text-transform: uppercase;
-            font-weight: 400;
-            color: var(--text-main);
-        }
-        .title-uikit strong {
             color: var(--accent-cyan);
+            background: rgba(0,219,255,.07);
+            text-decoration: none;
+            font-size: .78rem;
             font-weight: 800;
-        }
-
-        .css-reference-wrapper {
-            max-width: 1200px;
-            margin: 0 auto 60px auto;
-            padding: 0 20px;
-        }
-
-        .ds-card {
-            background: var(--bg-card);
-            border-radius: 16px;
-            padding: 40px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .ds-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 40px;
-        }
-
-        .ds-title {
-            font-size: 1.2rem;
-            color: var(--text-main);
-            margin-bottom: 5px;
             text-transform: uppercase;
+            transition: .2s;
         }
 
-        .ds-desc {
-            font-size: 0.9rem;
+        .btn-acessar:hover {
+            color: #000;
+            background: var(--accent-cyan);
+        }
+
+        /* SCREENSHOT AREA */
+        .tool-preview {
+            min-height: 100%;
+            padding: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background:
+                radial-gradient(circle at 70% 30%, rgba(0,219,255,.12), transparent 30%),
+                rgba(2,8,23,.35);
+            border-left: 1px solid var(--border);
+        }
+
+        .screenshot-frame {
+            width: 100%;
+            max-width: 540px;
+            aspect-ratio: 16 / 8;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,.12);
+            border-radius: 10px;
+            background: #0b1220;
+            box-shadow: 0 25px 60px rgba(0,0,0,.4);
+        }
+
+        .screenshot-frame img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* UI KIT */
+        #uikit {
+            border-top: 1px solid rgba(255,255,255,.08);
+        }
+
+        .uikit-shell {
+            background: linear-gradient(135deg, rgba(30,41,59,.98), rgba(15,23,42,.98));
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 34px;
+            box-shadow: var(--shadow);
+        }
+
+        .uikit-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+            gap: 26px;
+        }
+
+        .uikit-panel {
+            min-width: 0;
+            padding: 28px;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            background: rgba(15,23,42,.68);
+        }
+
+        .uikit-panel h3 {
+            font-size: 1rem;
+            text-transform: uppercase;
+            margin-bottom: 7px;
+        }
+
+        .uikit-panel > p {
             color: var(--text-muted);
+            font-size: .8rem;
             margin-bottom: 20px;
         }
 
-        /* Bloco de Código HTML */
         .code-snippet {
+            overflow: auto;
+            min-height: 245px;
+            padding: 18px;
+            border: 1px solid rgba(255,255,255,.08);
+            border-radius: 9px;
             background: #0f172a;
             color: #38bdf8;
-            padding: 20px;
-            border-radius: 8px;
-            border: 1px solid rgba(255,255,255,0.1);
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 13px;
-            overflow-x: auto;
+            font-family: "Courier New", monospace;
+            font-size: 12px;
+            line-height: 1.7;
         }
+
         .code-snippet .tag { color: #f472b6; }
         .code-snippet .attr { color: #2dd4bf; }
         .code-snippet .val { color: #fde047; }
         .code-snippet .comment { color: #64748b; }
 
-        /* Estilos simulados dos componentes */
         .preview-box {
             background: #fff;
-            padding: 20px;
-            border-radius: 8px;
             color: var(--az-escuro);
+            padding: 22px;
+            border-radius: 9px;
         }
 
         .preview-box button {
-            padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer;
-            font-size: 0.8em; font-weight: 800; text-transform: uppercase; margin: 5px;
+            width: auto;
+            display: inline-flex;
+            margin: 4px;
+            padding: 9px 13px;
+            border: 0;
+            border-radius: 5px;
+            cursor: default;
+            font-size: .75rem;
+            font-weight: 800;
+            text-transform: uppercase;
         }
+
         .preview-box .btn-azul { background: var(--accent-cyan); color: var(--az-escuro); }
         .preview-box .btn-roxo { background: var(--accent-purple); color: #fff; }
         .preview-box .btn-verde { background: var(--accent-green); color: #fff; }
         .preview-box .btn-laranja { background: var(--accent-orange); color: #fff; }
-        
-        .preview-box mark { background: var(--accent-lime); color: var(--az-escuro); padding: 3px; font-weight: bold; }
-        .preview-box .badge { padding: 5px 10px; border-radius: 10px; font-size: 0.8em; font-weight: bold; margin: 5px; display: inline-block; }
-        .preview-box .bd-azul { background: var(--accent-cyan); color: var(--az-escuro); }
-        .preview-box .bd-roxo { background: var(--accent-purple); color: #fff; }
-        
-        .preview-box input {
-            width: 100%; padding: 8px; border: 1px solid #c5c5c5; border-radius: 3px; margin-top: 10px; font-family: Verdana, sans-serif;
+
+        .preview-box mark {
+            background: var(--accent-lime);
+            color: var(--az-escuro);
+            padding: 3px;
+            font-weight: bold;
         }
 
-        /* Bloco de CSS para cópia */
+        .preview-box .badge {
+            display: inline-block;
+            margin: 4px;
+            padding: 5px 10px;
+            border-radius: 10px;
+            font-size: .75rem;
+            font-weight: bold;
+        }
+
+        .preview-box .bd-azul { background: var(--accent-cyan); color: var(--az-escuro); }
+        .preview-box .bd-roxo { background: var(--accent-purple); color: #fff; }
+
+        .preview-box input {
+            width: 100%;
+            padding: 8px;
+            margin-top: 10px;
+            border: 1px solid #c5c5c5;
+            border-radius: 3px;
+            font-family: Verdana, sans-serif;
+        }
+
         .css-col {
             display: flex;
             flex-direction: column;
-            height: 100%;
+            min-width: 0;
         }
 
         .css-header {
             display: flex;
-            justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 20px;
+            justify-content: space-between;
             gap: 15px;
+            margin-bottom: 18px;
         }
 
         .copy-btn {
+            flex: 0 0 auto;
+            width: auto;
+            padding: 8px 14px;
+            border: 0;
+            border-radius: 5px;
             background: var(--text-main);
             color: var(--bg-dark);
-            border: none;
-            padding: 8px 16px;
-            border-radius: 5px;
             cursor: pointer;
-            font-weight: 600;
-            font-size: 0.85rem;
+            font-weight: 800;
+            font-size: .72rem;
             text-transform: uppercase;
-            transition: background 0.3s;
-            white-space: nowrap;
         }
-        .copy-btn:hover { background: var(--accent-cyan); color: var(--bg-dark); }
+
+        .copy-btn:hover {
+            background: var(--accent-cyan);
+        }
 
         .css-box {
             width: 100%;
-            flex-grow: 1; 
-            min-height: 250px;
-            height: 100%;
+            min-height: 520px;
+            resize: vertical;
+            outline: none;
+            padding: 18px;
+            border: 1px solid rgba(255,255,255,.08);
+            border-radius: 9px;
             background: #0f172a;
             color: #38bdf8;
-            padding: 20px;
-            border-radius: 8px;
-            border: 1px solid rgba(255,255,255,0.1);
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 12px;
-            resize: none; 
-            outline: none;
-        }
-        
-        /* Toast Notification */
-        #toast {
-            visibility: hidden;
-            min-width: 250px;
-            background-color: var(--accent-cyan);
-            color: #000;
-            text-align: center;
-            border-radius: 4px;
-            padding: 16px;
-            position: fixed;
-            z-index: 2000;
-            left: 50%;
-            bottom: 30px;
-            transform: translateX(-50%);
-            font-weight: bold;
-            opacity: 0;
-            transition: opacity 0.5s, bottom 0.5s;
-        }
-        #toast.show {
-            visibility: visible;
-            opacity: 1;
-            bottom: 50px;
+            font-family: "Courier New", monospace;
+            font-size: 11px;
+            line-height: 1.55;
         }
 
-        /* Rodapé */
+        /* FOOTER */
         .site-footer {
+            padding: 55px 25px;
+            border-top: 1px solid var(--border);
             text-align: center;
-            padding: 40px 20px;
-            margin-top: 20px;
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
             color: var(--text-muted);
-            font-size: 0.85rem;
+            font-size: .78rem;
         }
+
         .site-footer strong {
             color: var(--text-main);
         }
 
-        @media (max-width: 900px) {
-            .ds-grid { grid-template-columns: 1fr; }
-            .css-box { height: 300px; flex-grow: 0; }
+        #toast {
+            position: fixed;
+            left: 50%;
+            bottom: 28px;
+            z-index: 2000;
+            min-width: 240px;
+            padding: 14px 18px;
+            border-radius: 7px;
+            background: var(--accent-cyan);
+            color: #000;
+            text-align: center;
+            font-size: .8rem;
+            font-weight: 800;
+            box-shadow: 0 10px 30px rgba(0,0,0,.35);
+            transform: translate(-50%, 30px);
+            opacity: 0;
+            pointer-events: none;
+            transition: .25s;
         }
 
-        @media (max-width: 768px) {
-            .hero h1 { font-size: 2rem; }
-            .tools-container { grid-template-columns: 1fr; }
-            .ds-card { padding: 20px; }
-            .css-header { flex-direction: column; }
+        #toast.show {
+            opacity: 1;
+            transform: translate(-50%, 0);
+        }
+
+        @media (min-width: 901px) {
+            .uikit-grid { align-items: stretch; }
+            .uikit-css-col { height: 100%; display: flex; flex-direction: column; }
+            .uikit-css-box { flex: 1 1 auto; min-height: 0; height: auto; }
+        }
+
+        @media (max-width: 900px) {
+            .tool-card,
+            .uikit-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .tool-preview {
+                min-height: 300px;
+                border-left: 0;
+                border-top: 1px solid var(--border);
+            }
+
+            .hero {
+                min-height: auto;
+            }
+        }
+
+        @media (max-width: 650px) {
+            .navbar {
+                padding: 0 18px;
+            }
+
+            .hero,
+            .section {
+                padding-left: 18px;
+                padding-right: 18px;
+            }
+
+            .hero {
+                padding-top: 125px;
+                padding-bottom: 65px;
+            }
+
+            .hero h1 {
+                letter-spacing: -1.5px;
+            }
+
+            .tool-info {
+                padding: 32px 26px;
+            }
+
+            .tool-preview {
+                padding: 18px;
+                min-height: 235px;
+            }
+
+            .uikit-shell,
+            .uikit-panel {
+                padding: 20px;
+            }
+
+            .css-header {
+                flex-direction: column;
+            }
+
+            .copy-btn {
+                width: 100%;
+            }
         }
     </style>
 </head>
+
 <body>
 
-    <!-- NAVBAR COM MENU SANDUÍCHE -->
     <nav class="navbar">
         <div class="logo">Daniela <span>Genovese</span></div>
-        <div class="hamburger" onclick="toggleMenu()">☰</div>
+
+        <button class="hamburger" id="hamburger" type="button"
+                aria-label="Abrir menu" aria-expanded="false">☰</button>
+
         <div class="nav-menu" id="navMenu">
             <a href="faturamento.html">Faturamento</a>
             <a href="item-contabil.html">Item Contábil</a>
             <a href="planejamento.html">Planejamento</a>
             <a href="planejamento-calculadora.html">Calculadora de Horas</a>
-            <a href="https://planejador-hospitalidade.vercel.app/" target="_blank">Alocador de Recursos</a>
-            <a href="https://layout-email.vercel.app/" target="_blank">Layout de E-mail</a>
-            <a href="https://fretado.vercel.app/" target="_blank">Horários de Fretado</a>
+            <a href="https://planejador-hospitalidade.vercel.app/" target="_blank" rel="noopener">Alocador de Recursos</a>
+            <a href="https://layout-email.vercel.app/" target="_blank" rel="noopener">Layout de E-mail</a>
+            <a href="https://fretado.vercel.app/" target="_blank" rel="noopener">Horários de Fretado</a>
+            <a href="#uikit">UI Kit &amp; Dev</a>
         </div>
     </nav>
 
-    <!-- CABEÇALHO -->
     <header class="hero">
-        <span class="tag-azul" style="display: none;">Workspace Operacional</span>
+        <div class="eyebrow">Workspace Operacional</div>
+
         <h1>Portfólio de Automações</h1>
-        <p>Aplicações desenvolvidas para eliminar trabalho repetitivo, padronizar a comunicação e automatizar a inteligência da gestão de projetos.</p>
+
+        <p>
+            Aplicações desenvolvidas para eliminar trabalho repetitivo,
+            padronizar processos, melhorar a experiência de uso e transformar
+            tarefas operacionais em ferramentas simples e inteligentes.
+        </p>
+
+        <div class="hero-stats">
+            <div class="stat"><strong>07</strong> ferramentas</div>
+            <div class="stat"><strong>UI</strong> padronizada</div>
+            <div class="stat"><strong>UX</strong> orientada ao uso real</div>
+        </div>
     </header>
 
-    <!-- ==========================================
-         SEÇÃO 1: GRID DAS FERRAMENTAS
-         ========================================== -->
-    <main class="tools-container">
-        
-        <!-- Ferramenta 1: Faturamento -->
-        <article class="tool-card card-azul">
-            <h2 class="tool-title">Faturamento</h2>
-            <p class="tool-desc">
-                Um gerador inteligente que monta templates perfeitos para tickets e e-mails de faturamento. Ele processa códigos de projeto para gerar o contrato PSA automaticamente e adapta saudações de acordo com o horário.
-            </p>
-            <ul class="tool-features">
-                <li>Separação entre Ticket e E-mail corporativo.</li>
-                <li>Validação e autocompletar de Contratos PSA.</li>
-                <li>Regras para "Faturamento Unilateral".</li>
-            </ul>
-            <a href="faturamento.html" class="btn-acessar btn-azul">Abrir Ferramenta</a>
-        </article>
+    <main>
 
-        <!-- Ferramenta 2: Item Contábil -->
-        <article class="tool-card card-azul">
-            <h2 class="tool-title">Item Contábil</h2>
-            <p class="tool-desc">
-                Permite a inclusão rápida de múltiplos projetos simultâneos para solicitação de alteração contábil. Ele consolida códigos e nomes em uma única mensagem elegante e formatada.
-            </p>
-            <ul class="tool-features">
-                <li>Adição dinâmica e ilimitada de linhas.</li>
-                <li>Formatação automática em negrito (Rich Text).</li>
-                <li>Ajuste automático de Assunto.</li>
-            </ul>
-            <a href="item-contabil.html" class="btn-acessar btn-azul">Abrir Ferramenta</a>
-        </article>
+        <section class="section" id="ferramentas">
+            <!--div class="section-heading">
+                <div class="section-kicker">Projetos desenvolvidos</div>
+                <h2>Ferramentas</h2>
+                <p>
+                    Soluções criadas a partir de problemas reais do dia a dia,
+                    com foco em automação, produtividade, padronização e facilidade de uso.
+                </p>
+            </div-->
 
-        <!-- Ferramenta 3: Planejamento -->
-        <article class="tool-card card-azul">
-            <h2 class="tool-title">Planejamento</h2>
-            <p class="tool-desc">
-                Uma robusta plataforma de escopo. Permite criar marcos, tarefas, atribuir horas e responsáveis. Possui recurso de arrastar-e-soltar e controle hierárquico automatizado (WBS).
-            </p>
-            <ul class="tool-features">
-                <li>Hierarquia automática (Ex: 1.1, 1.2).</li>
-                <li>Detalhamento interno de horas por dia útil.</li>
-                <li>Gera tabela HTML pronta para o E-mail.</li>
-            </ul>
-            <a href="planejamento.html" class="btn-acessar btn-azul">Abrir Ferramenta</a>
-        </article>
+            <div class="tools">
 
-        <!-- Ferramenta 4: Calculadora de Horas -->
-        <article class="tool-card card-azul">
-            <h2 class="tool-title">Calculadora de Horas</h2>
-            <p class="tool-desc">
-                O motor que divide horas brutas em dias úteis reais. Ele entende a matemática da Páscoa para calcular feriados móveis brasileiros até 2030, blindando o cronograma.
-            </p>
-            <ul class="tool-features">
-                <li>Reconhece Feriados Nacionais.</li>
-                <li>Avisos visuais caso exceda 8h/dia.</li>
-                <li>Tira um "Print" invisível da tabela em imagem.</li>
-            </ul>
-            <a href="planejamento-calculadora.html" class="btn-acessar btn-azul">Abrir Ferramenta</a>
-        </article>
+                <article class="tool-card">
+                    <div class="tool-info">
+                        <div class="tool-number">01 / OPERAÇÃO</div>
+                        <h2 class="tool-title">Faturamento</h2>
+                        <p class="tool-desc">
+                            Um gerador inteligente que monta templates para tickets e
+                            e-mails de faturamento. Processa códigos de projeto para
+                            gerar o contrato PSA automaticamente e adapta saudações
+                            de acordo com o horário.
+                        </p>
+                        <ul class="tool-features">
+                            <li>Separação entre Ticket e E-mail corporativo.</li>
+                            <li>Validação e autocompletar de Contratos PSA.</li>
+                            <li>Regras para "Faturamento Unilateral".</li>
+                        </ul>
+                        <a href="faturamento.html" class="btn-acessar">Abrir Ferramenta →</a>
+                    </div>
 
-        <!-- Ferramenta 5: Alocador de recursos -->
-        <article class="tool-card card-azul">
-            <h2 class="tool-title">Alocador de Recursos</h2>
-            <p class="tool-desc">
-                Ideal para grandes volumes, distribui projetos pelas horas disponíveis dos analistas usando dados do PSA do Dynamics. Evita sobrecarga da equipe balanceando a capacidade.
-            </p>
-            <ul class="tool-features">
-                <li>Reconhece feriados e pula finais de semana.</li>
-                <li>Notifica picos de mais de 8 horas no dia.</li>
-                <li>Distribuição inteligente em cenários de poucas horas.</li>
-            </ul>
-            <a href="https://planejador-hospitalidade.vercel.app/" class="btn-acessar btn-azul" target="_blank">Abrir Ferramenta</a>
-        </article>
+                    <div class="tool-preview">
+                        <div class="screenshot-frame">
+                           <img src="imagens/index/faturamento.png" alt="Print da ferramenta de Faturamento">
+                        </div>
+                    </div>
+                </article>
 
-        <!-- Ferramenta 6: Layout de Email -->
-        <article class="tool-card card-azul">
-            <h2 class="tool-title">Layout de E-mail</h2>
-            <p class="tool-desc">
-                Gerador de conteúdo em blocos para o Gmail, garantindo que toda comunicação siga a identidade visual da empresa de forma padronizada.
-            </p>
-            <ul class="tool-features">
-                <li>Copie e cole diretamente no corpo do e-mail.</li>
-                <li>Trabalha com blocos de edição pré-estilizados.</li>
-                <li>Salve o trabalho para carregar e editar depois.</li>
-            </ul>
-            <a href="https://layout-email.vercel.app/" class="btn-acessar btn-azul" target="_blank">Abrir Ferramenta</a>
-        </article>
+                <article class="tool-card">
+                    <div class="tool-info">
+                        <div class="tool-number">02 / CONTABILIDADE</div>
+                        <h2 class="tool-title">Item Contábil</h2>
+                        <p class="tool-desc">
+                            Permite a inclusão rápida de múltiplos projetos simultâneos
+                            para solicitação de alteração contábil. Consolida códigos
+                            e nomes em uma única mensagem formatada.
+                        </p>
+                        <ul class="tool-features">
+                            <li>Adição dinâmica e ilimitada de linhas.</li>
+                            <li>Formatação automática em negrito (Rich Text).</li>
+                            <li>Ajuste automático de Assunto.</li>
+                        </ul>
+                        <a href="item-contabil.html" class="btn-acessar">Abrir Ferramenta →</a>
+                    </div>
 
-        <!-- Ferramenta 7: Fretado -->
-        <article class="tool-card card-azul">
-            <h2 class="tool-title">Horários de Fretado</h2>
-            <p class="tool-desc">
-                Resolve a dificuldade de leitura das planilhas de linhas, organizando horários por dias, períodos e destinos em uma interface responsiva focada no celular.
-            </p>
-            <ul class="tool-features">
-                <li>Navegação mobile rápida e otimizada.</li>
-                <li>Filtro avançado (Destino, Dia e Período).</li>
-                <li>Agendamento de notificações no desktop.</li>
-            </ul>
-            <a href="https://fretado.vercel.app/" class="btn-acessar btn-azul" target="_blank">Abrir Ferramenta</a>
-        </article>
+                    <div class="tool-preview">
+                        <div class="screenshot-frame">
+                            <img src="imagens/index/item-contabil.png" alt="Print da ferramenta de Item Contábil">
+                        </div>
+                    </div>
+                </article>
 
-    </main>
+                <article class="tool-card">
+                    <div class="tool-info">
+                        <div class="tool-number">03 / GESTÃO</div>
+                        <h2 class="tool-title">Planejamento</h2>
+                        <p class="tool-desc">
+                            Uma plataforma de escopo para criar marcos, tarefas,
+                            atribuir horas e responsáveis. Possui arrastar-e-soltar
+                            e controle hierárquico automatizado (WBS).
+                        </p>
+                        <ul class="tool-features">
+                            <li>Hierarquia automática (Ex: 1.1, 1.2).</li>
+                            <li>Detalhamento interno de horas por dia útil.</li>
+                            <li>Gera tabela HTML pronta para o E-mail.</li>
+                        </ul>
+                        <a href="planejamento.html" class="btn-acessar">Abrir Ferramenta →</a>
+                    </div>
 
+                    <div class="tool-preview">
+                        <div class="screenshot-frame">
+                            <img src="imagens/index/planejamento.png" alt="Print da ferramenta de Planejamento">
+                        </div>
+                    </div>
+                </article>
 
-    <!-- ==========================================
-         SEÇÃO 2: DESIGN SYSTEM / CÓDIGO CSS
-         ========================================== -->
-         
-    <div class="section-divider"></div>
+                <article class="tool-card">
+                    <div class="tool-info">
+                        <div class="tool-number">04 / PRODUTIVIDADE</div>
+                        <h2 class="tool-title">Calculadora de Horas</h2>
+                        <p class="tool-desc">
+                            O motor que divide horas brutas em dias úteis reais.
+                            Entende a matemática da Páscoa para calcular feriados
+                            móveis brasileiros até 2030, ajudando a proteger o cronograma.
+                        </p>
+                        <ul class="tool-features">
+                            <li>Reconhece Feriados Nacionais.</li>
+                            <li>Avisos visuais caso exceda 8h/dia.</li>
+                            <li>Tira um "Print" invisível da tabela em imagem.</li>
+                        </ul>
+                        <a href="planejamento-calculadora.html" class="btn-acessar">Abrir Ferramenta →</a>
+                    </div>
 
-    <div class="title-uikit">
-        <h2><strong>UI Kit</strong> & Dev</h2>
-    </div>
+                    <div class="tool-preview">
+                        <div class="screenshot-frame">
+                            <img src="imagens/index/calculadora.png" alt="Print da ferramenta de Calculadora de Horas">
+                        </div>
+                    </div>
+                </article>
 
-    <section class="css-reference-wrapper">
-        <div class="ds-card">
-            
-            <div class="ds-grid">
-                
-                <!-- COLUNA 1: Estrutura HTML e Componentes (Empilhados) -->
-                <div style="display: flex; flex-direction: column; gap: 40px;">
-                    
-                    <div>
-                        <h3 class="ds-title">Estrutura Base (Layout)</h3>
-                        <p class="ds-desc">Use este template HTML no Gemini para gerar o Grid padrão de duas colunas (Formulário e Resultado).</p>
-                        
+                <article class="tool-card">
+                    <div class="tool-info">
+                        <div class="tool-number">05 / ALOCAÇÃO</div>
+                        <h2 class="tool-title">Alocador de Recursos</h2>
+                        <p class="tool-desc">
+                            Ideal para grandes volumes de projetos. Utiliza as horas
+                            disponíveis dos analistas obtidas no PSA do Dynamics e
+                            distribui os projetos pela capacidade existente, evitando
+                            sobrecarga e reduzindo o trabalho manual.
+                        </p>
+                        <ul class="tool-features">
+                            <li>Reconhece feriados e pula finais de semana.</li>
+                            <li>Notifica picos de mais de 8 horas no dia.</li>
+                            <li>Distribuição inteligente em cenários de poucas horas disponíveis.</li>
+                        </ul>
+                        <a href="https://planejador-hospitalidade.vercel.app/" class="btn-acessar" target="_blank" rel="noopener">Abrir Ferramenta →</a>
+                    </div>
+
+                    <div class="tool-preview">
+                        <div class="screenshot-frame">
+                            <img src="imagens/index/alocador.png" alt="Print da ferramenta de Alocador de Recursos">
+                        </div>
+                    </div>
+                </article>
+
+                <article class="tool-card">
+                    <div class="tool-info">
+                        <div class="tool-number">06 / COMUNICAÇÃO</div>
+                        <h2 class="tool-title">Layout de E-mail</h2>
+                        <p class="tool-desc">
+                            Gerador de conteúdo em blocos para o Gmail, criado para
+                            manter a comunicação dentro da identidade visual da empresa
+                            sem exigir conhecimento de HTML.
+                        </p>
+                        <ul class="tool-features">
+                            <li>Copie e cole diretamente no corpo do e-mail.</li>
+                            <li>Trabalha com blocos de edição pré-estilizados.</li>
+                            <li>Salve o trabalho para carregar e editar depois.</li>
+                        </ul>
+                        <a href="https://layout-email.vercel.app/" class="btn-acessar" target="_blank" rel="noopener">Abrir Ferramenta →</a>
+                    </div>
+
+                    <div class="tool-preview">
+                        <div class="screenshot-frame">
+                            <img src="imagens/index/layout-email.png" alt="Print da ferramenta de Layout de E-mail">
+                        </div>
+                    </div>
+                </article>
+
+                <article class="tool-card">
+                    <div class="tool-info">
+                        <div class="tool-number">07 / EXPERIÊNCIA</div>
+                        <h2 class="tool-title">Horários de Fretado</h2>
+                        <p class="tool-desc">
+                            Criado para resolver a dificuldade de leitura da tabela
+                            original de horários de fretado, principalmente no celular.
+                            Organiza as informações de forma visual por dias, períodos
+                            e destinos.
+                        </p>
+                        <ul class="tool-features">
+                            <li>Navegação mobile rápida e otimizada.</li>
+                            <li>Organização por Destino, Dia e Período.</li>
+                            <li>Agendamento de notificações no desktop.</li>
+                        </ul>
+                        <a href="https://fretado.vercel.app/" class="btn-acessar" target="_blank" rel="noopener">Abrir Ferramenta →</a>
+                    </div>
+
+                    <div class="tool-preview">
+                        <div class="screenshot-frame">
+                            <img src="imagens/index/fretado.png" alt="Print da ferramenta de Horários de Fretado">
+                        </div>
+                    </div>
+                </article>
+
+            </div>
+        </section>
+
+        <!-- UI KIT: CONTEÚDO ORIGINAL PRESERVADO 
+        <section class="section" id="uikit">
+            <div class="section-heading">
+                <div class="section-kicker">Design System / CSS</div>
+                <h2>UI Kit &amp; Dev</h2>
+                <p>
+                    Referência original de estrutura HTML, componentes e contexto CSS
+                    utilizado nas ferramentas.
+                </p>
+            </div>
+
+            <div class="uikit-shell">
+
+                <div class="uikit-grid">
+
+                    <div class="uikit-panel">
+                        <h3>Estrutura Base (Layout)</h3>
+                        <p>Use este template HTML no Gemini para gerar o Grid padrão de duas colunas (Formulário e Resultado).</p>
+
                         <div class="code-snippet">
 <span class="tag">&lt;main</span> <span class="attr">class=</span><span class="val">"container container-azul"</span><span class="tag">&gt;</span>
 
@@ -615,46 +936,40 @@
 
 <span class="tag">&lt;/main&gt;</span>
                         </div>
-                    </div>
 
-                    <div>
-                        <h3 class="ds-title">Componentes (Preview)</h3>
-                        <p class="ds-desc">Classes disponíveis no CSS global para botões, inputs e destaques.</p>
-                        
-                        <div class="preview-box">
-                            <div style="margin-bottom: 15px;">
-                                <button class="btn-azul">btn-azul</button>
-                                <button class="btn-roxo">btn-roxo</button>
-                                <button class="btn-verde">btn-verde</button>
-                                <button class="btn-laranja">btn-laranja</button>
-                            </div>
-                            
-                            <div style="margin-bottom: 15px; font-size: 0.9em;">
-                                Texto com <mark>mark-limao</mark> para destaque.<br><br>
-                                <span class="badge bd-azul">destaque-azul</span>
-                                <span class="badge bd-roxo">destaque-roxo</span>
-                            </div>
-                            
-                            <div class="input-group">
+                        <div style="margin-top: 28px;">
+                            <h3>Componentes (Preview)</h3>
+                            <p>Classes disponíveis no CSS global para botões, inputs e destaques.</p>
+
+                            <div class="preview-box">
+                                <div style="margin-bottom: 15px;">
+                                    <button class="btn-azul">btn-azul</button>
+                                    <button class="btn-roxo">btn-roxo</button>
+                                    <button class="btn-verde">btn-verde</button>
+                                    <button class="btn-laranja">btn-laranja</button>
+                                </div>
+
+                                <div style="margin-bottom: 15px; font-size: .9em;">
+                                    Texto com <mark>mark-limao</mark> para destaque.<br><br>
+                                    <span class="badge bd-azul">destaque-azul</span>
+                                    <span class="badge bd-roxo">destaque-roxo</span>
+                                </div>
+
                                 <input type="text" placeholder="input[type='text'] padrão responsivo">
                             </div>
                         </div>
                     </div>
 
-                </div>
-
-                <!-- COLUNA 2: Contexto CSS para IAs (Ocupa a mesma altura) -->
-                <div class="css-col">
-                    <div class="css-header">
-                        <div>
-                            <h3 class="ds-title">Contexto de CSS</h3>
-                            <p class="ds-desc" style="margin-bottom: 0;">Copie o código abaixo e alimente o Gemini/Notebook LM.</p>
+                    <div class="uikit-panel css-col">
+                        <div class="css-header">
+                            <div>
+                                <h3>Contexto de CSS</h3>
+                                <p style="margin-bottom:0;">Copie o código abaixo e alimente o Gemini/Notebook LM.</p>
+                            </div>
+                            <button class="copy-btn" id="copyCss" type="button">Copiar CSS</button>
                         </div>
-                        <button class="copy-btn" onclick="copiarCSS()">Copiar CSS</button>
-                    </div>
-                    
-                    <textarea id="cssTextarea" class="css-box" readonly>
-:root {
+
+                        <textarea id="cssTextarea" class="css-box" readonly>:root {
     --az-escuro: #002233;
     --preto: #000;
     --az-claro: #00DBFF;
@@ -724,7 +1039,7 @@ strong { font-weight: 800; }
     display: grid;
     grid-template-columns: 1.5fr 1fr;
     gap: 30px;
-    grid-template-areas: 
+    grid-template-areas:
         "form result"
         "buttons result";
     align-items: start;
@@ -846,50 +1161,76 @@ pre { white-space: pre-wrap; word-break: break-all; padding: 5px; background-col
     .menu { flex-direction: column; gap: 20px; }
     .menu button:not(:last-child)::after, .menu a:not(:last-child)::after { display: none; }
 }</textarea>
-                </div>
-                
-            </div>
-        </div>
-    </section>
+                    </div>
 
-    <!-- FOOTER DA CAPA -->
+                </div>
+            </div>
+        </section>
+
+        -->
+
+    </main>
+
     <footer class="site-footer">
-        <p>Desenvolvido por <strong>Daniela Genovese</strong> &copy; 2026<br>
-        Portfólio de Automações e Workspace Operacional</p>
+        <p>
+            Desenvolvido por <strong>Daniela Genovese</strong> &copy; 2026<br>
+            Portfólio de Automações e Workspace Operacional
+        </p>
     </footer>
 
-    <div id="toast">Copiado para a área de transferência!</div>
+    <div id="toast">CSS copiado!</div>
 
-    <!-- SCRIPT DO MENU E CÓPIA DE CSS -->
     <script>
-        function toggleMenu() {
-            document.getElementById("navMenu").classList.toggle("active");
-        }
+        const hamburger = document.getElementById("hamburger");
+        const navMenu = document.getElementById("navMenu");
+        const copyCss = document.getElementById("copyCss");
+        const cssTextarea = document.getElementById("cssTextarea");
+        const toast = document.getElementById("toast");
 
-        // Fecha o menu ao clicar fora dele
-        document.addEventListener('click', function(event) {
-            const menu = document.getElementById("navMenu");
-            const hamburger = document.querySelector(".hamburger");
-            
-            if (!menu.contains(event.target) && !hamburger.contains(event.target)) {
-                menu.classList.remove("active");
+        hamburger.addEventListener("click", function (event) {
+            event.stopPropagation();
+
+            const active = navMenu.classList.toggle("active");
+            hamburger.setAttribute("aria-expanded", active ? "true" : "false");
+        });
+
+        navMenu.addEventListener("click", function (event) {
+            if (event.target.tagName === "A") {
+                navMenu.classList.remove("active");
+                hamburger.setAttribute("aria-expanded", "false");
             }
         });
 
-        function copiarCSS() {
-            const textarea = document.getElementById("cssTextarea");
-            textarea.select();
-            textarea.setSelectionRange(0, 99999); // Para mobile
+        document.addEventListener("click", function (event) {
+            if (!navMenu.contains(event.target) && !hamburger.contains(event.target)) {
+                navMenu.classList.remove("active");
+                hamburger.setAttribute("aria-expanded", "false");
+            }
+        });
 
-            navigator.clipboard.writeText(textarea.value).then(() => {
-                const toast = document.getElementById("toast");
+        copyCss.addEventListener("click", async function () {
+            try {
+                await navigator.clipboard.writeText(cssTextarea.value);
                 toast.textContent = "CSS copiado! Cole no Gemini/NotebookLM.";
-                toast.className = "show";
-                setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 3000);
-            }).catch(err => {
-                console.error('Falha ao copiar:', err);
-            });
-        }
+                toast.classList.add("show");
+
+                setTimeout(function () {
+                    toast.classList.remove("show");
+                }, 3000);
+            } catch (error) {
+                cssTextarea.focus();
+                cssTextarea.select();
+                document.execCommand("copy");
+
+                toast.textContent = "CSS copiado!";
+                toast.classList.add("show");
+
+                setTimeout(function () {
+                    toast.classList.remove("show");
+                }, 3000);
+            }
+        });
     </script>
+
 </body>
 </html>
