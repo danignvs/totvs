@@ -3,132 +3,848 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="robots" content="noindex, nofollow">
-    <title>Portal de Ferramentas - TOTVS</title>
-    <link rel="stylesheet" href="style.css">
-
+    <title>Portfólio - Daniela Genovese</title>
+    
     <style>
-        /* Centraliza o conteúdo verticalmente e horizontalmente na tela toda */
-        body {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh; /* Ocupa 100% da altura da janela */
+        /* ==========================================
+           TEMA DA CAPA (DARK MODE CORPORATIVO)
+           ========================================== */
+        :root {
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            
+            /* Cores oficiais do seu projeto */
+            --accent-cyan: #00DBFF;
+            --accent-purple: #A44DFF;
+            --accent-green: #01cdab;
+            --accent-orange: #ff8900;
+            --accent-red: #ff4400;
+            --accent-pink: #ff009e;
+            --accent-lime: #d9ff65;
+            --az-escuro: #002233;
+        }
+
+        * {
             margin: 0;
-            padding: 20px;
+            padding: 0;
             box-sizing: border-box;
+            /* Fonte oficial da identidade visual */
+            font-family: Verdana, Geneva, Tahoma, sans-serif;
         }
 
-        /* Estrutura principal lado a lado */
-        .grade {
-            width: 100%;
-            max-width: 900px;
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* --- MENU SANDUÍCHE --- */
+        .navbar {
+            position: fixed;
+            top: 0; width: 100%;
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(10px);
             display: flex;
-            flex-direction: row;
+            justify-content: space-between;
             align-items: center;
-            justify-content: space-between; /* Afasta o título do menu */
-            gap: 40px; /* Garante que nunca grudem um no outro */
+            padding: 20px 40px;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         }
 
-        /* Tipografia do Título */
-        h1 {
-            font-size: 3rem; /* Tamanho mais imponente no desktop */
-            margin: 0;            
-            color: var(--branco);
-            font-weight: 400;
-            text-align: left;
-            line-height: 1.1;
-            flex: 1; /* Permite que o título ocupe o espaço livre */
+        .logo {
+            font-weight: 800;
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
         }
 
-        h1 strong {
-            font-weight: 800; /* Garante o negrito no TOTVS */
-        }
+        .logo span { color: var(--accent-cyan); }
 
-        /* Container dos Botões */
-        .menu-container {
+        .hamburger {
+            font-size: 2rem;
+            cursor: pointer;
+            color: var(--text-main);
+            transition: color 0.3s;
+        }
+        .hamburger:hover { color: var(--accent-cyan); }
+
+        .nav-menu {
+            position: fixed;
+            top: 75px;
+            right: -300px;
+            width: 250px;
+            background: var(--bg-card);
+            border-radius: 0 0 0 15px;
+            box-shadow: -5px 5px 20px rgba(0,0,0,0.5);
+            transition: right 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             display: flex;
             flex-direction: column;
-            gap: 20px;
-            width: auto;
+            padding: 20px 0;
+            border-left: 1px solid rgba(255,255,255,0.05);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
         }
 
-        /* Estilo base dos botões */
-        .btn-menu {
+        .nav-menu.active {
+            right: 0;
+        }
+
+        .nav-menu a {
+            text-decoration: none;
+            color: var(--text-muted);
+            padding: 15px 30px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-menu a:hover {
+            color: var(--text-main);
+            background: rgba(255,255,255,0.02);
+            border-left: 3px solid var(--accent-cyan);
+        }
+
+        /* --- HERO SECTION (CAPA) --- */
+        .hero {
+            padding: 150px 20px 80px 20px;
+            text-align: center;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .tag-azul {
+            display: inline-block;
+            color: var(--accent-cyan);
+            font-size: 0.85rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+            background: rgba(0, 219, 255, 0.1);
+            padding: 5px 15px;
+            border-radius: 20px;
+            border: 1px solid rgba(0, 219, 255, 0.2);
+        }
+        
+        .hero h1 {
+            font-size: 2.8rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+            line-height: 1.2;
+            text-transform: uppercase;
+            background: -webkit-linear-gradient(45deg, var(--accent-cyan), var(--accent-purple));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .hero h1 span { color: var(--accent-cyan); }
+
+        .hero p {
+            font-size: 1rem;
+            color: var(--text-muted);
+            max-width: 570px;
+            margin: 0 auto;
+            line-height: 1.7;
+        }
+
+        /* --- DESTAQUE DAS FERRAMENTAS --- */
+        .tools-container {
+            max-width: 1200px;
+            margin: 0 auto 60px auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 40px;
+        }
+
+        .tool-card {
+            background: var(--bg-card);
+            border-radius: 4px;
+            padding: 40px;
+            position: relative;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .tool-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+
+        .tool-card::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 4px;
+            border-radius: 16px 16px 0 0;
+        }
+
+        .card-fat::before { background: var(--accent-cyan); }
+        .card-cont::before { background: var(--accent-purple); }
+        .card-plan::before { background: var(--accent-green); }
+        .card-calc::before { background: var(--accent-orange); }
+
+        .tool-icon { font-size: 3rem; margin-bottom: 20px; }
+        
+        .tool-title {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: var(--text-main);
+            text-transform: uppercase;
+            font-weight: 800;
+        }
+
+        .tool-desc {
+            color: var(--text-muted);
+            margin-bottom: 25px;
+            font-size: 0.95rem;
+            line-height: 1.7;
+            flex-grow: 1;
+        }
+
+        .tool-features {
+            list-style: none;
+            margin-bottom: 30px;
+        }
+        .tool-features li {
+            font-size: 0.85rem;
+            color: #cbd5e1;
+            margin-bottom: 8px;
             display: flex;
             align-items: center;
-            justify-content: center;
-            text-decoration: none;
-            padding: 18px 40px;
-            font-size: 1.2rem;
-            text-transform: uppercase;
-            border-radius: 50px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            transition: transform 0.2s, box-shadow 0.2s;
-            min-width: 260px; /* Largura mínima unificada */
-            box-sizing: border-box;
-            border: none;
-            cursor: pointer;
+        }
+        .tool-features li::before {
+            content: '✓';
+            color: var(--accent-cyan);
+            margin-right: 10px;
             font-weight: bold;
         }
 
-        .btn-menu:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+        .btn-acessar {
+            display: inline-block;
+            padding: 12px 25px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-align: center;
+            transition: all 0.3s;
+            text-transform: uppercase;
         }
 
-        /* Responsividade para telas menores (celulares e tablets pequenos) */
-        @media (max-width: 800px) {
-            .grade {
-                flex-direction: column;
-                justify-content: center;
-                gap: 50px;
-                padding: 0;
-            }
+        .btn-cyan { background: rgba(0, 219, 255, 0.1); color: var(--accent-cyan); border: 1px solid var(--accent-cyan); }
+        .btn-cyan:hover { background: var(--accent-cyan); color: #000; }
 
-            h1 {
-                text-align: center;
-                font-size: 2.5rem;
-            }
-            
-            .menu-container {
-                width: 100%;
-                align-items: center; /* Centraliza os botões no mobile */
-            }
-            
-            .btn-menu {
-                width: 100%;
-                max-width: 350px; /* Evita que o botão fique gigante no mobile */
-            }
+        .btn-purple { background: rgba(164, 77, 255, 0.1); color: var(--accent-purple); border: 1px solid var(--accent-purple); }
+        .btn-purple:hover { background: var(--accent-purple); color: #fff; }
+
+        .btn-green { background: rgba(1, 205, 171, 0.1); color: var(--accent-green); border: 1px solid var(--accent-green); }
+        .btn-green:hover { background: var(--accent-green); color: #000; }
+
+        .btn-orange { background: rgba(255, 137, 0, 0.1); color: var(--accent-orange); border: 1px solid var(--accent-orange); }
+        .btn-orange:hover { background: var(--accent-orange); color: #fff; }
+
+
+        /* ==========================================
+           DIVISOR E SEÇÃO DO DESIGN SYSTEM / CSS
+           ========================================== */
+        
+        .section-divider {
+            max-width: 1200px;
+            margin: 0 auto;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
         }
         
+        .title-uikit {
+            text-align: center;
+            padding: 40px 0 20px 0;
+            font-size: 1.7em;
+            text-transform: uppercase;
+            font-weight: 400;
+            color: var(--text-main);
+        }
+        .title-uikit strong {
+            color: var(--accent-cyan);
+            font-weight: 800;
+        }
+
+        .css-reference-wrapper {
+            max-width: 1200px;
+            margin: 0 auto 60px auto;
+            padding: 0 20px;
+        }
+
+        .ds-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .ds-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+
+        .ds-title {
+            font-size: 1.2rem;
+            color: var(--text-main);
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+
+        .ds-desc {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+        }
+
+        /* Bloco de Código HTML */
+        .code-snippet {
+            background: #0f172a;
+            color: #38bdf8;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.1);
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 13px;
+            overflow-x: auto;
+        }
+        .code-snippet .tag { color: #f472b6; }
+        .code-snippet .attr { color: #2dd4bf; }
+        .code-snippet .val { color: #fde047; }
+        .code-snippet .comment { color: #64748b; }
+
+        /* Estilos simulados dos componentes */
+        .preview-box {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            color: var(--az-escuro);
+        }
+
+        .preview-box button {
+            padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer;
+            font-size: 0.8em; font-weight: 800; text-transform: uppercase; margin: 5px;
+        }
+        .preview-box .btn-azul { background: var(--accent-cyan); color: var(--az-escuro); }
+        .preview-box .btn-roxo { background: var(--accent-purple); color: #fff; }
+        .preview-box .btn-verde { background: var(--accent-green); color: #fff; }
+        .preview-box .btn-laranja { background: var(--accent-orange); color: #fff; }
+        
+        .preview-box mark { background: var(--accent-lime); color: var(--az-escuro); padding: 3px; font-weight: bold; }
+        .preview-box .badge { padding: 5px 10px; border-radius: 10px; font-size: 0.8em; font-weight: bold; margin: 5px; display: inline-block; }
+        .preview-box .bd-azul { background: var(--accent-cyan); color: var(--az-escuro); }
+        .preview-box .bd-roxo { background: var(--accent-purple); color: #fff; }
+        
+        .preview-box input {
+            width: 100%; padding: 8px; border: 1px solid #c5c5c5; border-radius: 3px; margin-top: 10px; font-family: Verdana, sans-serif;
+        }
+
+        /* Bloco de CSS para cópia */
+        .css-col {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .css-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            gap: 15px;
+        }
+
+        .copy-btn {
+            background: var(--text-main);
+            color: var(--bg-dark);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            transition: background 0.3s;
+            white-space: nowrap;
+        }
+        .copy-btn:hover { background: var(--accent-cyan); color: var(--bg-dark); }
+
+        .css-box {
+            width: 100%;
+            flex-grow: 1; 
+            min-height: 250px;
+            height: 100%;
+            background: #0f172a;
+            color: #38bdf8;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.1);
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 12px;
+            resize: none; 
+            outline: none;
+        }
+        
+        /* Toast Notification */
+        #toast {
+            visibility: hidden;
+            min-width: 250px;
+            background-color: var(--accent-cyan);
+            color: #000;
+            text-align: center;
+            border-radius: 4px;
+            padding: 16px;
+            position: fixed;
+            z-index: 2000;
+            left: 50%;
+            bottom: 30px;
+            transform: translateX(-50%);
+            font-weight: bold;
+            opacity: 0;
+            transition: opacity 0.5s, bottom 0.5s;
+        }
+        #toast.show {
+            visibility: visible;
+            opacity: 1;
+            bottom: 50px;
+        }
+
+        /* Rodapé */
+        .site-footer {
+            text-align: center;
+            padding: 40px 20px;
+            margin-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+        .site-footer strong {
+            color: var(--text-main);
+        }
+
+        @media (max-width: 900px) {
+            .ds-grid { grid-template-columns: 1fr; }
+            .css-box { height: 300px; flex-grow: 0; }
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2rem; }
+            .tools-container { grid-template-columns: 1fr; }
+            .ds-card { padding: 20px; }
+            .css-header { flex-direction: column; }
+        }
     </style>
 </head>
-
 <body>
 
-    <div class="grade">
-        
-        <h1>ferramentas<br><strong>TOTVS</strong></h1>
-
-        <div class="menu-container">
-            <a href="planejamento.html" class="btn-menu btn-azul">
-                Planejamento
-            </a>
-            
-            <a href="item-contabil.html" class="btn-menu btn-azul">
-                Item Contábil
-            </a>
-            
-            <a href="faturamento.html" class="btn-menu btn-azul">
-                Faturamento
-            </a>
-            
-            <a href="fretado.html" class="btn-menu btn-azul">
-                Fretado SP
-            </a>
+    <!-- NAVBAR COM MENU SANDUÍCHE -->
+    <nav class="navbar">
+        <div class="logo">Daniela <span>Genovese</span></div>
+        <div class="hamburger" onclick="toggleMenu()">☰</div>
+        <div class="nav-menu" id="navMenu">
+            <a href="faturamento.html">Faturamento</a>
+            <a href="item-contabil.html">Item Contábil</a>
+            <a href="planejamento.html">Planejamento</a>
+            <a href="planejamento-calculadora.html">Calculadora de Horas</a>
         </div>
+    </nav>
+
+    <!-- CABEÇALHO -->
+    <header class="hero">
+        <span class="tag-azul" style="display: none;">Workspace Operacional</span>
+        <h1>Portfólio de Automações</h1>
+        <p>Aplicações desenvolvidas para eliminar trabalho repetitivo, padronizar a comunicação e automatizar a inteligência da gestão de projetos.</p>
+    </header>
+
+    <!-- ==========================================
+         SEÇÃO 1: GRID DAS FERRAMENTAS
+         ========================================== -->
+    <main class="tools-container">
+        
+        <!-- Ferramenta 1: Faturamento -->
+        <article class="tool-card card-fat">
+            <h2 class="tool-title">Faturamento</h2>
+            <p class="tool-desc">
+                Um gerador inteligente que monta templates perfeitos para tickets e e-mails de faturamento. Ele processa códigos de projeto para gerar o contrato PSA automaticamente e adapta saudações de acordo com o horário.
+            </p>
+            <ul class="tool-features">
+                <li>Separação entre Ticket e E-mail corporativo.</li>
+                <li>Validação e autocompletar de Contratos PSA.</li>
+                <li>Regras para "Faturamento Unilateral".</li>
+            </ul>
+            <a href="faturamento.html" class="btn-acessar btn-cyan">Abrir Ferramenta</a>
+        </article>
+
+        <!-- Ferramenta 2: Item Contábil -->
+        <article class="tool-card card-cont">
+            <h2 class="tool-title">Item Contábil</h2>
+            <p class="tool-desc">
+                Permite a inclusão rápida de múltiplos projetos simultâneos para solicitação de alteração contábil. Ele consolida códigos e nomes em uma única mensagem elegante e formatada.
+            </p>
+            <ul class="tool-features">
+                <li>Adição dinâmica e ilimitada de linhas.</li>
+                <li>Formatação automática em negrito (Rich Text).</li>
+                <li>Ajuste automático de Assunto.</li>
+            </ul>
+            <a href="item-contabil.html" class="btn-acessar btn-purple">Abrir Ferramenta</a>
+        </article>
+
+        <!-- Ferramenta 3: Planejamento -->
+        <article class="tool-card card-plan">
+            <h2 class="tool-title">Planejamento</h2>
+            <p class="tool-desc">
+                Uma robusta plataforma de escopo. Permite criar marcos, tarefas, atribuir horas e responsáveis. Possui recurso de arrastar-e-soltar e controle hierárquico automatizado (WBS).
+            </p>
+            <ul class="tool-features">
+                <li>Hierarquia automática (Ex: 1.1, 1.2).</li>
+                <li>Detalhamento interno de horas por dia útil.</li>
+                <li>Gera tabela HTML pronta para o E-mail.</li>
+            </ul>
+            <a href="planejamento.html" class="btn-acessar btn-green">Abrir Ferramenta</a>
+        </article>
+
+        <!-- Ferramenta 4: Calculadora de Horas -->
+        <article class="tool-card card-calc">
+            <h2 class="tool-title">Calculadora de Horas</h2>
+            <p class="tool-desc">
+                O motor que divide horas brutas em dias úteis reais. Ele entende a matemática da Páscoa para calcular feriados móveis brasileiros até 2030, blindando o cronograma.
+            </p>
+            <ul class="tool-features">
+                <li>Reconhece Feriados Nacionais.</li>
+                <li>Avisos visuais caso exceda 8h/dia.</li>
+                <li>Tira um "Print" invisível da tabela em imagem.</li>
+            </ul>
+            <a href="planejamento-calculadora.html" class="btn-acessar btn-orange">Abrir Ferramenta</a>
+        </article>
+
+    </main>
+
+
+    <!-- ==========================================
+         SEÇÃO 2: DESIGN SYSTEM / CÓDIGO CSS
+         ========================================== -->
+         
+    <div class="section-divider"></div>
+
+    <div class="title-uikit">
+        <h2><strong>UI Kit</strong> & Dev</h2>
     </div>
 
+    <section class="css-reference-wrapper">
+        <div class="ds-card">
+            
+            <div class="ds-grid">
+                
+                <!-- COLUNA 1: Estrutura HTML e Componentes (Empilhados) -->
+                <div style="display: flex; flex-direction: column; gap: 40px;">
+                    
+                    <div>
+                        <h3 class="ds-title">Estrutura Base (Layout)</h3>
+                        <p class="ds-desc">Use este template HTML no Gemini para gerar o Grid padrão de duas colunas (Formulário e Resultado).</p>
+                        
+                        <div class="code-snippet">
+<span class="tag">&lt;main</span> <span class="attr">class=</span><span class="val">"container container-azul"</span><span class="tag">&gt;</span>
+
+  <span class="comment">&lt;!-- Lado Esquerdo --&gt;</span>
+  <span class="tag">&lt;section</span> <span class="attr">class=</span><span class="val">"container-formulario"</span><span class="tag">&gt;</span>
+    ...
+  <span class="tag">&lt;/section&gt;</span>
+
+  <span class="comment">&lt;!-- Lado Direito --&gt;</span>
+  <span class="tag">&lt;section</span> <span class="attr">class=</span><span class="val">"container-resultado"</span><span class="tag">&gt;</span>
+    ...
+  <span class="tag">&lt;/section&gt;</span>
+
+  <span class="comment">&lt;!-- Rodapé --&gt;</span>
+  <span class="tag">&lt;section</span> <span class="attr">class=</span><span class="val">"botoes-de-acao"</span><span class="tag">&gt;</span>
+    ...
+  <span class="tag">&lt;/section&gt;</span>
+
+<span class="tag">&lt;/main&gt;</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 class="ds-title">Componentes (Preview)</h3>
+                        <p class="ds-desc">Classes disponíveis no CSS global para botões, inputs e destaques.</p>
+                        
+                        <div class="preview-box">
+                            <div style="margin-bottom: 15px;">
+                                <button class="btn-azul">btn-azul</button>
+                                <button class="btn-roxo">btn-roxo</button>
+                                <button class="btn-verde">btn-verde</button>
+                                <button class="btn-laranja">btn-laranja</button>
+                            </div>
+                            
+                            <div style="margin-bottom: 15px; font-size: 0.9em;">
+                                Texto com <mark>mark-limao</mark> para destaque.<br><br>
+                                <span class="badge bd-azul">destaque-azul</span>
+                                <span class="badge bd-roxo">destaque-roxo</span>
+                            </div>
+                            
+                            <div class="input-group">
+                                <input type="text" placeholder="input[type='text'] padrão responsivo">
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- COLUNA 2: Contexto CSS para IAs (Ocupa a mesma altura) -->
+                <div class="css-col">
+                    <div class="css-header">
+                        <div>
+                            <h3 class="ds-title">Contexto de CSS</h3>
+                            <p class="ds-desc" style="margin-bottom: 0;">Copie o código abaixo e alimente o Gemini/Notebook LM.</p>
+                        </div>
+                        <button class="copy-btn" onclick="copiarCSS()">Copiar CSS</button>
+                    </div>
+                    
+                    <textarea id="cssTextarea" class="css-box" readonly>
+:root {
+    --az-escuro: #002233;
+    --preto: #000;
+    --az-claro: #00DBFF;
+    --az-claro2: #01c2e0;
+    --az-bg: #e4fbff;
+    --roxo: #A44DFF;
+    --roxo2: #833ad1;
+    --roxo-bg: #f3e9ff;
+    --branco: #ffffff;
+    --cinza-claro: #f6f6f6;
+    --cinza: #c5c5c5;
+    --cinza-escuro: #666666;
+    --bg-fundo: #002233;
+    --verde: #01cdab;
+    --verde2: #00b99a;
+    --limao: #d9ff65;
+    --laranja: #ff8900;
+    --laranja2: #ea7d00;
+    --rosa: #ff009e;
+    --vermelho: #ff4400;
+    --vermelho2: #dc3c02;
+}
+
+@font-face {
+    font-family: 'TOTVS';
+    src: url('https://raw.githubusercontent.com/danignvs/totvs/main/fontes/TOTVS-Bold.ttf') format('truetype');
+    font-weight: bold;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'TOTVS';
+    src: url('https://raw.githubusercontent.com/danignvs/totvs/main/fontes/TOTVS-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'TOTVS';
+    src: url('https://raw.githubusercontent.com/danignvs/totvs/main/fontes/TOTVS-Light.ttf') format('truetype');
+    font-weight: 300;
+    font-style: normal;
+}
+
+body {
+    font-family: 'TOTVS', 'Segoe UI', Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: var(--bg-fundo);
+    color: var(--az-escuro);
+    background: url('background.png') no-repeat center center fixed;
+    background-size: cover;
+    min-height: 100vh;
+}
+
+strong { font-weight: 800; }
+.hidden { display: none !important; }
+.center { text-align: center; }
+
+.container {
+    max-width: 1200px;
+    width: 90%;
+    margin: auto;
+    background: var(--branco);
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    animation: fadeIn 0.5s ease-in-out;
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: 30px;
+    grid-template-areas: 
+        "form result"
+        "buttons result";
+    align-items: start;
+}
+
+.container-formulario { grid-area: form; min-width: 400px; }
+.container-resultado { grid-area: result; margin-top: 0 !important; }
+.container-roxo { border-top: 6px solid var(--roxo); }
+.container-azul { border-top: 6px solid var(--az-claro); }
+.separator { border: 1px solid var(--cinza); margin: 30px 0; }
+
+h1, h2, h3 { text-transform: uppercase; }
+h1 { color: var(--branco); max-width: 700px; margin: 0 auto; padding: 30px 0; font-size: 1.7em; text-align: center; }
+h2, h3 { margin-top: 0; }
+h2 { font-size: 1.5em; }
+h3 { font-size: 1.3em; }
+h3 .roxo { border-left: 4px solid var(--roxo); padding-left: 10px; }
+
+.roxo { color: var(--roxo); }
+.azul { color: var(--az-escuro); }
+.azul-claro { color: var(--az-claro); }
+.laranja { color: var(--laranja); }
+.rosa { color: var(--rosa); }
+.verde { color: var(--verde); }
+.branco { color: var(--branco); }
+.vermelho { color: var(--vermelho); }
+.link { background-color: transparent; padding: 0; }
+
+.destaque-azul { background-color: var(--az-claro); color: var(--az-escuro); padding: 10px; border-radius: 10px; }
+.destaque-roxo { background-color: var(--roxo); color: var(--branco); padding: 10px; border-radius: 10px; }
+.destaque-verde { background-color: var(--verde); color: var(--az-escuro); padding: 10px; border-radius: 10px; }
+.destaque-rosa { background-color: var(--rosa); color: var(--branco); padding: 10px; border-radius: 10px; }
+.destaque-laranja { background-color: var(--laranja); color: var(--branco); padding: 10px; border-radius: 10px; }
+
+mark, mark a { padding: 3px 1px; color: var(--az-escuro); text-decoration: none; font-weight: bold; }
+.mark-limao, .mark-limao a { background-color: var(--limao); color: var(--az-escuro); font-weight: bold; text-decoration: none; }
+
+label { display: block; font-weight: 600; color: var(--az-escuro); font-size: 1em; }
+.container label { margin: 5px 0 0 0; }
+.resultado label { margin: 5px 0 10px; }
+
+input[type="text"], textarea, select {
+    width: 100%; padding: 5px; margin: 5px 0; border: 1px solid var(--cinza); border-radius: 3px; box-sizing: border-box; font-size: 14px; color: var(--az-escuro); background-color: var(--branco); transition: border-color 0.3s, box-shadow 0.3s;
+}
+input[type="text"]:focus, textarea:focus, select:focus { border-color: var(--cinza-escuro); outline: none; box-shadow: 0 0 0 3px rgba(0, 221, 255, 0.3); background-color: var(--branco); }
+
+.input-group { display: flex; align-items: center; gap: 7px; margin-bottom: 0; align-self: center; }
+.input-item { flex: 1; }
+.custom-date-wrapper { position: relative; width: 100%; }
+.inp-date-text { padding-right: 35px !important; }
+.calendar-icon { position: absolute; right: 8px; top: 46%; transform: translateY(-40%); font-size: 16px; pointer-events: none; color: #666; }
+.inp-date-picker { position: absolute; right: 0; top: 5px; width: 40px; height: 36px; opacity: 0; cursor: pointer; z-index: 10; }
+.inp-date-picker::-webkit-calendar-picker-indicator { position: absolute; right: 0; top: 0; width: 100%; height: 100%; cursor: pointer; }
+
+.drag-handle { cursor: grab; font-size: 20px; color: var(--cinza-escuro); user-select: none; }
+.drag-handle:active { cursor: grabbing; }
+
+button { padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; transition: background-color 0.3s ease, transform 0.1s; width: 100%; display: flex; justify-content: center; align-items: center; font-size: 0.8em; letter-spacing: 0.1px; font-weight: 800; text-transform: uppercase; }
+.btn-aux { width: auto; padding: 3px 7px; font-size: 0.7em; float: right; }
+.botoes-de-acao { grid-area: buttons; display: flex; gap: 15px; width: 100%; margin-top: 20px; margin-bottom: 10px; align-self: center; }
+.botoes-de-acao button { font-size: 0.8em; }
+
+.btn-close { background: var(--az-claro); color: var(--branco); padding: 7px 13px; font-size: 14px; width: auto; float: right; cursor: pointer; border-radius: 3px; border: 0; font-weight: 800; margin: -20px; }
+.btn-close:hover { background: var(--az-claro2); }
+
+.menu { display: flex; justify-content: center; align-items: center; gap: 20px; width: 100%; padding: 40px 0 10px 0; margin: 0; }
+.menu button, .menu a { width: auto !important; background: transparent; color: var(--az-claro); border: none; cursor: pointer; font-weight: 800; position: relative; padding: 0 5px; margin: 0; text-decoration: none;}
+.menu button:not(:last-child)::after, .menu a:not(:last-child)::after { content: ""; position: absolute; right: -10px; top: 50%; transform: translateY(-50%); height: 20px; width: 2px; background-color: var(--az-claro); }
+
+.btn-roxo { background-color: var(--roxo); color: var(--branco); }
+.btn-roxo:hover { background-color: var(--roxo2); }
+.btn-verde { background-color: var(--verde); color: var(--branco); }
+.btn-verde:hover { background-color: var(--verde2); }
+.btn-vermelho { background-color: var(--vermelho); color: var(--branco); }
+.btn-vermelho:hover { background-color: var(--vermelho2); }
+.btn-laranja { background-color: var(--laranja); color: var(--branco); }
+.btn-laranja:hover { background-color: var(--laranja2); }
+.btn-azul { background-color: var(--az-claro); color: var(--az-escuro); }
+.btn-azul:hover { background-color: var(--az-claro2); color: var(--preto); }
+
+.topo { display: flex; justify-content: space-between; align-items: center; }
+.topo h3, .topo h2 { margin: 0; }
+.topo .input-group { align-self: flex-end; }
+
+.resultado { padding: 20px; background-color: var(--cinza-claro); margin: 20px 0; border: 1px solid var(--cinza); border-radius: 3px;}
+pre { white-space: pre-wrap; word-break: break-all; padding: 5px; background-color: var(--branco); min-height: 20px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; font-size: 14px; border: 1px solid var(--cinza); border-radius: 3px;}
+::placeholder { font-size: .9em; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+.justificativa-manual { display: none; }
+
+#toast { visibility: hidden; min-width: 250px; background-color: var(--az-claro); color: var(--az-escuro); text-align: center; border-radius: 4px; padding: 30px 16px; position: fixed; z-index: 1000; left: 50%; bottom: 30px; transform: translateX(-50%); font-size: 15px; font-weight: bold; letter-spacing: 0.03em; opacity: 0; transition: opacity 0.5s, bottom 0.5s; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); }
+#toast.show { visibility: visible; opacity: 1; bottom: 50px; }
+
+.tutorial { color: var(--branco); max-width: 1200px; margin-top: 40px; margin-bottom: 60px; display: block; border-top: none; background: transparent; box-shadow: none; line-height: 1.7; font-size: 1em; }
+.tutorial h2 { color: var(--az-claro); border-bottom: 2px solid var(--az-claro); padding-bottom: 5px; margin-bottom: 20px; font-size: 1.4em; width: 100%; }
+.tutorial ul { padding-left: 20px; margin: 0; }
+.tutorial ul li { padding: 10px 0; }
+
+.modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(2px); }
+.modal-box { background-color: #fff; padding: 10px 30px 30px; border-radius: 8px; max-width: 300px; width: 75%; text-align: center; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border-top: 6px solid var(--az-claro); animation: fadeIn 0.3s ease-in-out; margin: 0 auto; margin-top: 200px; }
+.modal-box .btn-fechar-modal { position: absolute; top: 0px; right: -10px; background: transparent; border: none; font-size: 1em; font-weight: 600; cursor: pointer; color: var(--az-escuro); width: 50px; }
+.modal-box .btn-fechar-modal:hover { color: var(--az-claro); }
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+@media (max-width: 1100px) {
+    .container { max-width: 700px; display: flex; flex-direction: column; }
+    .container-formulario, .container-resultado { min-width: 100%; }
+    .container-resultado { margin-top: 20px; }
+    .botoes-de-acao { order: 3; }
+}
+@media (max-width: 800px) {
+    body { padding: 0; }
+    .container { padding: 3%; width: 94%; border-radius: 0; box-shadow: none; border-top: none; max-width: 100% !important; }
+}
+@media (max-width: 370px) {
+    .input-group { flex-direction: column; gap: 0; }
+    .input-item { min-width: 100%; }
+    .botoes-de-acao { flex-direction: column; gap: 10px; }
+    .menu { flex-direction: column; gap: 20px; }
+    .menu button:not(:last-child)::after, .menu a:not(:last-child)::after { display: none; }
+}</textarea>
+                </div>
+                
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER DA CAPA -->
+    <footer class="site-footer">
+        <p>Desenvolvido por <strong>Daniela Genovese</strong> &copy; 2026<br>
+        Portfólio de Automações e Workspace Operacional</p>
+    </footer>
+
+    <div id="toast">Copiado para a área de transferência!</div>
+
+    <!-- SCRIPT DO MENU E CÓPIA DE CSS -->
+    <script>
+        function toggleMenu() {
+            document.getElementById("navMenu").classList.toggle("active");
+        }
+
+        // Fecha o menu ao clicar fora dele
+        document.addEventListener('click', function(event) {
+            const menu = document.getElementById("navMenu");
+            const hamburger = document.querySelector(".hamburger");
+            
+            if (!menu.contains(event.target) && !hamburger.contains(event.target)) {
+                menu.classList.remove("active");
+            }
+        });
+
+        function copiarCSS() {
+            const textarea = document.getElementById("cssTextarea");
+            textarea.select();
+            textarea.setSelectionRange(0, 99999); // Para mobile
+
+            navigator.clipboard.writeText(textarea.value).then(() => {
+                const toast = document.getElementById("toast");
+                toast.textContent = "CSS copiado! Cole no Gemini/NotebookLM.";
+                toast.className = "show";
+                setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 3000);
+            }).catch(err => {
+                console.error('Falha ao copiar:', err);
+            });
+        }
+    </script>
 </body>
 </html>
