@@ -52,9 +52,9 @@
         
             <label for="tipoJustificativa">Justificativa:</label>
             <select id="tipoJustificativa">                
-                <option value="padrao">Padrão</option>
-                <option value="Conclusão do Projeto">Conclusão do Projeto</option>
-                <option value="Cancelamento do Projeto">Cancelamento do Projeto</option>
+                <option value="Conclusão do Projeto">Termo de conclusão do projeto - MIT062</option>
+                <option value="Documentação de aceite do cliente">Termo de validação de entrega - MIT010</option>
+                <option value="Cancelamento do Projeto">Cancelamento de projeto</option>
             </select>
         
             <div id="ticketDiv" class="input-item hidden" style="margin-top: 10px;">
@@ -138,21 +138,23 @@
 
             // Define Justificativa
             let txtJustificativa = '';
-            if (tipoJustificativa === 'padrao') {
-                txtJustificativa = 'Documentação de aceite do cliente disponível no repositório do projeto.';
-            } else if (tipoJustificativa === 'Conclusão do Projeto') {
+            if (tipoJustificativa === 'Conclusão do Projeto') {
                 txtJustificativa = 'Certificado de Conclusão disponível no repositório do projeto.';
+            } else if (tipoJustificativa === 'Documentação de aceite do cliente') {
+                txtJustificativa = 'Documentação de aceite do cliente disponível no repositório do projeto.';
             } else if (tipoJustificativa === 'Cancelamento do Projeto') {
                 txtJustificativa = `Encerramento do projeto devido ao cancelamento registrado no ticket nº ${numTicket || 'XXXXX'}`;
             }
 
             // Define Corpo do Email
-            const corpoEmail = `Favor proceder com a aprovação dos marcos do projeto abaixo: 
+            const corpoEmail = `Gentileza proceder com a aprovação dos marcos do projeto abaixo: 
 
 Código do contrato PSA: ${codContrato}
 Código do cliente: ${codCliente}
+
 Código do projeto: ${codProjeto}
 Nome do projeto: ${nomeProjeto}
+
 Justificativa: ${txtJustificativa}`;
 
             // Renderiza
