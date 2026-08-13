@@ -52,9 +52,10 @@
         
             <label for="tipoJustificativa">Justificativa:</label>
             <select id="tipoJustificativa">                
-                <option value="Conclusão do Projeto">Termo de conclusão do projeto - MIT062</option>
+                <option value="Conclusão do projeto">Termo de conclusão do projeto - MIT062</option>
                 <option value="Documentação de aceite do cliente">Termo de validação de entrega - MIT010</option>
-                <option value="Cancelamento do Projeto">Cancelamento de projeto</option>
+                <option value="Cancelamento do projeto">Cancelamento de projeto</option>
+                <option value="Faturamento unilateral">Faturamento unilateral</option>
             </select>
         
             <div id="ticketDiv" class="input-item hidden" style="margin-top: 10px;">
@@ -144,6 +145,8 @@
                 txtJustificativa = 'Documentação de aceite do cliente disponível no repositório do projeto.';
             } else if (tipoJustificativa === 'Cancelamento do Projeto') {
                 txtJustificativa = `Encerramento do projeto devido ao cancelamento registrado no ticket nº ${numTicket || 'XXXXX'}`;
+            } else if (tipoJustificativa === 'Faturamento unilateral') {
+                txtJustificativa = `Faturamento unilateral.`;
             }
 
             // Define Corpo do Email
