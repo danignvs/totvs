@@ -79,13 +79,22 @@
         </section>
 
         <section class="botoes-de-acao">
-            <button class="btn-roxo" id="btnTicket">Ticket</button>
+            <a class="btn btn-verde" href="https://suporte.interno.totvs.io/hc/pt-br/requests/new?ticket_form_id=43090375254931&tf_43653456041107=peso_2&tf_43093105543571=CST_PMO+Local_Gest%C3%A3o+de+Projetos_Aprova%C3%A7%C3%A3o+de+Marco+-+Projeto&isLeaf=level4&tf_43093056156819=01KQMPRVRX24GN0WEBHJ75KBQV&tf_undefined=portal_cst_brasil&pais=Brasil&tf_49875679614355=pais_brasil&level1=PMO+Local&level2=Gest%C3%A3o+de+Projetos&level3=Aprova%C3%A7%C3%A3o+de+Marco+-+Projeto" target="_blank">
+                Ticket
+            </a>
             <button class="btn-roxo" id="btnCopiarStatus">Status</button>
-            <button class="btn-verde" id="btnIndicadores">Indicadores</button>
+            <button class="btn-roxo" id="btnIndicadores">Indicadores</button>
             <button class="btn-laranja" id="btnLimpar">Limpar</button>
+
             <div id="toast">Copiado para a área de transferência!</div>
         </section>
     </main>  
+
+    <div class="menu">
+        <button><a href="faturamento.html" target="_blank" style="text-decoration: none;">Faturamento</a></button>
+        <button><a href="encerramento.html" target="_blank" style="text-decoration: none;">Encerramento</a></button>
+        <button><a href="planejamento-calculadora.html" target="_blank" style="text-decoration: none;">Calculadora de horas</a></button>
+    </div>
 
     <script>
     document.addEventListener('DOMContentLoaded', () => {
@@ -254,15 +263,7 @@ Justificativa: ${txtJustificativa}`;
                 mostrarToast(`"${txt}" copiado!`, true);
             });
         });
-
-        document.getElementById('btnTicket').addEventListener('click', () => {
-            // link para refletir a solicitação de Aprovação de Marco
-            const linkTicket = "https://suporte.interno.totvs.io/hc/pt-br/requests/new?ticket_form_id=43090375254931&tf_43653456041107=peso_2&tf_43093105543571=CST_PMO+Local_Gest%C3%A3o+de+Projetos_Aprova%C3%A7%C3%A3o+de+Marco+-+Projeto&isLeaf=level4&tf_43093056156819=01KQMPRVRX24GN0WEBHJ75KBQV&tf_undefined=portal_cst_brasil&pais=Brasil&tf_49875679614355=pais_brasil&level1=PMO+Local&level2=Gest%C3%A3o+de+Projetos&level3=Aprova%C3%A7%C3%A3o+de+Marco+-+Projeto";
-            
-            navigator.clipboard.writeText(linkTicket).then(() => {
-                mostrarToast("Caminho do ticket copiado! Cole no navegador.", true);
-            });
-        });
+        
 
         document.getElementById('btnIndicadores').addEventListener('click', abrirIndicadores);
 

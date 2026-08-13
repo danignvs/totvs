@@ -76,13 +76,20 @@
         </section>
 
         <section class="botoes-de-acao">
-            <button class="btn-roxo" id="btnTicket">Ticket</button>
-            <button class="btn-roxo" id="btnCopiarStatus">Status</button>
-            <button class="btn-verde" id="btnIndicadores">Indicadores</button>
+            <a class="btn btn-verde" href="https://suporte.interno.totvs.io/hc/pt-br/requests/new?ticket_form_id=43090375254931&tf_43653456041107=peso_2&tf_43093105543571=CST_PMO+Local_Gest%C3%A3o+de+Projetos_Encerramento+-+Projeto&isLeaf=level4&tf_43093056156819=01KQMPRQ5859J7KT10J1V04R8N&tf_undefined=portal_cst_brasil&pais=Brasil&tf_49875679614355=pais_brasil&level1=PMO+Local&level2=Gest%C3%A3o+de+Projetos&level3=Encerramento+-+Projeto" target="_blank">
+                Ticket
+            </a>
             <button class="btn-laranja" id="btnLimpar">Limpar</button>
+            
             <div id="toast">Copiado para a área de transferência!</div>
         </section>
     </main>  
+
+    <div class="menu">
+        <button><a href="faturamento.html" target="_blank" style="text-decoration: none;">Faturamento</a></button>
+        <button><a href="marco.html" target="_blank" style="text-decoration: none;">Marco</a></button>
+        <button><a href="planejamento-calculadora.html" target="_blank" style="text-decoration: none;">Calculadora de horas</a></button>
+    </div>
 
     <script>
     document.addEventListener('DOMContentLoaded', () => {
@@ -232,29 +239,7 @@ Justificativa: ${txtJustificativa}`;
         document.getElementById('btnCopiarMensagem').addEventListener('click', () => copiarTextoRico('resultadoCorpo'));
         document.getElementById('btnLimpar').addEventListener('click', limparFormulario);
 
-        // Event Listeners Novos (Ticket, Status, Indicadores)
-        document.getElementById('btnCopiarStatus').addEventListener('click', () => {
-            const dataFormatada = new Intl.DateTimeFormat('pt-BR', {
-                day: '2-digit',
-                month: '2-digit',
-                year: '2-digit'
-            }).format(new Date());
-            
-            const txt = `${dataFormatada} - Encerramento Solicitado`;
-            
-            navigator.clipboard.writeText(txt).then(() => {
-                mostrarToast(`"${txt}" copiado!`, true);
-            });
-        });
-
-        document.getElementById('btnTicket').addEventListener('click', () => {
-            const linkTicket = "https://suporte.interno.totvs.io/hc/pt-br/requests/new?ticket_form_id=43090375254931&tf_43653456041107=peso_2&tf_43093105543571=CST_PMO+Local_Gest%C3%A3o+de+Projetos_Encerramento+-+Projeto&isLeaf=level4&tf_43093056156819=01KQMPRQ5859J7KT10J1V04R8N&tf_undefined=portal_cst_brasil&pais=Brasil&tf_49875679614355=pais_brasil&level1=PMO+Local&level2=Gest%C3%A3o+de+Projetos&level3=Encerramento+-+Projeto";
-            
-            // Abre o link em uma nova aba
-            window.open(linkTicket, '_blank');
-        });
-
-        document.getElementById('btnIndicadores').addEventListener('click', abrirIndicadores);
+        
 
         // Inicializa
         mudarJustificativa();

@@ -101,16 +101,24 @@
             </div>
         </section>
 
-        <section class="botoes-de-acao">
-            <button class="btn-roxo" id="btnTicket">Ticket</button>
+        <section class="botoes-de-acao">            
+            <a class="btn btn-verde" href="https://suporte.interno.totvs.io/hc/pt-br/requests/new?ticket_form_id=43090375254931&tf_43653456041107=peso_4&tf_43093105543571=CST_PMO+Local_Gest%C3%A3o+de+Projetos_Solicita%C3%A7%C3%A3o+de+Faturamento+-+Projeto&isLeaf=level4&tf_43093056156819=01KQMPRJP2AGE5BP7D362CCRW9&tf_undefined=portal_cst_brasil&pais=Brasil&tf_49875679614355=pais_brasil&level1=PMO+Local&level2=Gest%C3%A3o+de+Projetos&level3=Solicita%C3%A7%C3%A3o+de+Faturamento+-+Projeto" target="_blank">
+                Ticket
+            </a>
             <button class="btn-roxo" id="btnCopiarStatus">Status</button>
-            <button class="btn-verde" id="btnIndicadores">Indicadores</button>
-            <button class="btn-laranja" id="btnLimpar">Limpar</button>
-            
+            <button class="btn-roxo" id="btnIndicadores">Indicadores</button>
+            <button class="btn-laranja" id="btnLimpar">Limpar</button>            
 
             <div id="toast">Copiado para a área de transferência!</div>
         </section>
+        
     </main>  
+
+    <div class="menu">
+        <button><a href="marco.html" target="_blank" style="text-decoration: none;">Marco</a></button>
+        <button><a href="encerramento.html" target="_blank" style="text-decoration: none;">Encerramento</a></button>
+        <button><a href="planejamento-calculadora.html" target="_blank" style="text-decoration: none;">Calculadora de horas</a></button>
+    </div>
 
     <script>
     document.addEventListener('DOMContentLoaded', () => {
@@ -345,15 +353,6 @@
             });
         });
 
-        // Botão Ticket copiando o link
-        document.getElementById('btnTicket').addEventListener('click', () => {
-            const linkTicket = "https://suporte.interno.totvs.io/hc/pt-br/requests/new?ticket_form_id=43090375254931&tf_43653456041107=peso_4&tf_43093105543571=CST_PMO+Local_Gest%C3%A3o+de+Projetos_Solicita%C3%A7%C3%A3o+de+Faturamento+-+Projeto&isLeaf=level4&tf_43093056156819=01KQMPRJP2AGE5BP7D362CCRW9&tf_undefined=portal_cst_brasil&pais=Brasil&tf_49875679614355=pais_brasil&level1=PMO+Local&level2=Gest%C3%A3o+de+Projetos&level3=Solicita%C3%A7%C3%A3o+de+Faturamento+-+Projeto";
-            
-            navigator.clipboard.writeText(linkTicket).then(() => {
-                // Passa o texto desejado e "true" para não cortar a mensagem
-                mostrarToast("Caminho do ticket copiado! Cole no navegador.", true);
-            });
-        });
         
         document.getElementById('btnIndicadores').addEventListener('click', abrirIndicadores);
         document.getElementById('btnLimpar').addEventListener('click', limparFormulario);
