@@ -250,9 +250,8 @@ Justificativa: ${txtJustificativa}`;
         document.getElementById('btnTicket').addEventListener('click', () => {
             const linkTicket = "https://suporte.interno.totvs.io/hc/pt-br/requests/new?ticket_form_id=43090375254931&tf_43653456041107=peso_2&tf_43093105543571=CST_PMO+Local_Gest%C3%A3o+de+Projetos_Encerramento+-+Projeto&isLeaf=level4&tf_43093056156819=01KQMPRQ5859J7KT10J1V04R8N&tf_undefined=portal_cst_brasil&pais=Brasil&tf_49875679614355=pais_brasil&level1=PMO+Local&level2=Gest%C3%A3o+de+Projetos&level3=Encerramento+-+Projeto";
             
-            navigator.clipboard.writeText(linkTicket).then(() => {
-                mostrarToast("Caminho do ticket copiado! Cole no navegador.", true);
-            });
+            // Abre o link em uma nova aba
+            window.open(linkTicket, '_blank');
         });
 
         document.getElementById('btnIndicadores').addEventListener('click', abrirIndicadores);
