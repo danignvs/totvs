@@ -335,7 +335,7 @@
             cursor: grabbing;
         }
 
-        button {
+        button, .btn {
             padding: 10px 20px;
             border: none;
             border-radius: 5px;
@@ -349,11 +349,16 @@
             letter-spacing: 0.1px;
             font-weight: 800;
             text-transform: uppercase;
+            font-family: 'TOTVS', 'Segoe UI', Arial, sans-serif;
+        }
+
+        .btn {
+            text-decoration: none;
         }
 
         .btn-aux {
             width: auto;
-            padding: 3px 7px;
+            padding: 4px 7px 3px;
             font-size: 0.7em;
             float: right;
         }
@@ -369,7 +374,7 @@
             align-self: center;
         }
 
-        .botoes-de-acao button {
+        .botoes-de-acao button .btn{
             font-size: 0.8em;
         }
 

@@ -8,7 +8,6 @@
     <title>Faturamento</title>
     
     <link rel="stylesheet" href="style.css">
-    
     <link rel="icon" type="image/x-icon" href="https://danignvs.github.io/totvs/favicons/fat.ico">
 </head>
 
@@ -26,27 +25,11 @@
             </div>
             <br>
 
-            <div class="input-group">
-                <div class="input-item">
-                    <label for="formatoSaida">Formato:</label>
-                    <select id="formatoSaida">
-                        <option value="Ticket" selected>Ticket</option>
-                        <option value="Email">E-mail</option>
-                    </select>
-                </div>
-            </div>
-        
+            <!-- Nome do projeto sozinho em uma linha -->
             <div class="input-group">
                 <div class="input-item">
                     <label for="nomeProjeto">Nome do projeto:</label>
                     <input type="text" id="nomeProjeto" placeholder="">
-                </div>
-                <div class="input-item">
-                    <label for="tipoAssunto">Assunto:</label>
-                    <select id="tipoAssunto">
-                        <option value="Faturamento">Solicitação de faturamento</option>
-                        <option value="Projeto">Nome do projeto</option>
-                    </select>
                 </div>
             </div>
 
@@ -86,8 +69,6 @@
         </section>
 
         <section class="container-resultado">
-            
-
             <div class="resultado">
                 <button class="btn-azul btn-aux" id="btnCopiarAssunto">Copiar</button>
                 <label>Assunto</label>
@@ -114,29 +95,41 @@
         
     </main>  
 
-    <div class="menu">
-        <button><a href="marco.html" target="_blank" style="text-decoration: none;">Marco</a></button>
-        <button><a href="encerramento.html" target="_blank" style="text-decoration: none;">Encerramento</a></button>
-        <button><a href="planejamento-calculadora.html" target="_blank" style="text-decoration: none;">Calculadora de horas</a></button>
-    </div>
+    <!-- Container onde o menu externo será renderizado -->
+    <div id="menu-container"></div>
 
     <script>
     document.addEventListener('DOMContentLoaded', () => {
+        // --- 0. LÓGICA DO MENU DINÂMICO ---
+        fetch('menu.html')
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('menu-container').innerHTML = html;
+                
+                // Pega o nome do arquivo atual 
+                const currentPage = window.location.pathname.split('/').pop() || 'planejamento-calculadora.html'; 
+                const links = document.querySelectorAll('#menu-container a');
+                
+                // Varre os links e REMOVE o botão da página que está aberta
+                links.forEach(link => {
+                    if (link.getAttribute('href') === currentPage) {
+                        link.parentElement.remove(); // <-- A mágica acontece aqui!
+                    }
+                });
+            })
+            .catch(err => console.error('Erro ao carregar o menu:', err));
+
         // --- 1. CONFIGURAÇÕES INICIAIS ---
         if (history.scrollRestoration) {
             history.scrollRestoration = 'manual';
         }
         window.scrollTo(0, 0);
 
-        // Constantes de Justificativa
         const JUSTIFICATIVA_PADRAO = "Termo de conclusão assinado no repositório do projeto.";
         const JUSTIFICATIVA_UNILATERAL = "Faturamento unilateral. Evidências de envio da MIT0062 disponível no repositório do fluig.";
 
-        // Mapeamento de Elementos do DOM
         const formElements = {
-            formatoSaida: document.getElementById('formatoSaida'),
             nomeProjeto: document.getElementById('nomeProjeto'),
-            tipoAssunto: document.getElementById('tipoAssunto'),
             codProjeto: document.getElementById('codProjeto'),
             codContratoPSA: document.getElementById('codContratoPSA'),
             codCliente: document.getElementById('codCliente'),
@@ -178,14 +171,12 @@
             const { tipoJustificativa, justificativa, justificativaManualDiv } = formElements;
             const tipo = tipoJustificativa.value;
 
-            // Remove ou adiciona a classe .hidden para usar a regra CSS do style.css
             if (tipo === 'Selecione' || tipo === 'Padrao' || tipo === 'Unilateral') {
                 justificativaManualDiv.style.display = 'none';
             } else {
                 justificativaManualDiv.style.display = 'block';
             }
 
-            // Preenche de acordo com o tipo
             if (tipo === 'Padrao') justificativa.value = JUSTIFICATIVA_PADRAO;
             else if (tipo === 'Unilateral') justificativa.value = JUSTIFICATIVA_UNILATERAL;
             else if (tipo === 'Outras') {
@@ -201,10 +192,8 @@
 
         const gerarEmail = () => {
             const vals = {
-                formato: formElements.formatoSaida.value,
                 codProjeto: formElements.codProjeto.value.trim(),
                 nomeProjeto: formElements.nomeProjeto.value.trim(),
-                tipoAssunto: formElements.tipoAssunto.value,
                 codContrato: formElements.codContratoPSA.value.trim(),
                 codCliente: formElements.codCliente.value.trim(),
                 justificativa: formElements.justificativa.value.trim(),
@@ -213,41 +202,26 @@
 
             let valorLiq = formElements.valorLiquido.value.trim();
             if (valorLiq && !valorLiq.toUpperCase().startsWith("R$")) {
-                valorLiq = `R$ ${valorLiq}`; // Adicionado espaço para melhor UX "R$ 100,00"
+                valorLiq = `R$ ${valorLiq}`; 
             }
 
-            // Define Assunto
-            let assunto = '';
-            if (vals.tipoAssunto === 'Faturamento') {
-                assunto = vals.codProjeto ? `${vals.codProjeto} - Solicitação de Faturamento` : '';
-            } else {
-                assunto = (vals.codProjeto && vals.nomeProjeto) ? `${vals.codProjeto} - ${vals.nomeProjeto}` : '';
-            }
+            // Define Assunto Fixo
+            let assunto = vals.codProjeto ? `${vals.codProjeto} - Solicitação de Faturamento` : '';
 
-            // REGRA NOVA: Adiciona "Unilateral" no assunto se o select for esse tipo e o assunto não estiver vazio
             if (vals.tipoJustificativa === 'Unilateral' && assunto !== '') {
                 assunto += ' Unilateral';
             }
 
-            // Define Corpo do Email
-            let corpoEmail = "";
-            if (vals.formato === 'Email') {
-                corpoEmail += `Olá, ${obterSaudacao()}!\n\n`;
-            }
-
+            // Define Corpo da Mensagem (Sempre com saudação, sem atenciosamente)
+            let corpoEmail = `Olá, ${obterSaudacao()}!\n\n`;
             corpoEmail += `Favor proceder com o faturamento abaixo:\n\nCódigo do contrato PSA: ${vals.codContrato}\nCódigo do cliente: ${vals.codCliente}\nValor líquido: ${valorLiq}\n\nCódigo do projeto: ${vals.codProjeto}\nNome do projeto: ${vals.nomeProjeto}\n\nJustificativa: ${vals.justificativa}`;
 
-            if (vals.formato === 'Email') {
-                corpoEmail += `\n\nAtenciosamente,`;
-            }
-
-            // Renderiza
             resultElements.assunto.textContent = assunto;
             resultElements.corpo.innerHTML = corpoEmail.replace(/\n/g, '<br>');
         };
 
 
-        // --- 3. FUNÇÕES DE UTILIDADE E FEEDBACK (TOAST / CLIPBOARD) ---
+        // --- 3. FUNÇÕES DE UTILIDADE E FEEDBACK ---
         const mostrarToast = (texto, mensagemExata = false) => {
             const toast = document.getElementById("toast");
             
@@ -291,8 +265,6 @@
 
         const limparFormulario = () => {
             document.querySelectorAll('#formFaturamento input[type="text"]').forEach(input => input.value = '');
-            formElements.formatoSaida.selectedIndex = 0;
-            formElements.tipoAssunto.selectedIndex = 0;
             formElements.tipoJustificativa.selectedIndex = 0;
             mudarJustificativa();
         };
@@ -302,14 +274,11 @@
             const linkPlanilha = "https://docs.google.com/spreadsheets/d/19b-F8VDW_tJeJ2h4lM_owYeUDWt0upNsK_OR_bVe0aw/edit";
 
             navigator.clipboard.writeText(codProjeto).then(() => {
-                // Mensagem personalizada dependendo se tem código ou não
                 if (codProjeto) {
                     mostrarToast("Código copiado! Abrindo planilha...", true);
                 } else {
                     mostrarToast("Abrindo planilha (Nenhum código para copiar)", true);
                 }
-                
-                // Abre a planilha após um pequeno delay para dar tempo de ler o toast (opcional)
                 setTimeout(() => window.open(linkPlanilha, '_blank'), 300);
             }).catch(() => {
                 window.open(linkPlanilha, '_blank');
@@ -318,45 +287,36 @@
 
 
         // --- 4. ATRIBUIÇÃO DOS EVENT LISTENERS ---
-        // Inputs gerais que só precisam atualizar a visualização
-        ['formatoSaida', 'nomeProjeto', 'tipoAssunto', 'codContratoPSA', 'codCliente', 'valorLiquido', 'justificativa'].forEach(id => {
+        ['nomeProjeto', 'codContratoPSA', 'codCliente', 'valorLiquido', 'justificativa'].forEach(id => {
             document.getElementById(id).addEventListener('input', gerarEmail);
         });
 
-        // Cód. Projeto (Precisa preencher o PSA também)
         formElements.codProjeto.addEventListener('input', () => {
             preencherContrato();
             gerarEmail();
         });
 
-        // Tipo Justificativa (Precisa validar o bloco manual)
         formElements.tipoJustificativa.addEventListener('change', mudarJustificativa);
 
-        // Botões de Ação
         document.getElementById('btnCopiarAssunto').addEventListener('click', () => copiarTextoPuro('resultadoAssunto'));
         document.getElementById('btnCopiarMensagem').addEventListener('click', () => copiarTextoRico('resultadoCorpo'));
         
         document.getElementById('btnCopiarStatus').addEventListener('click', () => {
-            // Gera a data atual no formato DD/MM/YY
             const dataFormatada = new Intl.DateTimeFormat('pt-BR', {
                 day: '2-digit',
                 month: '2-digit',
                 year: '2-digit'
             }).format(new Date());
             
-            // Monta o texto final
             const txt = `${dataFormatada} - Faturamento Solicitado`;
             
-            // Copia para a área de transferência e mostra o toast personalizado
             navigator.clipboard.writeText(txt).then(() => {
                 mostrarToast(`"${txt}" copiado!`, true);
             });
         });
 
-        
         document.getElementById('btnIndicadores').addEventListener('click', abrirIndicadores);
         document.getElementById('btnLimpar').addEventListener('click', limparFormulario);
-
 
         // Inicializa o estado atual no primeiro carregamento
         mudarJustificativa();
