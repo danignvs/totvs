@@ -256,7 +256,11 @@
             corpoEmail += `Nome do projeto: ${nomeExibicao}\n\n`;
 
             if (txtJustificativa) {
-                corpoEmail += `Justificativa: ${txtJustificativa}\n\n`;
+                corpoEmail += `Justificativa: ${txtJustificativa}\n`;
+            }
+
+            if (linkFluig) {
+                corpoEmail += `Link do repositório: ${linkFluig}\n`;
             }
 
             let detalhesMarco = [];
@@ -270,11 +274,7 @@
             }
 
             if (detalhesMarco.length > 0) {
-                corpoEmail += detalhesMarco.join('\n') + '\n\n';
-            }
-
-            if (linkFluig) {
-                corpoEmail += `Link do repositório (Fluig): ${linkFluig}\n`;
+                corpoEmail += detalhesMarco.join('\n') + '\n';
             }
 
             resultElements.assunto.textContent = assunto;
