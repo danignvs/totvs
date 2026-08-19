@@ -189,14 +189,12 @@
             }
 
             // Define Corpo do Email com Saudação Automática
-            const corpoEmail = `Olá, ${obterSaudacao()}!\n\nGentileza proceder com a aprovação dos marcos do projeto abaixo: 
-
-Código do contrato PSA: ${codContrato}
-Código do cliente: ${codCliente}
+            const corpoEmail = `Olá, ${obterSaudacao()}!\n\nSolicito a aprovação de todos os marcos do projeto abaixo: 
 
 Código do projeto: ${codProjeto}
 Nome do projeto: ${nomeProjeto}
-
+Código do contrato: ${codContrato}
+Código do cliente: ${codCliente}
 Justificativa: ${txtJustificativa}`;
 
             // Renderiza
