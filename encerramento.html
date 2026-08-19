@@ -33,12 +33,12 @@
         
             <div class="input-group">
                 <div class="input-item">
-                    <label for="codProjeto">Cód. projeto:</label>
-                    <input type="text" id="codProjeto" placeholder="Ex: D...001">
+                    <label for="codProjeto">Código do projeto:</label>
+                    <input type="text" id="codProjeto" placeholder="">
                 </div>
                 <div class="input-item">
-                    <label for="codCliente">Cód. cliente:</label>
-                    <input type="text" id="codCliente" placeholder="Ex: T...">
+                    <label for="codCliente">Código do cliente:</label>
+                    <input type="text" id="codCliente" placeholder="">
                 </div>
             </div>
 
@@ -49,16 +49,22 @@
                 </div>
             </div>
         
-            <label for="tipoJustificativa">Justificativa:</label>
-            <select id="tipoJustificativa">          
-                <option value="Conclusão do Projeto">Conclusão do Projeto</option>
-                <option value="Cancelamento do Projeto">Cancelamento do Projeto</option>
-            </select>
-        
-            <div id="ticketDiv" class="input-item hidden" style="margin-top: 10px;">
-                <label for="numTicket">Nº do Ticket <span class="vermelho">*</span>:</label>
-                <input type="text" id="numTicket" placeholder="Ex: 123456">
+            <div class="input-group">
+            <div class="input-item">
+                <label for="tipoJustificativa">Justificativa:</label>
+                <select id="tipoJustificativa">          
+                    <option value="Conclusão do projeto">Conclusão do projeto</option>
+                    <option value="Cancelamento do projeto">Cancelamento do projeto</option>
+                </select>
             </div>
+
+            <!-- O margin-top inline foi removido para alinhar corretamente com o select -->
+            <div id="ticketDiv" class="input-item hidden">
+                <label for="numTicket">Nº do Ticket:</label>
+                <input type="text" id="numTicket" placeholder="">
+            </div>
+        </div>
+        
         </section>
 
         <section class="container-resultado">
@@ -144,17 +150,18 @@
         };
 
         const mudarJustificativa = () => {
-            const tipo = formElements.tipoJustificativa.value;
+        const tipo = formElements.tipoJustificativa.value;
 
-            if (tipo === 'Cancelamento do Projeto') {
-                formElements.ticketDiv.classList.remove('hidden');
-                formElements.numTicket.focus();
-            } else {
-                formElements.ticketDiv.classList.add('hidden');
-                formElements.numTicket.value = '';
-            }
-            gerarEmail();
-        };
+        // Corrigido para 'projeto' com 'p' minúsculo, exatamente igual ao value do HTML
+        if (tipo === 'Cancelamento do projeto') {
+            formElements.ticketDiv.classList.remove('hidden');
+            formElements.numTicket.focus();
+        } else {
+            formElements.ticketDiv.classList.add('hidden');
+            formElements.numTicket.value = '';
+        }
+        gerarEmail();
+    };
 
         const gerarEmail = () => {
             const codProjeto = formElements.codProjeto.value.trim();
@@ -172,28 +179,41 @@
             // Define Assunto
             const assunto = codProjeto || nomeProjeto 
                 ? ['Encerramento', codProjeto, nomeProjeto].filter(Boolean).join(' - ') 
-                : 'Solicitação de Encerramento';
+                : 'Solicitação de encerramento';
 
             // Define Justificativa
             let txtJustificativa = '';
-            if (tipoJustificativa === 'Conclusão do Projeto') {
+            if (tipoJustificativa === 'Conclusão do projeto') {
                 txtJustificativa = 'Certificado de Conclusão disponível no repositório do projeto.';
-            } else if (tipoJustificativa === 'Cancelamento do Projeto') {
+            } else if (tipoJustificativa === 'Cancelamento do projeto') {
                 txtJustificativa = `Encerramento do projeto devido ao cancelamento registrado no ticket nº ${numTicket || 'XXXXX'}`;
             }
 
-            // Define Corpo do Email com Saudação Automática
-            const corpoEmail = `Olá, ${obterSaudacao()}!\n\nSolicito o encerramento do projeto abaixo:
+            // Definição dos placeholders com cor vermelha
+            const codExibicao = codProjeto ? codProjeto : '<span style="color: red;">[código do projeto]</span>';
+            const nomeExibicao = nomeProjeto ? nomeProjeto : '<span style="color: red;">[nome do projeto]</span>';
 
-Código do projeto: ${codProjeto}
-Nome do projeto: ${nomeProjeto}
-Código do contrato: ${codContrato}
-Código do cliente: ${codCliente}
-Justificativa: ${txtJustificativa}`;
+            // Define Corpo do Email com Saudação Automática
+            let corpoEmail = `Olá, ${obterSaudacao()}!\n\nSolicito o encerramento do projeto abaixo:\n\n`;
+
+            // Linhas fixas para Código e Nome do projeto com placeholders visuais
+            corpoEmail += `Código do projeto: ${codExibicao}\n`;
+            corpoEmail += `Nome do projeto: ${nomeExibicao}\n`;
+
+            // Dados dinâmicos: só aparecem se estiverem preenchidos
+            if (codContrato) {
+                corpoEmail += `Código do contrato: ${codContrato}\n`;
+            }
+            if (codCliente) {
+                corpoEmail += `Código do cliente: ${codCliente}\n`;
+            }
+            if (txtJustificativa) {
+                corpoEmail += `Justificativa: ${txtJustificativa}\n`;
+            }
 
             // Renderiza
             resultElements.assunto.textContent = assunto;
-            resultElements.corpo.innerHTML = corpoEmail.replace(/\n/g, '<br>');
+            resultElements.corpo.innerHTML = corpoEmail.trim().replace(/\n/g, '<br>');
         };
 
 
