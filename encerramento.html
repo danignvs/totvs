@@ -30,40 +30,62 @@
                 <h2>Dados do Projeto</h2>                
             </div>
             <br>
+
+            <div class="input-item">
+                <label for="nomeProjeto">Nome do projeto:</label>
+                <input type="text" id="nomeProjeto" placeholder="">
+            </div>
         
             <div class="input-group">
                 <div class="input-item">
                     <label for="codProjeto">Código do projeto:</label>
-                    <input type="text" id="codProjeto" placeholder="">
+                    <div class="input-com-copia">
+                        <input type="text" id="codProjeto" placeholder="">
+                        <button type="button" class="btn-copiar-input"
+                            id="btnCopiarCodProjeto"
+                            title="Copiar código do projeto"
+                            aria-label="Copiar código do projeto">
+                            📋
+                        </button>
+                    </div>
                 </div>
+
+                <!-- Novo input do Código do Contrato -->
+                <div class="input-item">
+                    <label for="codContrato">Código do contrato:</label>
+                    <div class="input-com-copia">
+                        <input type="text" id="codContrato" placeholder="">
+                        <button type="button" class="btn-copiar-input"
+                            id="btnCopiarCodContrato"
+                            title="Copiar código do contrato"
+                            aria-label="Copiar código do contrato">
+                            📋
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="input-group hidden">
                 <div class="input-item">
                     <label for="codCliente">Código do cliente:</label>
                     <input type="text" id="codCliente" placeholder="">
                 </div>
             </div>
-
-            <div class="input-group">
-                <div class="input-item">
-                    <label for="nomeProjeto">Nome do projeto:</label>
-                    <input type="text" id="nomeProjeto" placeholder="">
-                </div>
-            </div>
         
             <div class="input-group">
-            <div class="input-item">
-                <label for="tipoJustificativa">Justificativa:</label>
-                <select id="tipoJustificativa">          
-                    <option value="Conclusão do projeto">Conclusão do projeto</option>
-                    <option value="Cancelamento do projeto">Cancelamento do projeto</option>
-                </select>
-            </div>
+                <div class="input-item">
+                    <label for="tipoJustificativa">Justificativa:</label>
+                    <select id="tipoJustificativa">          
+                        <option value="Conclusão do projeto">Conclusão do projeto</option>
+                        <option value="Cancelamento do projeto">Cancelamento do projeto</option>
+                    </select>
+                </div>
 
-            <!-- O margin-top inline foi removido para alinhar corretamente com o select -->
-            <div id="ticketDiv" class="input-item hidden">
-                <label for="numTicket">Nº do Ticket:</label>
-                <input type="text" id="numTicket" placeholder="">
+                <div id="ticketDiv" class="input-item hidden">
+                    <label for="numTicket">Nº do Ticket:</label>
+                    <input type="text" id="numTicket" placeholder="">
+                </div>
             </div>
-        </div>
         
         </section>
 
@@ -109,7 +131,7 @@
                 // Varre os links e REMOVE o botão da página que está aberta
                 links.forEach(link => {
                     if (link.getAttribute('href') === currentPage) {
-                        link.parentElement.remove(); // <-- A mágica acontece aqui!
+                        link.parentElement.remove();
                     }
                 });
             })
@@ -123,6 +145,7 @@
 
         const formElements = {
             codProjeto: document.getElementById('codProjeto'),
+            codContrato: document.getElementById('codContrato'),
             nomeProjeto: document.getElementById('nomeProjeto'),
             codCliente: document.getElementById('codCliente'),
             tipoJustificativa: document.getElementById('tipoJustificativa'),
@@ -134,7 +157,6 @@
             assunto: document.getElementById('resultadoAssunto'),
             corpo: document.getElementById('resultadoCorpo')
         };
-
 
         // --- 2. FUNÇÕES DE LÓGICA E CONSTRUÇÃO ---
         const obterSaudacao = () => {
@@ -149,19 +171,27 @@
             return "boa noite"; 
         };
 
-        const mudarJustificativa = () => {
-        const tipo = formElements.tipoJustificativa.value;
+        const preencherContrato = () => {
+            const cod = formElements.codProjeto.value;
+            if (cod.length > 3) {
+                formElements.codContrato.value = cod.slice(0, -3);
+            } else if (cod.length === 0) {
+                formElements.codContrato.value = "";
+            }
+        };
 
-        // Corrigido para 'projeto' com 'p' minúsculo, exatamente igual ao value do HTML
-        if (tipo === 'Cancelamento do projeto') {
-            formElements.ticketDiv.classList.remove('hidden');
-            formElements.numTicket.focus();
-        } else {
-            formElements.ticketDiv.classList.add('hidden');
-            formElements.numTicket.value = '';
-        }
-        gerarEmail();
-    };
+        const mudarJustificativa = () => {
+            const tipo = formElements.tipoJustificativa.value;
+
+            if (tipo === 'Cancelamento do projeto') {
+                formElements.ticketDiv.classList.remove('hidden');
+                formElements.numTicket.focus();
+            } else {
+                formElements.ticketDiv.classList.add('hidden');
+                formElements.numTicket.value = '';
+            }
+            gerarEmail();
+        };
 
         const gerarEmail = () => {
             const codProjeto = formElements.codProjeto.value.trim();
@@ -169,12 +199,6 @@
             const codCliente = formElements.codCliente.value.trim();
             const tipoJustificativa = formElements.tipoJustificativa.value;
             const numTicket = formElements.numTicket.value.trim();
-
-            // Lógica do Contrato: Código do projeto menos os 3 últimos números
-            let codContrato = '';
-            if (codProjeto.length > 3) {
-                codContrato = codProjeto.slice(0, -3);
-            }
 
             // Define Assunto
             const assunto = codProjeto || nomeProjeto 
@@ -196,14 +220,9 @@
             // Define Corpo do Email com Saudação Automática
             let corpoEmail = `Olá, ${obterSaudacao()}!\n\nSolicito o encerramento do projeto abaixo:\n\n`;
 
-            // Linhas fixas para Código e Nome do projeto com placeholders visuais
             corpoEmail += `Código do projeto: ${codExibicao}\n`;
             corpoEmail += `Nome do projeto: ${nomeExibicao}\n`;
 
-            // Dados dinâmicos: só aparecem se estiverem preenchidos
-            if (codContrato) {
-                corpoEmail += `Código do contrato: ${codContrato}\n`;
-            }
             if (codCliente) {
                 corpoEmail += `Código do cliente: ${codCliente}\n`;
             }
@@ -259,16 +278,32 @@
             }
         };
 
+        const copiarValorInput = (idInput, mensagem) => {
+            const input = document.getElementById(idInput);
+            const valor = input.value.trim();
+            if (!valor) {
+                mostrarToast("Não há valor para copiar.", true);
+                return;
+            }
+            navigator.clipboard.writeText(valor)
+                .then(() => mostrarToast(mensagem, true))
+                .catch(err => console.error("Erro ao copiar:", err));
+        };
+
         const limparFormulario = () => {
             document.querySelectorAll('#formEncerramento input[type="text"]').forEach(input => input.value = '');
             formElements.tipoJustificativa.selectedIndex = 0;
             mudarJustificativa();
         };
 
-
         // --- 4. ATRIBUIÇÃO DOS EVENT LISTENERS ---
-        ['codProjeto', 'nomeProjeto', 'codCliente', 'numTicket'].forEach(id => {
+        ['nomeProjeto', 'codCliente', 'numTicket'].forEach(id => {
             document.getElementById(id).addEventListener('input', gerarEmail);
+        });
+
+        formElements.codProjeto.addEventListener('input', () => {
+            preencherContrato();
+            gerarEmail();
         });
 
         formElements.tipoJustificativa.addEventListener('change', mudarJustificativa);
@@ -276,6 +311,10 @@
         document.getElementById('btnCopiarAssunto').addEventListener('click', () => copiarTextoPuro('resultadoAssunto'));
         document.getElementById('btnCopiarMensagem').addEventListener('click', () => copiarTextoRico('resultadoCorpo'));
         document.getElementById('btnLimpar').addEventListener('click', limparFormulario);
+        
+        // Listeners dos novos botões de cópia
+        document.getElementById('btnCopiarCodProjeto').addEventListener('click', () => copiarValorInput('codProjeto', 'Código do projeto copiado!'));
+        document.getElementById('btnCopiarCodContrato').addEventListener('click', () => copiarValorInput('codContrato', 'Código do contrato copiado!'));
 
         // Inicializa
         mudarJustificativa();
