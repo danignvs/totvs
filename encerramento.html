@@ -181,14 +181,12 @@
             }
 
             // Define Corpo do Email com Saudação Automática
-            const corpoEmail = `Olá, ${obterSaudacao()}!\n\nGentileza proceder com o encerramento do projeto abaixo:
-
-Nº Contrato: ${codContrato}
-Código do cliente: ${codCliente}
+            const corpoEmail = `Olá, ${obterSaudacao()}!\n\nSolicito o encerramento do projeto abaixo:
 
 Código do projeto: ${codProjeto}
 Nome do projeto: ${nomeProjeto}
-
+Código do contrato: ${codContrato}
+Código do cliente: ${codCliente}
 Justificativa: ${txtJustificativa}`;
 
             // Renderiza
