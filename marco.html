@@ -174,7 +174,9 @@
             }
 
             // Define Assunto
-            const assunto = codProjeto ? `${codProjeto} - Solicitação de Aprovação de Marco` : 'Solicitação de Aprovação de Marco';
+                        const assunto = codProjeto || nomeProjeto 
+            ? ['Aprovação de Marco', codProjeto, nomeProjeto].filter(Boolean).join(' - ') 
+            : 'Solicitação de Aprovação de Marco';
 
             // Define Justificativa
             let txtJustificativa = '';

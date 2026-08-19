@@ -170,7 +170,9 @@
             }
 
             // Define Assunto
-            const assunto = codProjeto ? `${codProjeto} - Solicitação de Encerramento` : 'Solicitação de Encerramento';
+            const assunto = codProjeto || nomeProjeto 
+                ? ['Encerramento', codProjeto, nomeProjeto].filter(Boolean).join(' - ') 
+                : 'Solicitação de Encerramento';
 
             // Define Justificativa
             let txtJustificativa = '';
