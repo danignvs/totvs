@@ -28,8 +28,13 @@
             
             <div class="topo">
                 <h2>Dados do Projeto</h2>                
+                <button class="btn-vermelho btn-aux" id="btnLimpar" 
+                    style="padding: 7px 15px; background-color: transparent; color: var(--vermelho)">
+                    <img src="imagens/lixeira-vermelha.svg" style="width: 20px;">
+                </button>
             </div>
             <br>
+            
         
             <!-- Nome do projeto (Obrigatório) -->
             <div class="input-group">
@@ -75,48 +80,56 @@
                     <input type="text" id="linkFluig" placeholder="">
                 </div>
             </div>
+            <div class="input-group">
+                <div class="input-item col-70">
+                    <label for="tipoJustificativa">Justificativa:</label>
+                    <select id="tipoJustificativa">                
+                        <option value="Conclusão do projeto">Conclusão do projeto MIT062</option>
+                        <option value="Documentação de aceite do cliente">Validação de entrega MIT010</option>
+                        <option value="Cancelamento do projeto">Cancelamento de projeto</option>
+                        <option value="Faturamento unilateral">Faturamento unilateral</option>
+                    </select>
+                </div>
+            
+                <!-- Justificativa do Cancelamento (Oculta por padrão) -->
+                <div id="divTicketCancelamento" class="input-item hidden col-30">
+                    <label for="ticketCancelamento">Ticket:</label>
+                    <input type="text" id="ticketCancelamento" placeholder="">
+                </div>
+            </div>
 
             <!-- Status do marco + Possui Backlog na mesma linha -->
             <div class="input-group">
-                <div class="input-item col-60">
-                    <label for="statusMarco">Status do marco:</label>
-                    <input type="text" id="statusMarco" placeholder="Pré-aprovado">
-                </div>
-                <div class="input-item col-40">
-                    <label for="possuiBacklog">Possui backlog?</label>
+                <div class="input-item col-20">
+                    <label for="possuiBacklog">Backlog?</label>
                     <select id="possuiBacklog">
                         <option value="Não">Não</option>
                         <option value="Sim">Sim</option>
                     </select>
                 </div>
-            </div>
 
-            <!-- Justificativa do Backlog (Oculta por padrão) -->
-            <div id="divJustificativaBacklog" class="input-item hidden" style="margin-top: 10px;">
-                <label for="justificativaBacklog">Justificativa do Backlog:</label>
-                <input type="text" id="justificativaBacklog" placeholder="Descreva a justificativa do backlog">
-            </div>
-        
-            <!-- Justificativa + Ticket -->
-            <div class="input-group">
-                <div class="input-item col-60">
-                    <label for="tipoJustificativa">Justificativa:</label>
-                    <select id="tipoJustificativa">                
-                        <option value="Conclusão do projeto">Termo de conclusão do projeto - MIT062</option>
-                        <option value="Documentação de aceite do cliente">Termo de validação de entrega - MIT010</option>
-                        <option value="Cancelamento do projeto">Cancelamento de projeto</option>
-                        <option value="Faturamento unilateral">Faturamento unilateral</option>
-                    </select>
-                </div>
-                <div class="input-item col-40">
-                    <label for="numTicket">Ticket:</label>
-                    <input type="text" id="numTicket" placeholder="Gerado após envio da solicitação">
+                <!-- Justificativa do Backlog (Oculta por padrão) -->
+                <div id="divJustificativaBacklog" class="input-item hidden col-70">
+                    <label for="justificativaBacklog">Justificativa:</label>
+                    <input type="text" id="justificativaBacklog" placeholder="">
                 </div>
             </div>
+            
+                <div class="input-item hidden">
+                    <label for="statusMarco">Status do marco:</label>
+                    <input type="text" id="statusMarco" placeholder="Pré-aprovado">
+                </div>
+
+                <div class="input-item hidden">
+                    <label for="numTicket">Ticket gerado:</label>
+                    <input type="text" id="numTicket" placeholder="Copie após o envio da solicitação">
+                </div>
+            
 
         </section>
 
         <section class="container-resultado">
+
             <div class="resultado">
                 <button class="btn-azul btn-aux" id="btnCopiarAssunto">Copiar</button>
                 <label>Assunto</label>
@@ -128,15 +141,15 @@
                 <label>Mensagem</label>
                 <pre id="resultadoCorpo"></pre>
             </div>
+
         </section>
 
         <section class="botoes-de-acao">
-            <a class="btn btn-verde" href="https://suporte.interno.totvs.io/hc/pt-br/requests/new?ticket_form_id=43090375254931&tf_43653456041107=peso_2&tf_43093105543571=CST_PMO+Local_Gest%C3%A3o+de+Projetos_Aprova%C3%A7%C3%A3o+de+Marco+-+Projeto&isLeaf=level4&tf_43093056156819=01KQMPRVRX24GN0WEBHJ75KBQV&tf_undefined=portal_cst_brasil&pais=Brasil&tf_49875679614355=pais_brasil&level1=PMO+Local&level2=Gest%C3%A3o+de+Projetos&level3=Aprova%C3%A7%C3%A3o+de+Marco+-+Projeto" target="_blank">
+            <a class="btn btn-roxo" href="https://suporte.interno.totvs.io/hc/pt-br/requests/new?ticket_form_id=43090375254931&tf_43653456041107=peso_2&tf_43093105543571=CST_PMO+Local_Gest%C3%A3o+de+Projetos_Aprova%C3%A7%C3%A3o+de+Marco+-+Projeto&isLeaf=level4&tf_43093056156819=01KQMPRVRX24GN0WEBHJ75KBQV&tf_undefined=portal_cst_brasil&pais=Brasil&tf_49875679614355=pais_brasil&level1=PMO+Local&level2=Gest%C3%A3o+de+Projetos&level3=Aprova%C3%A7%C3%A3o+de+Marco+-+Projeto" target="_blank">
                 Ticket
             </a>
-            <button class="btn-roxo" id="btnCopiarStatus">Status</button>
-            <button class="btn-roxo" id="btnIndicadores">Indicadores</button>
-            <button class="btn-laranja" id="btnLimpar">Limpar</button>
+            <button class="btn-rosa" id="btnCopiarStatus">Status</button>
+            <button class="btn-verde" id="btnIndicadores">Indicadores</button>
 
             <div id="toast">Copiado para a área de transferência!</div>
         </section>
@@ -144,6 +157,20 @@
 
     <!-- Container onde o menu externo será renderizado -->
     <div id="menu-container"></div>
+
+    <!-- Modal de Status -->
+    <div id="modalStatus" class="modal-overlay">
+        <div class="modal-box">
+            <button class="btn-fechar-modal" id="btnFecharModalStatus">X</button>
+            <h3 class="azul-claro" style="margin-bottom: 15px;"></h3>
+            
+            <label for="inputTicketModal">Ticket gerado na solicitação</label>
+            <input type="text" id="inputTicketModal" placeholder="">
+            
+            <br><br>
+            <button class="btn btn-roxo" id="btnConfirmarStatusModal">Copiar Status</button>
+        </div>
+    </div>
 
     <script>
     document.addEventListener('DOMContentLoaded', () => {
@@ -176,6 +203,8 @@
             nomeProjeto: document.getElementById('nomeProjeto'),
             tipoJustificativa: document.getElementById('tipoJustificativa'),
             numTicket: document.getElementById('numTicket'),
+            ticketCancelamento: document.getElementById('ticketCancelamento'), // Novo
+            divTicketCancelamento: document.getElementById('divTicketCancelamento'), // Novo
             linkFluig: document.getElementById('linkFluig'),
             statusMarco: document.getElementById('statusMarco'),
             possuiBacklog: document.getElementById('possuiBacklog'),
@@ -221,11 +250,22 @@
             gerarEmail();
         };
 
+        // Nova função para exibir/esconder o input de Ticket do Cancelamento
+        const mudarJustificativa = () => {
+            if (formElements.tipoJustificativa.value === 'Cancelamento do projeto') {
+                formElements.divTicketCancelamento.classList.remove('hidden');
+            } else {
+                formElements.divTicketCancelamento.classList.add('hidden');
+                formElements.ticketCancelamento.value = '';
+            }
+            gerarEmail();
+        };
+
         const gerarEmail = () => {
             const codProjeto = formElements.codProjeto.value.trim();
             const nomeProjeto = formElements.nomeProjeto.value.trim();
             const tipoJustificativa = formElements.tipoJustificativa.value;
-            const numTicket = formElements.numTicket.value.trim();
+            const ticketCancelamento = formElements.ticketCancelamento.value.trim();
             const linkFluig = formElements.linkFluig.value.trim();
             const statusMarco = formElements.statusMarco.value.trim() || 'Pré-aprovado';
             const possuiBacklog = formElements.possuiBacklog.value;
@@ -241,21 +281,24 @@
             } else if (tipoJustificativa === 'Documentação de aceite do cliente') {
                 txtJustificativa = 'Documentação de aceite do cliente disponível no repositório do projeto.';
             } else if (tipoJustificativa === 'Cancelamento do projeto') {
-                txtJustificativa = `Encerramento do projeto devido ao cancelamento registrado no ticket nº ${numTicket || 'XXXXX'}`;
+                txtJustificativa = `Encerramento do projeto devido ao cancelamento registrado no ticket nº ${ticketCancelamento || 'XXXXX'}`;
             } else if (tipoJustificativa === 'Faturamento unilateral') {
                 txtJustificativa = `Faturamento unilateral.`;
             }
 
-            // Definição dos placeholders com cor vermelha
             const codExibicao = codProjeto ? codProjeto : '<span style="color: red;">[código do projeto]</span>';
             const nomeExibicao = nomeProjeto ? nomeProjeto : '<span style="color: red;">[nome do projeto]</span>';
 
-            // Construção do corpo do e-mail
             let corpoEmail = `Olá, ${obterSaudacao()}!\n\nSolicito a aprovação de todos os marcos do projeto abaixo:\n\n`;
 
-            // Linhas fixas para Código e Nome do projeto com placeholders visuais
             corpoEmail += `Código do projeto: ${codExibicao}\n`;
-            corpoEmail += `Nome do projeto: ${nomeExibicao}\n\n`;
+            corpoEmail += `Nome do projeto: ${nomeExibicao}\n`;
+
+            if (statusMarco) {
+                corpoEmail += `Status do marco: ${statusMarco}\n`;
+            }
+            
+            corpoEmail += `\n`;
 
             if (txtJustificativa) {
                 corpoEmail += `Justificativa: ${txtJustificativa}\n`;
@@ -264,19 +307,14 @@
             if (linkFluig) {
                 corpoEmail += `Link do repositório: ${linkFluig}\n`;
             }
-
-            let detalhesMarco = [];
-            if (statusMarco) detalhesMarco.push(`Status do marco: ${statusMarco}`);
             
-            if (possuiBacklog === 'Sim') {
-                detalhesMarco.push(`Possui backlog? Sim`);
-                if (justificativaBacklog) {
-                    detalhesMarco.push(`Justificativa do backlog: ${justificativaBacklog}`);
-                }
-            }
+            corpoEmail += `\n`;
 
-            if (detalhesMarco.length > 0) {
-                corpoEmail += detalhesMarco.join('\n') + '\n';
+            if (possuiBacklog === 'Sim') {
+                corpoEmail += `Possui backlog? Sim\n`;
+                if (justificativaBacklog) {
+                    corpoEmail += `Justificativa do backlog: ${justificativaBacklog}\n`;
+                }
             }
 
             resultElements.assunto.textContent = assunto;
@@ -358,12 +396,12 @@
 
         const limparFormulario = () => {
             document.querySelectorAll('#formMarco input[type="text"]').forEach(input => {
-                // Removido o if que impedia o statusMarco de ser limpo
                 input.value = '';
             });
             formElements.tipoJustificativa.selectedIndex = 0;
             formElements.possuiBacklog.selectedIndex = 0;
-            mudarBacklog(); // Aplica a lógica do select do backlog ao limpar
+            mudarBacklog(); 
+            mudarJustificativa(); // Aplica a lógica do cancelamento ao limpar
         };
 
         const abrirIndicadores = () => {
@@ -383,7 +421,7 @@
         };
 
         // --- 4. ATRIBUIÇÃO DOS EVENT LISTENERS ---
-        ['nomeProjeto', 'numTicket', 'linkFluig', 'justificativaBacklog', 'statusMarco'].forEach(id => {
+        ['nomeProjeto', 'numTicket', 'ticketCancelamento', 'linkFluig', 'justificativaBacklog', 'statusMarco'].forEach(id => {
             document.getElementById(id).addEventListener('input', gerarEmail);
         });
 
@@ -392,7 +430,7 @@
             gerarEmail();
         });
 
-        formElements.tipoJustificativa.addEventListener('change', gerarEmail);
+        formElements.tipoJustificativa.addEventListener('change', mudarJustificativa);
         formElements.possuiBacklog.addEventListener('change', mudarBacklog);
         
         document.getElementById('btnCopiarAssunto').addEventListener('click', () => copiarTextoPuro('resultadoAssunto'));
@@ -408,15 +446,49 @@
             copiarValorInput('codContrato', 'Código do contrato copiado!');
         });
 
+        // --- LÓGICA DO MODAL DE STATUS ---
+        const modalStatus = document.getElementById('modalStatus');
+        const btnFecharModalStatus = document.getElementById('btnFecharModalStatus');
+        const btnConfirmarStatusModal = document.getElementById('btnConfirmarStatusModal');
+        const inputTicketModal = document.getElementById('inputTicketModal');
+
+        // Abre o modal ao clicar no botão "Status"
         document.getElementById('btnCopiarStatus').addEventListener('click', () => {
+            modalStatus.style.display = 'flex';
+            // Se a pessoa já tinha digitado um ticket antes, puxa o valor
+            inputTicketModal.value = formElements.numTicket.value; 
+            inputTicketModal.focus();
+        });
+
+        // Função para fechar o modal
+        const fecharModalStatus = () => {
+            modalStatus.style.display = 'none';
+        };
+
+        // Fecha no botão X
+        btnFecharModalStatus.addEventListener('click', fecharModalStatus);
+
+        // Fecha ao clicar fora da caixinha do modal
+        modalStatus.addEventListener('click', (e) => {
+            if (e.target === modalStatus) {
+                fecharModalStatus();
+            }
+        });
+
+        // Lógica de copiar (com ou sem ticket) ao confirmar no modal
+        btnConfirmarStatusModal.addEventListener('click', () => {
             const dataFormatada = new Intl.DateTimeFormat('pt-BR', {
                 day: '2-digit',
                 month: '2-digit',
                 year: '2-digit'
             }).format(new Date());
             
-            const ticket = formElements.numTicket.value.trim();
+            const ticket = inputTicketModal.value.trim();
             
+            // Atualiza o input oculto original para manter o dado salvo no formulário
+            formElements.numTicket.value = ticket;
+            
+            // Mesma lógica original: copia apenas data e texto se estiver vazio
             let txt = `${dataFormatada} - Marco solicitado`;
             
             if (ticket) {
@@ -425,6 +497,7 @@
             
             navigator.clipboard.writeText(txt).then(() => {
                 mostrarToast(`"${txt}" copiado!`, true);
+                fecharModalStatus(); // Fecha o modal após copiar com sucesso
             });
         });
         
@@ -432,6 +505,7 @@
 
         // Inicializa o estado visual e o email gerado de imediato
         mudarBacklog();
+        mudarJustificativa();
     });
     </script>
 </body>

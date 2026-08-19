@@ -19,6 +19,7 @@
             --laranja: #ff8900;
             --laranja2: #ea7d00;
             --rosa: #ff009e;
+            --rosa2: #e6008a;
             --vermelho: #ff4400;
             --vermelho2: #dc3c02;
         }
@@ -427,12 +428,9 @@
 
         .botoes-de-acao {
             grid-area: buttons; /* Encaixa na área "buttons" do grid */
-            margin-top: 20px;
             display: flex;
-            gap: 15px;
+            gap: 10px;
             width: 100%;
-            margin-top: 20px;
-            margin-bottom: 10px;
             align-self: center;
         }
 
@@ -500,6 +498,15 @@
 
         .btn-roxo:hover {
             background-color: var(--roxo2);
+        }        
+
+        .btn-rosa {
+            background-color: var(--rosa);
+            color: var(--branco);
+        }
+
+        .btn-rosa:hover {
+            background-color: var(--rosa2);
         }
 
 
