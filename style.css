@@ -80,12 +80,12 @@
             /* Animação suave ao abrir */
             animation: fadeIn 0.5s ease-in-out;
             display: grid;
-            grid-template-columns: 1.5fr 1fr; /* Esquerda (1.5 partes) e Direita (1 parte) */
+            grid-template-columns: 1fr 1.1fr; /* Esquerda (1 parte) e Direita (1.1 partes) */
             gap: 30px; /* Espaço entre as colunas */
             grid-template-areas: 
                 "form result"
                 "buttons result"; /* Botões ficam embaixo do form, Resultado ocupa a lateral toda */
-            align-items: start;
+            align-items: stretch; /* Garante que as colunas tenham a mesma altura */
         }
 
         .container-formulario{
@@ -334,6 +334,68 @@
         .drag-handle:active {
             cursor: grabbing;
         }
+
+        /* ==========================================================
+        COPIAR DENTRO DOS INPUTS
+        ========================================================== */
+
+        .input-com-copia {
+            position: relative;
+            width: 100%;
+        }
+
+        .input-com-copia input {
+            width: 100%;
+            padding-right: 42px;
+        }
+
+        .btn-copiar-input {
+            position: absolute;
+            right: 6px;
+            top: 50%;
+            transform: translateY(-50%);
+
+            width: 32px;
+            height: 32px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border: none;
+            background: transparent;
+
+            cursor: pointer;
+
+            font-size: 16px;
+            line-height: 1;
+
+            border-radius: 6px;
+
+            opacity: 0.65;
+
+            transition:
+                background-color 0.2s ease,
+                opacity 0.2s ease,
+                transform 0.2s ease;
+        }
+
+        .btn-copiar-input:hover {
+            opacity: 1;
+            background-color: rgba(0, 0, 0, 0.06);
+        }
+
+        .btn-copiar-input:active {
+            transform: translateY(-50%) scale(0.92);
+        }
+
+        .btn-copiar-input:focus {
+            outline: none;
+        }
+
+        /* ==========================================================
+        FIM COPIAR DENTRO DOS INPUTS
+        ========================================================== */
 
         button, .btn {
             padding: 10px 20px;
@@ -648,6 +710,27 @@
             to {
                 opacity: 1;
                 transform: translateY(0);
+            }
+        }
+        
+        @media (min-width: 400px) {
+            .col-70 {
+                flex: 7; /* Ocupa ~70% */
+            }
+            .col-30 {
+                flex: 3; /* Ocupa ~30% */
+            }
+            .col-40 {
+                flex: 4; /* Ocupa ~40% */
+            }
+            .col-60 {
+                flex: 6; /* Ocupa ~60% */
+            }
+            .col-80 {
+                flex: 8; /* Ocupa ~80% */
+            }
+            .col-20 {
+                flex: 2; /* Ocupa ~20% */
             }
         }
 

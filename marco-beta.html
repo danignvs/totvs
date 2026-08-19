@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Aprovação de Marco</title>
+    
+    <link rel="stylesheet" href="style.css">
+    
+    <link rel="icon" type="image/x-icon" href="https://danignvs.github.io/totvs/favicons/marco.ico">
+    <style>
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Solicitação de <span class="azul-claro">Aprovação de Marco</span></h1>
+    </header>
+
+    <main class="container container-azul">
+
+        <section class="container-formulario" id="formMarco">
+            
+            <div class="topo">
+                <h2>Dados do Projeto</h2>                
+            </div>
+            <br>
+        
+            <!-- Nome do projeto (Obrigatório) -->
+            <div class="input-group">
+                <div class="input-item">
+                    <label for="nomeProjeto">Nome do projeto:</label>
+                    <input type="text" id="nomeProjeto" placeholder="" required>
+                </div>
+            </div>
+
+            <!-- Código do projeto / contrato (Obrigatório) -->
+            <div class="input-group">
+                <div class="input-item">
+                    <label for="codProjeto">Código do projeto:</label>
+                    <div class="input-com-copia">
+                        <input type="text" id="codProjeto" placeholder="" required>
+                        <button type="button" class="btn-copiar-input"
+                            id="btnCopiarCodProjeto"
+                            title="Copiar código do projeto"
+                            aria-label="Copiar código do projeto">
+                            📋
+                        </button>
+                    </div>
+                </div>
+
+                <div class="input-item">
+                    <label for="codContrato">Código do contrato:</label>
+                    <div class="input-com-copia">
+                        <input type="text" id="codContrato" placeholder="">
+                        <button type="button" class="btn-copiar-input"
+                            id="btnCopiarCodContrato"
+                            title="Copiar código do contrato"
+                            aria-label="Copiar código do contrato">
+                            📋
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Link Fluig isolado na própria linha -->
+            <div class="input-group">
+                <div class="input-item">
+                    <label for="linkFluig">Link do repositório (Fluig):</label>
+                    <input type="text" id="linkFluig" placeholder="">
+                </div>
+            </div>
+
+            <!-- Status do marco + Possui Backlog na mesma linha -->
+            <div class="input-group">
+                <div class="input-item col-60">
+                    <label for="statusMarco">Status do marco:</label>
+                    <input type="text" id="statusMarco" placeholder="Pré-aprovado">
+                </div>
+                <div class="input-item col-40">
+                    <label for="possuiBacklog">Possui backlog?</label>
+                    <select id="possuiBacklog">
+                        <option value="Não">Não</option>
+                        <option value="Sim">Sim</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Justificativa do Backlog (Oculta por padrão) -->
+            <div id="divJustificativaBacklog" class="input-item hidden" style="margin-top: 10px;">
+                <label for="justificativaBacklog">Justificativa do Backlog:</label>
+                <input type="text" id="justificativaBacklog" placeholder="Descreva a justificativa do backlog">
+            </div>
+        
+            <!-- Justificativa + Ticket -->
+            <div class="input-group">
+                <div class="input-item col-60">
+                    <label for="tipoJustificativa">Justificativa:</label>
+                    <select id="tipoJustificativa">                
+                        <option value="Conclusão do projeto">Termo de conclusão do projeto - MIT062</option>
+                        <option value="Documentação de aceite do cliente">Termo de validação de entrega - MIT010</option>
+                        <option value="Cancelamento do projeto">Cancelamento de projeto</option>
+                        <option value="Faturamento unilateral">Faturamento unilateral</option>
+                    </select>
+                </div>
+                <div class="input-item col-40">
+                    <label for="numTicket">Ticket:</label>
+                    <input type="text" id="numTicket" placeholder="Gerado após envio da solicitação">
+                </div>
+            </div>
+
+        </section>
+
+        <section class="container-resultado">
+            <div class="resultado">
+                <button class="btn-azul btn-aux" id="btnCopiarAssunto">Copiar</button>
+                <label>Assunto</label>
+                <pre id="resultadoAssunto"></pre>
+            </div>
+
+            <div class="resultado">
+                <button class="btn-azul btn-aux" id="btnCopiarMensagem">Copiar</button>
+                <label>Mensagem</label>
+                <pre id="resultadoCorpo"></pre>
+            </div>
+        </section>
+
+        <section class="botoes-de-acao">
+            <a class="btn btn-verde" href="https://suporte.interno.totvs.io/hc/pt-br/requests/new?ticket_form_id=43090375254931&tf_43653456041107=peso_2&tf_43093105543571=CST_PMO+Local_Gest%C3%A3o+de+Projetos_Aprova%C3%A7%C3%A3o+de+Marco+-+Projeto&isLeaf=level4&tf_43093056156819=01KQMPRVRX24GN0WEBHJ75KBQV&tf_undefined=portal_cst_brasil&pais=Brasil&tf_49875679614355=pais_brasil&level1=PMO+Local&level2=Gest%C3%A3o+de+Projetos&level3=Aprova%C3%A7%C3%A3o+de+Marco+-+Projeto" target="_blank">
+                Ticket
+            </a>
+            <button class="btn-roxo" id="btnCopiarStatus">Status</button>
+            <button class="btn-roxo" id="btnIndicadores">Indicadores</button>
+            <button class="btn-laranja" id="btnLimpar">Limpar</button>
+
+            <div id="toast">Copiado para a área de transferência!</div>
+        </section>
+    </main>  
+
+    <!-- Container onde o menu externo será renderizado -->
+    <div id="menu-container"></div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // --- 0. LÓGICA DO MENU DINÂMICO ---
+        fetch('menu.html')
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('menu-container').innerHTML = html;
+                
+                const currentPage = window.location.pathname.split('/').pop() || 'planejamento-calculadora.html'; 
+                const links = document.querySelectorAll('#menu-container a');
+                
+                links.forEach(link => {
+                    if (link.getAttribute('href') === currentPage) {
+                        link.parentElement.remove();
+                    }
+                });
+            })
+            .catch(err => console.error('Erro ao carregar o menu:', err));
+
+        // --- 1. CONFIGURAÇÕES INICIAIS ---
+        if (history.scrollRestoration) {
+            history.scrollRestoration = 'manual';
+        }
+        window.scrollTo(0, 0);
+
+        const formElements = {
+            codProjeto: document.getElementById('codProjeto'),
+            codContrato: document.getElementById('codContrato'),
+            nomeProjeto: document.getElementById('nomeProjeto'),
+            tipoJustificativa: document.getElementById('tipoJustificativa'),
+            numTicket: document.getElementById('numTicket'),
+            linkFluig: document.getElementById('linkFluig'),
+            statusMarco: document.getElementById('statusMarco'),
+            possuiBacklog: document.getElementById('possuiBacklog'),
+            justificativaBacklog: document.getElementById('justificativaBacklog'),
+            divJustificativaBacklog: document.getElementById('divJustificativaBacklog')
+        };
+
+        const resultElements = {
+            assunto: document.getElementById('resultadoAssunto'),
+            corpo: document.getElementById('resultadoCorpo')
+        };
+
+
+        // --- 2. FUNÇÕES DE LÓGICA E CONSTRUÇÃO ---
+        const obterSaudacao = () => {
+            const hora = parseInt(new Date().toLocaleString("en-US", {
+                timeZone: "America/Sao_Paulo",
+                hour: "numeric",
+                hour12: false
+            }), 10);
+
+            if (hora >= 5 && hora < 12) return "bom dia";
+            if (hora >= 12 && hora < 18) return "boa tarde";
+            return "boa noite"; 
+        };
+
+        const preencherContrato = () => {
+            const cod = formElements.codProjeto.value;
+            if (cod.length > 3) {
+                formElements.codContrato.value = cod.slice(0, -3);
+            } else if (cod.length === 0) {
+                formElements.codContrato.value = "";
+            }
+        };
+
+        const mudarBacklog = () => {
+            if (formElements.possuiBacklog.value === 'Sim') {
+                formElements.divJustificativaBacklog.classList.remove('hidden');
+            } else {
+                formElements.divJustificativaBacklog.classList.add('hidden');
+                formElements.justificativaBacklog.value = '';
+            }
+            gerarEmail();
+        };
+
+        const gerarEmail = () => {
+            const codProjeto = formElements.codProjeto.value.trim();
+            const nomeProjeto = formElements.nomeProjeto.value.trim();
+            const tipoJustificativa = formElements.tipoJustificativa.value;
+            const numTicket = formElements.numTicket.value.trim();
+            const linkFluig = formElements.linkFluig.value.trim();
+            const statusMarco = formElements.statusMarco.value.trim() || 'Pré-aprovado';
+            const possuiBacklog = formElements.possuiBacklog.value;
+            const justificativaBacklog = formElements.justificativaBacklog.value.trim();
+
+            const assunto = codProjeto ? `${codProjeto} - Solicitação de Aprovação de Marco` : 'Solicitação de Aprovação de Marco';
+
+            let txtJustificativa = '';
+            if (tipoJustificativa === 'Conclusão do projeto') {
+                txtJustificativa = 'Certificado de Conclusão disponível no repositório do projeto.';
+            } else if (tipoJustificativa === 'Documentação de aceite do cliente') {
+                txtJustificativa = 'Documentação de aceite do cliente disponível no repositório do projeto.';
+            } else if (tipoJustificativa === 'Cancelamento do projeto') {
+                txtJustificativa = `Encerramento do projeto devido ao cancelamento registrado no ticket nº ${numTicket || 'XXXXX'}`;
+            } else if (tipoJustificativa === 'Faturamento unilateral') {
+                txtJustificativa = `Faturamento unilateral.`;
+            }
+
+            // Definição dos placeholders com cor vermelha
+            const codExibicao = codProjeto ? codProjeto : '<span style="color: red;">[código do projeto]</span>';
+            const nomeExibicao = nomeProjeto ? nomeProjeto : '<span style="color: red;">[nome do projeto]</span>';
+
+            // Construção do corpo do e-mail
+            let corpoEmail = `Olá, ${obterSaudacao()}!\n\nGentileza proceder com a aprovação de todos os marcos do projeto abaixo:\n\n`;
+
+            // Linhas fixas para Código e Nome do projeto com placeholders visuais
+            corpoEmail += `Código do projeto: ${codExibicao}\n`;
+            corpoEmail += `Nome do projeto: ${nomeExibicao}\n\n`;
+
+            if (txtJustificativa) {
+                corpoEmail += `Justificativa: ${txtJustificativa}\n\n`;
+            }
+
+            let detalhesMarco = [];
+            if (statusMarco) detalhesMarco.push(`Status do marco: ${statusMarco}`);
+            
+            if (possuiBacklog === 'Sim') {
+                detalhesMarco.push(`Possui backlog? Sim`);
+                if (justificativaBacklog) {
+                    detalhesMarco.push(`Justificativa do backlog: ${justificativaBacklog}`);
+                }
+            }
+
+            if (detalhesMarco.length > 0) {
+                corpoEmail += detalhesMarco.join('\n') + '\n\n';
+            }
+
+            if (linkFluig) {
+                corpoEmail += `Link do repositório (Fluig): ${linkFluig}\n`;
+            }
+
+            resultElements.assunto.textContent = assunto;
+            resultElements.corpo.innerHTML = corpoEmail.trim().replace(/\n/g, '<br>');
+        };
+
+
+        // --- 3. FUNÇÕES DE UTILIDADE E FEEDBACK ---
+        const mostrarToast = (texto, mensagemExata = false) => {
+            const toast = document.getElementById("toast");
+            
+            if (mensagemExata) {
+                toast.textContent = texto;
+            } else {
+                let textoExibido = texto.length > 40 ? texto.substring(0, 40) + "..." : texto;
+                toast.textContent = `"${textoExibido}" copiado!`;
+            }
+            
+            toast.className = "show";
+            setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 4000);
+        };
+
+        const validarObrigatorios = () => {
+            if (!formElements.codProjeto.value.trim() || !formElements.nomeProjeto.value.trim()) {
+                mostrarToast("Preencha Nome e Código do projeto!", true);
+                return false;
+            }
+            return true;
+        };
+
+        const copiarTextoPuro = (idElemento) => {
+            if (!validarObrigatorios()) return;
+
+            const texto = document.getElementById(idElemento).textContent;
+            if (!texto.trim()) return;
+            
+            navigator.clipboard.writeText(texto).then(() => mostrarToast(texto))
+                .catch(err => console.error('Erro ao copiar: ', err));
+        };
+
+        const copiarTextoRico = async (idElemento) => {
+            if (!validarObrigatorios()) return;
+
+            const elemento = document.getElementById(idElemento);
+            const html = elemento.innerHTML;
+            const textoPuro = elemento.innerText;
+            const htmlFormatado = `<div style="margin: 0 !important; padding: 0 !important; font-family: Arial, sans-serif;">${html}</div>`;
+
+            try {
+                const data = [new ClipboardItem({ 
+                    "text/html": new Blob([htmlFormatado], { type: "text/html" }), 
+                    "text/plain": new Blob([textoPuro], { type: "text/plain" }) 
+                })];
+                await navigator.clipboard.write(data);
+                mostrarToast("Texto copiado!");
+            } catch (err) {
+                console.warn("ClipboardItem não suportado ou falhou. Usando fallback de texto puro...", err);
+                copiarTextoPuro(idElemento); 
+            }
+        };
+
+        const copiarValorInput = (idInput, mensagem) => {
+            const input = document.getElementById(idInput);
+            const valor = input.value.trim();
+
+            if (!valor) {
+                mostrarToast("Não há valor para copiar.", true);
+                return;
+            }
+
+            navigator.clipboard.writeText(valor)
+                .then(() => {
+                    mostrarToast(mensagem, true);
+                })
+                .catch(err => {
+                    console.error("Erro ao copiar:", err);
+                });
+        };
+
+        const limparFormulario = () => {
+            document.querySelectorAll('#formMarco input[type="text"]').forEach(input => {
+                // Removido o if que impedia o statusMarco de ser limpo
+                input.value = '';
+            });
+            formElements.tipoJustificativa.selectedIndex = 0;
+            formElements.possuiBacklog.selectedIndex = 0;
+            mudarBacklog(); // Aplica a lógica do select do backlog ao limpar
+        };
+
+        const abrirIndicadores = () => {
+            const codProjeto = formElements.codProjeto.value;
+            const linkPlanilha = "https://docs.google.com/spreadsheets/d/19b-F8VDW_tJeJ2h4lM_owYeUDWt0upNsK_OR_bVe0aw/edit";
+
+            navigator.clipboard.writeText(codProjeto).then(() => {
+                if (codProjeto) {
+                    mostrarToast("Código copiado! Abrindo planilha...", true);
+                } else {
+                    mostrarToast("Abrindo planilha (Nenhum código para copiar)", true);
+                }
+                setTimeout(() => window.open(linkPlanilha, '_blank'), 300);
+            }).catch(() => {
+                window.open(linkPlanilha, '_blank');
+            });
+        };
+
+        // --- 4. ATRIBUIÇÃO DOS EVENT LISTENERS ---
+        ['nomeProjeto', 'numTicket', 'linkFluig', 'justificativaBacklog', 'statusMarco'].forEach(id => {
+            document.getElementById(id).addEventListener('input', gerarEmail);
+        });
+
+        formElements.codProjeto.addEventListener('input', () => {
+            preencherContrato();
+            gerarEmail();
+        });
+
+        formElements.tipoJustificativa.addEventListener('change', gerarEmail);
+        formElements.possuiBacklog.addEventListener('change', mudarBacklog);
+        
+        document.getElementById('btnCopiarAssunto').addEventListener('click', () => copiarTextoPuro('resultadoAssunto'));
+        document.getElementById('btnCopiarMensagem').addEventListener('click', () => copiarTextoRico('resultadoCorpo'));
+        document.getElementById('btnLimpar').addEventListener('click', limparFormulario);
+
+        // Copiar botões de input
+        document.getElementById('btnCopiarCodProjeto').addEventListener('click', () => {
+            copiarValorInput('codProjeto', 'Código do projeto copiado!');
+        });
+
+        document.getElementById('btnCopiarCodContrato').addEventListener('click', () => {
+            copiarValorInput('codContrato', 'Código do contrato copiado!');
+        });
+
+        document.getElementById('btnCopiarStatus').addEventListener('click', () => {
+            const dataFormatada = new Intl.DateTimeFormat('pt-BR', {
+                day: '2-digit',
+                month: '2-digit',
+                year: '2-digit'
+            }).format(new Date());
+            
+            const ticket = formElements.numTicket.value.trim();
+            
+            let txt = `${dataFormatada} - Marco solicitado`;
+            
+            if (ticket) {
+                txt += ` - Ticket ${ticket}`;
+            }
+            
+            navigator.clipboard.writeText(txt).then(() => {
+                mostrarToast(`"${txt}" copiado!`, true);
+            });
+        });
+        
+        document.getElementById('btnIndicadores').addEventListener('click', abrirIndicadores);
+
+        // Inicializa o estado visual e o email gerado de imediato
+        mudarBacklog();
+    });
+    </script>
+</body>
+</html>
