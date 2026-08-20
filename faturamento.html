@@ -23,6 +23,10 @@
 
             <div class="topo">
                 <h2></h2>
+                <button class="btn-vermelho btn-aux" id="btnLimpar" 
+                    style="padding: 15px 0 0 0; background-color: transparent; color: var(--vermelho)">
+                    <img src="imagens/lixeira-vermelha.svg" style="width: 20px;">
+                </button>
             </div>
             <br>
 
@@ -38,7 +42,7 @@
             <div class="input-group">
 
                 <div class="input-item">
-                    <label for="codProjeto">Código do  projeto:</label>
+                    <label for="codProjeto">Código do projeto:</label>
 
                     <div class="input-com-copia">
                         <input type="text" id="codProjeto" placeholder="">
@@ -96,9 +100,9 @@
                 </div>
 
                 <!-- campo Ticket -->
-                <div class="input-item">
+                <div class="input-item hidden">
                     <label for="ticket">Ticket:</label>
-                    <input type="text" id="ticket" placeholder="Gerado após envio da solicitação">
+                    <input type="text" id="ticket" placeholder="Copie após o envio da solicitação">
                 </div>
 
             </div>
@@ -129,15 +133,14 @@
 
         <section class="botoes-de-acao">
 
-            <a class="btn btn-verde"
+            <a class="btn btn-roxo"
                 href="https://suporte.interno.totvs.io/hc/pt-br/requests/new?ticket_form_id=43090375254931&tf_43653456041107=peso_4&tf_43093105543571=CST_PMO+Local_Gest%C3%A3o+de+Projetos_Solicita%C3%A7%C3%A3o+de+Faturamento+-+Projeto&isLeaf=level4&tf_43093056156819=01KQMPRJP2AGE5BP7D362CCRW9&tf_undefined=portal_cst_brasil&pais=Brasil&tf_49875679614355=pais_brasil&level1=PMO+Local&level2=Gest%C3%A3o+de+Projetos&level3=Solicita%C3%A7%C3%A3o+de+Faturamento+-+Projeto"
                 target="_blank">
                 Ticket
             </a>
 
-            <button class="btn-roxo" id="btnCopiarStatus">Status</button>
-            <button class="btn-roxo" id="btnIndicadores">Indicadores</button>
-            <button class="btn-laranja" id="btnLimpar">Limpar</button>
+            <button class="btn-rosa" id="btnCopiarStatus">Status</button>
+            <button class="btn-verde" id="btnIndicadores">Indicadores</button>
 
             <div id="toast">Copiado para a área de transferência!</div>
 
@@ -147,6 +150,20 @@
 
     <!-- Container onde o menu externo será renderizado -->
     <div id="menu-container"></div>
+
+    <!-- Modal de Status -->
+    <div id="modalStatus" class="modal-overlay">
+        <div class="modal-box">
+            <button class="btn-fechar-modal" id="btnFecharModalStatus">X</button>
+            <h3 class="azul-claro" style="margin-bottom: 15px;"></h3>
+            
+            <label for="inputTicketModal">Ticket gerado na solicitação</label>
+            <input type="text" id="inputTicketModal" placeholder="">
+            
+            <br><br>
+            <button class="btn btn-roxo" id="btnConfirmarStatusModal">Copiar Status</button>
+        </div>
+    </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -397,26 +414,63 @@
             document.getElementById('btnCopiarCodProjeto').addEventListener('click', () => copiarValorInput('codProjeto', 'Código do projeto copiado!'));
             document.getElementById('btnCopiarCodContrato').addEventListener('click', () => copiarValorInput('codContratoPSA', 'Código do contrato copiado!'));
 
+            document.getElementById('btnIndicadores').addEventListener('click', abrirIndicadores);
+            document.getElementById('btnLimpar').addEventListener('click', limparFormulario);
+
+            // ============================================================
+            // --- LÓGICA DO MODAL DE STATUS ---
+            // ============================================================
+            const modalStatus = document.getElementById('modalStatus');
+            const btnFecharModalStatus = document.getElementById('btnFecharModalStatus');
+            const btnConfirmarStatusModal = document.getElementById('btnConfirmarStatusModal');
+            const inputTicketModal = document.getElementById('inputTicketModal');
+
+            // Abre o modal ao clicar no botão "Status"
             document.getElementById('btnCopiarStatus').addEventListener('click', () => {
+                modalStatus.style.display = 'flex';
+                inputTicketModal.value = formElements.ticket.value; 
+                inputTicketModal.focus();
+            });
+
+            // Função para fechar o modal
+            const fecharModalStatus = () => {
+                modalStatus.style.display = 'none';
+            };
+
+            // Fecha no botão X
+            btnFecharModalStatus.addEventListener('click', fecharModalStatus);
+
+            // Fecha ao clicar fora da caixinha do modal
+            modalStatus.addEventListener('click', (e) => {
+                if (e.target === modalStatus) {
+                    fecharModalStatus();
+                }
+            });
+
+            // Lógica de copiar (com ou sem ticket) ao confirmar no modal
+            btnConfirmarStatusModal.addEventListener('click', () => {
                 const dataFormatada = new Intl.DateTimeFormat('pt-BR', {
                     day: '2-digit',
                     month: '2-digit',
                     year: '2-digit'
                 }).format(new Date());
-
-                const ticket = formElements.ticket.value.trim();
+                
+                const ticket = inputTicketModal.value.trim();
+                
+                // Atualiza o input original do formulário
+                formElements.ticket.value = ticket;
+                
                 let txt = `${dataFormatada} - Faturamento Solicitado`;
+                
                 if (ticket) {
                     txt += ` - Ticket ${ticket}`;
                 }
-
+                
                 navigator.clipboard.writeText(txt).then(() => {
                     mostrarToast(`"${txt}" copiado!`, true);
+                    fecharModalStatus();
                 });
             });
-
-            document.getElementById('btnIndicadores').addEventListener('click', abrirIndicadores);
-            document.getElementById('btnLimpar').addEventListener('click', limparFormulario);
 
             // ============================================================
             // INICIALIZAÇÃO
