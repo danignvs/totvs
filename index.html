@@ -204,14 +204,13 @@
             top: 0;
             bottom: 0;
             width: 5px;
-            background: var(--accent-purple);
+            background: var(--card-accent, var(--accent-purple)); /* Usa a cor dinâmica da sequência */
         }
 
-        /* Variações de cores da barra lateral das cartas */
-        .card-purple::before { background: var(--accent-purple); }
-        .card-green::before { background: var(--accent-green); }
-        .card-pink::before { background: var(--accent-pink); }
-        .card-orange::before { background: var(--accent-orange); }
+        /* Remove a faixa lateral dos cards descontinuados */
+        .tool-card.deprecated::before {
+            display: none;
+        }
 
         .tool-card.deprecated {
             opacity: 0.7;
@@ -349,13 +348,14 @@
         <button class="hamburger" id="hamburger" type="button" aria-label="Abrir menu" aria-expanded="false">☰</button>
 
         <div class="nav-menu" id="navMenu">
-            <a href="faturamento.html">Faturamento</a>
-            <a href="marco.html">Aprovação de Marco</a>
-            <a href="encerramento.html">Encerramento</a>
-            <a href="planejamento-calculadora.html">Calculadora de Horas</a>
+            <a href="faturamento.html" target="_blank">Faturamento</a>
+            <a href="marco.html" target="_blank">Aprovação de Marco</a>
+            <a href="encerramento.html" target="_blank">Encerramento</a>
+            <a href="planejamento-calculadora.html" target="_blank">Calculadora de Horas</a>
             <a href="https://planejador-hospitalidade.vercel.app/" target="_blank" rel="noopener">Alocador de Recursos</a>
-            <a href="item-contabil.html">Item Contábil (Legado)</a>
-            <a href="planejamento.html">Planejamento (Legado)</a>
+            <a href="https://news-totvs.vercel.app/" target="_blank" rel="noopener">Gerador de News</a>
+            <a href="item-contabil.html" target="_blank">Item Contábil (Legado)</a>
+            <a href="planejamento.html" target="_blank">Planejamento (Legado)</a>
             <a href="https://fretado.vercel.app/" target="_blank" rel="noopener">Horários de Fretado</a>
         </div>
     </nav>
@@ -367,7 +367,7 @@
         <div class="tools">
 
             <!-- Card 1: Roxo -->
-            <article class="tool-card card-purple">
+            <article class="tool-card">
                 <div class="tool-info">
                     <h2 class="tool-title">Faturamento</h2>
                     <p class="tool-desc">
@@ -384,7 +384,7 @@
             </article>
 
             <!-- Card 2: Verde -->
-            <article class="tool-card card-green">
+            <article class="tool-card">
                 <div class="tool-info">
                     <h2 class="tool-title">Aprovação de Marco</h2>
                     <p class="tool-desc">
@@ -401,7 +401,7 @@
             </article>
 
             <!-- Card 3: Rosa -->
-            <article class="tool-card card-pink">
+            <article class="tool-card">
                 <div class="tool-info">
                     <h2 class="tool-title">Encerramento</h2>
                     <p class="tool-desc">
@@ -418,7 +418,7 @@
             </article>
 
             <!-- Card 4: Laranja -->
-            <article class="tool-card card-orange">
+            <article class="tool-card">
                 <div class="tool-info">
                     <h2 class="tool-title">Calculadora de Horas</h2>
                     <p class="tool-desc">
@@ -435,11 +435,11 @@
             </article>
 
             <!-- Card 5: Roxo (Reinicia a sequência) -->
-            <article class="tool-card card-purple">
+            <article class="tool-card">
                 <div class="tool-info">
                     <h2 class="tool-title">Alocador de Recursos</h2>
                     <p class="tool-desc">
-                        Ideal para grandes volumes de projetos. Utiliza as horas disponíveis dos analistas obtidas no PSA do Dynamics e distribui os projetos pela capacidade existente, evitando sobrecarga e reduzindo o trabalho manual.
+                        Utiliza as horas disponíveis dos analistas obtidas no PSA do Dynamics e distribui os projetos pela capacidade existente, evitando sobrecarga e reduzindo o trabalho manual. Ideal para grandes volumes de projetos.
                     </p>
                     <a href="https://planejador-hospitalidade.vercel.app/" class="btn-acessar" target="_blank" rel="noopener">Abrir Ferramenta →</a>
                 </div>
@@ -447,6 +447,23 @@
                 <div class="tool-preview">
                     <div class="screenshot-frame">
                         <img src="imagens/index/alocador.png" alt="Print da ferramenta de Alocador de Recursos">
+                    </div>
+                </div>
+            </article>
+
+            <!-- Card: Gerador de News -->
+            <article class="tool-card">
+                <div class="tool-info">
+                    <h2 class="tool-title">Gerador de News</h2>
+                    <p class="tool-desc">
+                        Cria e formata comunicados operacionais de forma automatizada. Facilita o disparo de boletins, atualizações e comunicados internos com layout padronizado. É só copiar e colar no corpo do e-mail.
+                    </p>
+                    <a href="https://news-totvs.vercel.app/" class="btn-acessar" target="_blank" rel="noopener">Abrir Ferramenta →</a>
+                </div>
+
+                <div class="tool-preview">
+                    <div class="screenshot-frame">
+                        <img src="imagens/index/news.png" alt="Print do Gerador de News">
                     </div>
                 </div>
             </article>
@@ -460,7 +477,7 @@
         <div class="tools">
 
             <!-- Card 6: Verde (Continua a sequência) -->
-            <article class="tool-card card-green">
+            <article class="tool-card">
                 <div class="tool-info">
                     <h2 class="tool-title">Botão inserir tabela</h2>
                     <p class="tool-desc">
@@ -476,7 +493,7 @@
             </article>
 
             <!-- Card 7: Rosa -->
-            <article class="tool-card card-pink">
+            <article class="tool-card">
                 <div class="tool-info">
                     <h2 class="tool-title">Horários de Fretado</h2>
                     <p class="tool-desc">
@@ -500,7 +517,7 @@
         <div class="tools">
 
             <!-- Card 8: Laranja -->
-            <article class="tool-card card-orange deprecated">
+            <article class="tool-card deprecated">
                 <div class="tool-info">
                     <h2 class="tool-title">Planejamento</h2>
                     <p class="tool-desc">
@@ -517,7 +534,7 @@
             </article>
 
             <!-- Card 9: Roxo (Reinicia a sequência) -->
-            <article class="tool-card card-purple deprecated">
+            <article class="tool-card deprecated">
                 <div class="tool-info">
                     <h2 class="tool-title">Item Contábil</h2>
                     <p class="tool-desc">
@@ -565,6 +582,18 @@
                 navMenu.classList.remove("active");
                 hamburger.setAttribute("aria-expanded", "false");
             }
+        });
+
+        // Aplica a sequência de cores contínua entre todas as seções (ignorando descontinuados)
+        const colors = [
+            'var(--accent-purple)',
+            'var(--accent-green)',
+            'var(--accent-pink)',
+            'var(--accent-orange)'
+        ];
+
+        document.querySelectorAll('.tool-card:not(.deprecated)').forEach((card, index) => {
+            card.style.setProperty('--card-accent', colors[index % colors.length]);
         });
     </script>
 
