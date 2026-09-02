@@ -1,0 +1,73 @@
+{
+  "BR": [
+    {"data": "01/01/{ano}", "nome": "Confraternização Universal", "tipo": "nacional"},
+    {"data": "21/04/{ano}", "nome": "Tiradentes", "tipo": "nacional"},
+    {"data": "01/05/{ano}", "nome": "Dia do Trabalho", "tipo": "nacional"},
+    {"data": "07/09/{ano}", "nome": "Independência do Brasil", "tipo": "nacional"},
+    {"data": "12/10/{ano}", "nome": "Nossa Senhora Aparecida", "tipo": "nacional"},
+    {"data": "02/11/{ano}", "nome": "Finados", "tipo": "nacional"},
+    {"data": "15/11/{ano}", "nome": "Proclamação da República", "tipo": "nacional"},
+    {"data": "20/11/{ano}", "nome": "Dia da Consciência Negra", "tipo": "nacional"},
+    {"data": "25/12/{ano}", "nome": "Natal", "tipo": "nacional"}
+  ],
+  "SP": [
+    {"data": "25/01/{ano}", "nome": "Aniversário de São Paulo", "tipo": "municipal"},
+    {"data": "09/07/{ano}", "nome": "Revolução Constitucionalista", "tipo": "estadual"}
+  ],
+  "RJ": [
+    {"data": "20/01/{ano}", "nome": "São Sebastião", "tipo": "municipal"},
+    {"data": "23/04/{ano}", "nome": "São Jorge", "tipo": "estadual"},
+    {"data": "20/10/{ano}", "nome": "Data utilizada pelo calendário do PSA", "tipo": "psa"}    
+  ],
+  "BH": [
+    {"data": "15/08/{ano}", "nome": "Nossa Senhora da Boa Viagem", "tipo": "municipal"},
+    {"data": "08/12/{ano}", "nome": "Imaculada Conceição", "tipo": "municipal"}
+  ],
+  "SSA": [
+    {"data": "24/06/{ano}", "nome": "São João", "tipo": "municipal"},
+    {"data": "02/07/{ano}", "nome": "Independência da Bahia", "tipo": "estadual"},
+    {"data": "08/12/{ano}", "nome": "Nossa Senhora da Conceição da Praia", "tipo": "municipal"}
+  ],
+  "BSB": [
+    {"data": "30/11/{ano}", "nome": "Dia do Evangélico", "tipo": "distrital"}
+  ],
+  "POA": [
+    {"data": "02/02/{ano}", "nome": "Nossa Senhora dos Navegantes", "tipo": "municipal"},
+    {"data": "20/09/{ano}", "nome": "Revolução Farroupilha", "tipo": "estadual"}
+  ],
+  "REC": [
+    {"data": "06/03/{ano}", "nome": "Data Magna de Pernambuco", "tipo": "estadual"},
+    {"data": "24/06/{ano}", "nome": "São João", "tipo": "municipal"},
+    {"data": "16/07/{ano}", "nome": "Nossa Senhora do Carmo", "tipo": "municipal"},
+    {"data": "08/12/{ano}", "nome": "Nossa Senhora da Conceição", "tipo": "municipal"}
+  ],
+  "CUR": [
+    {"data": "08/09/{ano}", "nome": "Nossa Senhora da Luz dos Pinhais", "tipo": "municipal"}
+  ],
+  "FOR": [
+    {"data": "19/03/{ano}", "nome": "São José", "tipo": "estadual"},
+    {"data": "25/03/{ano}", "nome": "Data Magna do Ceará", "tipo": "estadual"},
+    {"data": "13/04/{ano}", "nome": "Aniversário de Fortaleza", "tipo": "municipal"},
+    {"data": "15/08/{ano}", "nome": "Nossa Senhora da Assunção", "tipo": "municipal"}
+  ],
+  "MAO": [
+    {"data": "05/09/{ano}", "nome": "Elevação do Amazonas", "tipo": "estadual"},
+    {"data": "24/10/{ano}", "nome": "Aniversário de Manaus", "tipo": "municipal"},
+    {"data": "08/12/{ano}", "nome": "Nossa Senhora da Conceição", "tipo": "municipal"}
+  ],
+  "BEL": [
+    {"data": "12/01/{ano}", "nome": "Aniversário de Belém", "tipo": "municipal"},
+    {"data": "15/08/{ano}", "nome": "Adesão do Pará", "tipo": "estadual"},
+    {"data": "08/12/{ano}", "nome": "Nossa Senhora da Conceição", "tipo": "municipal"}
+  ],
+  "VIX": [
+    {"data": "08/09/{ano}", "nome": "Nossa Senhora da Vitória / Aniversário de Vitória", "tipo": "municipal"}
+  ],
+  "FLN": [
+    {"data": "23/03/{ano}", "nome": "Aniversário de Florianópolis", "tipo": "municipal"}
+  ],
+  "GYN": [
+    {"data": "24/05/{ano}", "nome": "Nossa Senhora Auxiliadora", "tipo": "municipal"},
+    {"data": "24/10/{ano}", "nome": "Aniversário de Goiânia", "tipo": "municipal"}
+  ]
+}

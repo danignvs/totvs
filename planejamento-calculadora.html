@@ -225,6 +225,26 @@
         <section class="container-formulario" style="width: 100%;">        
 
             <div class="input-group">
+                <div class="input-item">
+                    <label for="selLocalFeriados"></label>
+                    <select id="selLocalFeriados" onchange="gerarDistribuicao()">
+                        <option value="RJ">Feriados Rio de Janeiro</option>
+                        <option value="BR">Feriados nacionais</option>
+                        <!--option value="SP">São Paulo (SP)</option>
+                        <option value="BH">Belo Horizonte (MG)</option>
+                        <option value="SSA">Salvador (BA)</option>
+                        <option value="BSB">Brasília (DF)</option>
+                        <option value="POA">Porto Alegre (RS)</option>
+                        <option value="REC">Recife (PE)</option>
+                        <option value="CUR">Curitiba (PR)</option>
+                        <option value="FOR">Fortaleza (CE)</option>
+                        <option value="MAO">Manaus (AM)</option>
+                        <option value="BEL">Belém (PA)</option>
+                        <option value="VIX">Vitória (ES)</option>
+                        <option value="FLN">Florianópolis (SC)</option>
+                        <option value="GYN">Goiânia (GO)</option-->
+                    </select>
+                </div>
                 <div class="input-item custom-date-wrapper">
                     <label for="txtHoras"></label>
                     <input type="text" id="txtHoras" placeholder="Total de Horas" oninput="gerarDistribuicao()">
@@ -288,19 +308,6 @@
 
     </div>
 
-    <div id="secaoTutorial" class="container tutorial">
-        <h2>💡 Dicas de Uso</h2>
-        <ul>
-            <li>Preencha o "Total de Horas", "Início" e "Conclusão" para <mark class="mark-limao">distribuir as horas automaticamente</mark> pelos dias úteis.</li>
-            <li>O sistema reconhece automaticamente finais de semana e <mark class="mark-limao">feriados nacionais</mark> (incluindo feriados móveis), ignorando-os na distribuição padrão.</li>
-            <li>Para um <strong>ajuste manual</strong>, basta clicar em qualquer dia do calendário e digitar. O limite de segurança é de <strong>8 horas por dia</strong>.</li>
-            <li><strong>Atalhos rápidos:</strong> Posicione o mouse ou clique no quadradinho de um dia e use as <mark class="mark-limao">setas do teclado (↑ e ↓)</mark> para somar ou subtrair horas.</li>
-            <li>Use a tecla <strong>TAB</strong> para pular rapidamente para o dia seguinte sem usar o mouse.</li>
-            <li>Horas lançadas acidentalmente em um dia de descanso farão com que a data fique <strong class="laranja">laranja</strong> como forma de aviso.</li>
-            <li><strong>Terminou?</strong> Clique no botão <strong class="roxo">"Copiar"</strong>. A ferramenta tira um "print" automático da tabela, gerando uma imagem para você colar no Teams ou E-mail sem desconfigurar o layout.</li>
-        </ul>
-    </div>
-
     <!-- Container onde o menu externo será renderizado -->
     <div id="menu-container"></div>
 
@@ -315,6 +322,7 @@
     let contadorCliquesHora = 0;
     let usouTabNesteModal = false;
     let ultimoInputClicado = -1;
+    let feriadosCacheados = {};
 
     // --- TOAST NOTIFICATION ---
     const mostrarToast = (txt) => {
@@ -445,7 +453,6 @@
         areaTabela.innerHTML = htmlTabela;
     };
 
-
     const registrarCliqueHora = (indexAtual) => {
         if (usouTabNesteModal) return;
         if (indexAtual === ultimoInputClicado + 1) {
@@ -517,56 +524,94 @@
         return isNaN(parseFloat(limpo)) ? 0 : parseFloat(limpo);
     };
 
-    const FERIADOS_EXTRAS = []; 
-    let feriadosCacheados = {};
+    // =====================================================================
+    // FERIADOS FIXOS: carregados externamente de feriados.json
+    // =====================================================================
 
-    const obterFeriadosNacionais = (ano) => {
-        if (feriadosCacheados[ano]) return feriadosCacheados[ano];
-        
-        let feriados = [
-            `01/01/${ano}`, 
-            `20/01/${ano}`, 
-            `21/04/${ano}`, 
-            `23/04/${ano}`, 
-            `01/05/${ano}`, 
-            `07/09/${ano}`, 
-            `12/10/${ano}`, 
-            `02/11/${ano}`, 
-            `15/11/${ano}`, 
-            `20/11/${ano}`, 
-            `25/12/${ano}`  
-        ];
+    let feriadosFixosConfig = {};
+    let carregamentoFeriadosFixos = null;
 
-        if (typeof FERIADOS_EXTRAS !== 'undefined' && FERIADOS_EXTRAS.length > 0) {
-            FERIADOS_EXTRAS.forEach(f => feriados.push(`${f}/${ano}`));
-        }
+    const carregarFeriadosFixos = () => {
+        if (carregamentoFeriadosFixos) return carregamentoFeriadosFixos;
 
+        carregamentoFeriadosFixos = fetch('feriados.json', { cache: 'no-store' })
+            .then(response => {
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                return response.json();
+            })
+            .then(config => {
+                feriadosFixosConfig = config || {};
+                return feriadosFixosConfig;
+            })
+            .catch(err => {
+                console.error('Erro ao carregar feriados.json:', err);
+                feriadosFixosConfig = {};
+                return feriadosFixosConfig;
+            });
+
+        return carregamentoFeriadosFixos;
+    };
+
+    const obterFeriadosFixos = (local, ano) => {
+        const nacionais = Array.isArray(feriadosFixosConfig.BR) ? feriadosFixosConfig.BR : [];
+        const locais = Array.isArray(feriadosFixosConfig[local]) ? feriadosFixosConfig[local] : [];
+
+        const converterData = item => {
+            if (typeof item === 'string') return item.replace('{ano}', ano);
+            if (item && typeof item.data === 'string') return item.data.replace('{ano}', ano);
+            return null;
+        };
+
+        return [...nacionais, ...(local !== 'BR' ? locais : [])]
+            .map(converterData)
+            .filter(Boolean);
+    };
+
+    // --- OBTÉM FERIADOS COMPLETOS (FIXOS DO JSON + MÓVEIS DA PÁSCOA) ---
+    const obterTodosFeriados = (ano) => {
+        const elSelect = document.getElementById('selLocalFeriados');
+        const local = elSelect ? elSelect.value : 'BR';
+        const chaveCache = `${local}_${ano}`;
+
+        if (feriadosCacheados[chaveCache]) return feriadosCacheados[chaveCache];
+
+        // Feriados fixos são mantidos exclusivamente em feriados.json
+        let feriados = obterFeriadosFixos(local, ano);
+
+        // =============================================================
+        // Cálculo dos feriados móveis conforme a Páscoa
+        // =============================================================
         let a = ano % 19, b = Math.floor(ano / 100), c = ano % 100, d = Math.floor(b / 4), e = b % 4;
         let f = Math.floor((b + 8) / 25), g = Math.floor((b - f + 1) / 3), h = (19 * a + b - d - g + 15) % 30;
         let i = Math.floor(c / 4), k = c % 4, l = (32 + 2 * e + 2 * i - h - k) % 7;
         let m = Math.floor((a + 11 * h + 22 * l) / 451), mes = Math.floor((h + l - 7 * m + 114) / 31);
         let dia = ((h + l - 7 * m + 114) % 31) + 1;
-        
+
         let pascoa = new Date(ano, mes - 1, dia);
         let formata = (dt) => String(dt.getDate()).padStart(2, '0') + '/' + String(dt.getMonth() + 1).padStart(2, '0') + '/' + ano;
-        
+
         let segundaCarnaval = new Date(pascoa); segundaCarnaval.setDate(pascoa.getDate() - 48);
         let carnaval = new Date(pascoa); carnaval.setDate(pascoa.getDate() - 47);
         let sextaSanta = new Date(pascoa); sextaSanta.setDate(pascoa.getDate() - 2);
         let corpusChristi = new Date(pascoa); corpusChristi.setDate(pascoa.getDate() + 60);
-        
+
         feriados.push(
-            formata(segundaCarnaval), 
-            formata(carnaval), 
-            formata(sextaSanta), 
+            formata(segundaCarnaval),
+            formata(carnaval),
+            formata(sextaSanta),
             formata(corpusChristi)
         );
-        
-        feriadosCacheados[ano] = feriados;
+
+        // Evita datas duplicadas quando uma data móvel coincidir com uma fixa.
+        feriados = [...new Set(feriados)];
+
+        feriadosCacheados[chaveCache] = feriados;
         return feriados;
     };
 
-    const gerarDistribuicao = () => {
+    const gerarDistribuicao = async () => {
+        await carregarFeriadosFixos();
+
         let horasPrevistas = parseHoras(document.getElementById('txtHoras').value);
         let dtInStr = document.getElementById('txtInicio').value;
         let dtFimStr = document.getElementById('txtFim').value;
@@ -589,7 +634,7 @@
                 let dtTemp = new Date(dataInicioGlobal);
                 while (dtTemp <= dataFimGlobal) {
                     let ano = dtTemp.getFullYear();
-                    let feriados = obterFeriadosNacionais(ano);
+                    let feriados = obterTodosFeriados(ano);
                     let dataStr = String(dtTemp.getDate()).padStart(2, '0') + '/' + String(dtTemp.getMonth() + 1).padStart(2, '0') + '/' + ano;
                     let isFds = dtTemp.getDay() === 0 || dtTemp.getDay() === 6;
                     let isFeriado = feriados.includes(dataStr);
@@ -639,7 +684,7 @@
             grid.innerHTML = '<div class="cal-dias-semana"><div>D</div><div>S</div><div>T</div><div>Q</div><div>Q</div><div>S</div><div>S</div></div>';
             let primeiroDiaMes = new Date(ano, mes, 1).getDay();
             let totalDiasMes = new Date(ano, mes + 1, 0).getDate();
-            let feriados = obterFeriadosNacionais(ano);
+            let feriados = obterTodosFeriados(ano);
             for (let i = 0; i < primeiroDiaMes; i++) {
                 grid.innerHTML += `<div class="cal-dia fora-mes"></div>`;
             }
@@ -753,7 +798,7 @@
                     totalNoCalendario += horasState[key];
                 }
                 if (dt) {
-                    let feriados = obterFeriadosNacionais(dt.getFullYear());
+                    let feriados = obterTodosFeriados(dt.getFullYear());
                     let isFds = dt.getDay() === 0 || dt.getDay() === 6;
                     if (isFds || feriados.includes(key)) temFeriadoPreenchido = true;
                 }
@@ -854,27 +899,25 @@
         }
     });
 
-    document.addEventListener('DOMContentLoaded', () => {
-        // --- 0. LÓGICA DO MENU DINÂMICO ---
+    document.addEventListener('DOMContentLoaded', async () => {
+        await carregarFeriadosFixos();
+
         fetch('menu.html')
             .then(response => response.text())
             .then(html => {
                 document.getElementById('menu-container').innerHTML = html;
                 
-                // Pega o nome do arquivo atual 
                 const currentPage = window.location.pathname.split('/').pop() || 'planejamento-calculadora.html'; 
                 const links = document.querySelectorAll('#menu-container a');
                 
-                // Varre os links e REMOVE o botão da página que está aberta
                 links.forEach(link => {
                     if (link.getAttribute('href') === currentPage) {
-                        link.parentElement.remove(); // <-- A mágica acontece aqui!
+                        link.parentElement.remove();
                     }
                 });
             })
             .catch(err => console.error('Erro ao carregar o menu:', err));
 
-        // Inicia o calendário na data de hoje
         currentDate.setDate(1);
         renderCalendario();
     });
