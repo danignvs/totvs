@@ -14,6 +14,23 @@
         .hidden {
             display: none !important;
         }
+        .opcoes-assunto {
+            display: flex;
+            gap: 25px;
+            margin-bottom: 15px;
+        }
+        .opcoes-assunto label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            margin: 0;
+        }
+        .opcoes-assunto input[type="radio"] {
+            width: auto;
+            margin: 0;
+            cursor: pointer;
+        }
     </style>
 </head>
 
@@ -36,6 +53,12 @@
             <br>
             
         
+            <!-- Tipo de solicitação (Aprovar / Aprovar e encerrar) -->
+            <div class="opcoes-assunto">
+                <label><input type="radio" name="tipoAssunto" value="Aprovação dos marcos" checked> Aprovar marco</label>
+                <label><input type="radio" name="tipoAssunto" value="Aprovação dos marcos e encerramento"> Aprovar marcos e encerrar</label>
+            </div>
+
             <!-- Nome do projeto (Obrigatório) -->
             <div class="input-group">
                 <div class="input-item">
@@ -271,9 +294,11 @@
             const possuiBacklog = formElements.possuiBacklog.value;
             const justificativaBacklog = formElements.justificativaBacklog.value.trim();
 
+            const tipoAssunto = document.querySelector('input[name="tipoAssunto"]:checked').value;
+
             const assunto = codProjeto || nomeProjeto 
-            ? ['Aprovação dos marcos e encerramento do projeto', codProjeto, nomeProjeto].filter(Boolean).join(' - ') 
-            : 'Aprovação dos marcos e encerramento do projeto';
+            ? [tipoAssunto, codProjeto, nomeProjeto].filter(Boolean).join(' - ') 
+            : `Solicitação de ${tipoAssunto.toLowerCase()} do projeto`;
 
             let txtJustificativa = '';
             if (tipoJustificativa === 'Conclusão do projeto') {
@@ -289,7 +314,11 @@
             const codExibicao = codProjeto ? codProjeto : '<span style="color: red;">[código do projeto]</span>';
             const nomeExibicao = nomeProjeto ? nomeProjeto : '<span style="color: red;">[nome do projeto]</span>';
 
-            let corpoEmail = `Olá, ${obterSaudacao()}!\n\nSolicito a aprovação de todos os marcos do projeto abaixo:\n\n`;
+            const txtSolicitacao = tipoAssunto.includes('encerramento')
+                ? 'Solicito a aprovação de todos os marcos e o encerramento do projeto abaixo:'
+                : 'Solicito a aprovação de todos os marcos do projeto abaixo:';
+
+            let corpoEmail = `Olá, ${obterSaudacao()}!\n\n${txtSolicitacao}\n\n`;
 
             corpoEmail += `Código do projeto: ${codExibicao}\n`;
             corpoEmail += `Nome do projeto: ${nomeExibicao}\n`;
@@ -400,6 +429,7 @@
             });
             formElements.tipoJustificativa.selectedIndex = 0;
             formElements.possuiBacklog.selectedIndex = 0;
+            document.querySelector('input[name="tipoAssunto"]').checked = true;
             mudarBacklog(); 
             mudarJustificativa(); // Aplica a lógica do cancelamento ao limpar
         };
@@ -432,6 +462,9 @@
 
         formElements.tipoJustificativa.addEventListener('change', mudarJustificativa);
         formElements.possuiBacklog.addEventListener('change', mudarBacklog);
+        document.querySelectorAll('input[name="tipoAssunto"]').forEach(radio => {
+            radio.addEventListener('change', gerarEmail);
+        });
         
         document.getElementById('btnCopiarAssunto').addEventListener('click', () => copiarTextoPuro('resultadoAssunto'));
         document.getElementById('btnCopiarMensagem').addEventListener('click', () => copiarTextoRico('resultadoCorpo'));
@@ -489,7 +522,12 @@
             formElements.numTicket.value = ticket;
             
             // Mesma lógica original: copia apenas data e texto se estiver vazio
-            let txt = `${dataFormatada} - Marco solicitado`;
+            const tipoAssuntoStatus = document.querySelector('input[name="tipoAssunto"]:checked').value;
+            const txtStatus = tipoAssuntoStatus.includes('encerramento')
+                ? 'Marco e encerramento solicitados'
+                : 'Marco solicitado';
+
+            let txt = `${dataFormatada} - ${txtStatus}`;
             
             if (ticket) {
                 txt += ` - Ticket ${ticket}`;
