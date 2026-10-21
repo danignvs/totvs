@@ -272,8 +272,8 @@
             const justificativaBacklog = formElements.justificativaBacklog.value.trim();
 
             const assunto = codProjeto || nomeProjeto 
-            ? ['Aprovação dos marcos', codProjeto, nomeProjeto].filter(Boolean).join(' - ') 
-            : 'Solicitação de aprovação dos marcos do projeto';
+            ? ['Aprovação dos marcos e encerramento do projeto', codProjeto, nomeProjeto].filter(Boolean).join(' - ') 
+            : 'Aprovação dos marcos e encerramento do projeto';
 
             let txtJustificativa = '';
             if (tipoJustificativa === 'Conclusão do projeto') {
