@@ -55,8 +55,8 @@
         
             <!-- Tipo de solicitação (Aprovar / Aprovar e encerrar) -->
             <div class="opcoes-assunto">
-                <label><input type="radio" name="tipoAssunto" value="Aprovação dos marcos" checked> Aprovar marco</label>
-                <label><input type="radio" name="tipoAssunto" value="Aprovação dos marcos e encerramento"> Aprovar marcos e encerrar</label>
+                <label><input type="radio" name="tipoAssunto" value="Aprovação dos marcos e encerramento" checked> Aprovar marcos e encerrar</label>
+                <label><input type="radio" name="tipoAssunto" value="Aprovação dos marcos"> Aprovar marco</label>
             </div>
 
             <!-- Nome do projeto (Obrigatório) -->
@@ -524,7 +524,7 @@
             // Mesma lógica original: copia apenas data e texto se estiver vazio
             const tipoAssuntoStatus = document.querySelector('input[name="tipoAssunto"]:checked').value;
             const txtStatus = tipoAssuntoStatus.includes('encerramento')
-                ? 'Marco e encerramento solicitados'
+                ? 'Marco solicitado'
                 : 'Marco solicitado';
 
             let txt = `${dataFormatada} - ${txtStatus}`;
