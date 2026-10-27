@@ -11,27 +11,55 @@
     
     <link rel="icon" type="image/x-icon" href="https://danignvs.github.io/totvs/favicons/marco.ico">
     <style>
-        .hidden {
-            display: none !important;
+        /* Nome do CP: campo com seta (lista + digitação livre) */
+        #nomeCP {
+            padding-right: 30px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' fill='none' stroke='%23002233' stroke-width='1.8'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 8px center;
         }
-        .opcoes-assunto {
-            display: flex;
-            gap: 25px;
-            margin-bottom: 15px;
+
+        .cp-wrap {
+            position: relative;
         }
-        .opcoes-assunto label {
-            display: flex;
-            align-items: center;
-            gap: 6px;
+
+        .cp-seta {
+            position: absolute;
+            top: 5px;
+            right: 0;
+            bottom: 5px;
+            width: 30px;
             cursor: pointer;
-            margin: 0;
         }
-        .opcoes-assunto input[type="radio"] {
-            width: auto;
-            margin: 0;
+
+        .cp-lista {
+            display: none;
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: calc(100% - 5px);
+            z-index: 100;
+            background-color: var(--branco);
+            border: 1px solid var(--cinza);
+            border-radius: 3px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .cp-lista div {
+            padding: 6px 8px;
+            font-size: 14px;
+            color: var(--az-escuro);
             cursor: pointer;
+        }
+
+        .cp-lista div:hover,
+        .cp-lista div.ativo {
+            background-color: var(--az-bg);
         }
     </style>
+   
 </head>
 
 <body>
@@ -53,17 +81,31 @@
             <br>
             
         
-            <!-- Tipo de solicitação (Aprovar / Aprovar e encerrar) -->
-            <div class="opcoes-assunto">
-                <label><input type="radio" name="tipoAssunto" value="Aprovação dos marcos e encerramento" checked> Aprovar marcos e encerrar</label>
-                <label><input type="radio" name="tipoAssunto" value="Aprovação dos marcos"> Aprovar marco</label>
-            </div>
-
             <!-- Nome do projeto (Obrigatório) -->
             <div class="input-group">
                 <div class="input-item">
                     <label for="nomeProjeto">Nome do projeto:</label>
                     <input type="text" id="nomeProjeto" placeholder="" required>
+                </div>
+            </div>
+
+            <!-- Nome do CP (opcional) + Tipo de solicitação na mesma linha -->
+            <div class="input-group">
+                <div class="input-item">
+                    <label for="nomeCP">Nome do CP:</label>
+                    <div class="cp-wrap">
+                        <input type="text" id="nomeCP" autocomplete="off">
+                        <span class="cp-seta" id="cpSeta"></span>
+                        <div class="cp-lista" id="listaCP"></div>
+                    </div>
+                </div>
+
+                <div class="input-item">
+                    <label for="tipoAssunto">Solicitação:</label>
+                    <select id="tipoAssunto">
+                        <option value="Aprovação dos marcos e encerramento">Aprovar marcos e encerrar</option>
+                        <option value="Aprovação dos marcos">Aprovar marco</option>
+                    </select>
                 </div>
             </div>
 
@@ -104,36 +146,37 @@
                 </div>
             </div>
             <div class="input-group">
-                <div class="input-item col-70">
+                <div class="input-item col-50">
                     <label for="tipoJustificativa">Justificativa:</label>
                     <select id="tipoJustificativa">                
                         <option value="Conclusão do projeto">Conclusão do projeto MIT062</option>
                         <option value="Documentação de aceite do cliente">Validação de entrega MIT010</option>
-                        <option value="Cancelamento do projeto">Cancelamento de projeto</option>
+                        <option value="Cancelamento do projeto">Cancelamento do projeto</option>
                         <option value="Faturamento unilateral">Faturamento unilateral</option>
                     </select>
                 </div>
             
                 <!-- Justificativa do Cancelamento (Oculta por padrão) -->
-                <div id="divTicketCancelamento" class="input-item hidden col-30">
+                <div id="divTicketCancelamento" class="input-item hidden">
                     <label for="ticketCancelamento">Ticket:</label>
                     <input type="text" id="ticketCancelamento" placeholder="">
                 </div>
-            </div>
 
-            <!-- Status do marco + Possui Backlog na mesma linha -->
-            <div class="input-group">
-                <div class="input-item col-20">
-                    <label for="possuiBacklog">Backlog?</label>
+                <div class="input-item">
+                    <label for="possuiBacklog">Backlog:</label>
                     <select id="possuiBacklog">
                         <option value="Não">Não</option>
                         <option value="Sim">Sim</option>
                     </select>
                 </div>
+            </div>
+
+            
+            <div class="input-group">
 
                 <!-- Justificativa do Backlog (Oculta por padrão) -->
                 <div id="divJustificativaBacklog" class="input-item hidden col-70">
-                    <label for="justificativaBacklog">Justificativa:</label>
+                    <label for="justificativaBacklog">Justificativa do backlog:</label>
                     <input type="text" id="justificativaBacklog" placeholder="">
                 </div>
             </div>
@@ -224,6 +267,8 @@
             codProjeto: document.getElementById('codProjeto'),
             codContrato: document.getElementById('codContrato'),
             nomeProjeto: document.getElementById('nomeProjeto'),
+            nomeCP: document.getElementById('nomeCP'),
+            tipoAssunto: document.getElementById('tipoAssunto'),
             tipoJustificativa: document.getElementById('tipoJustificativa'),
             numTicket: document.getElementById('numTicket'),
             ticketCancelamento: document.getElementById('ticketCancelamento'), // Novo
@@ -293,8 +338,9 @@
             const statusMarco = formElements.statusMarco.value.trim() || 'Pré-aprovado';
             const possuiBacklog = formElements.possuiBacklog.value;
             const justificativaBacklog = formElements.justificativaBacklog.value.trim();
+            const nomeCP = formElements.nomeCP.value.trim();
 
-            const tipoAssunto = document.querySelector('input[name="tipoAssunto"]:checked').value;
+            const tipoAssunto = formElements.tipoAssunto.value;
 
             const assunto = codProjeto || nomeProjeto 
             ? [tipoAssunto, codProjeto, nomeProjeto].filter(Boolean).join(' - ') 
@@ -322,6 +368,10 @@
 
             corpoEmail += `Código do projeto: ${codExibicao}\n`;
             corpoEmail += `Nome do projeto: ${nomeExibicao}\n`;
+
+            if (nomeCP) {
+                corpoEmail += `CP: ${nomeCP}\n`;
+            }
 
             if (statusMarco) {
                 corpoEmail += `Status do marco: ${statusMarco}\n`;
@@ -429,7 +479,7 @@
             });
             formElements.tipoJustificativa.selectedIndex = 0;
             formElements.possuiBacklog.selectedIndex = 0;
-            document.querySelector('input[name="tipoAssunto"]').checked = true;
+            formElements.tipoAssunto.selectedIndex = 0;
             mudarBacklog(); 
             mudarJustificativa(); // Aplica a lógica do cancelamento ao limpar
         };
@@ -451,7 +501,7 @@
         };
 
         // --- 4. ATRIBUIÇÃO DOS EVENT LISTENERS ---
-        ['nomeProjeto', 'numTicket', 'ticketCancelamento', 'linkFluig', 'justificativaBacklog', 'statusMarco'].forEach(id => {
+        ['nomeProjeto', 'nomeCP', 'numTicket', 'ticketCancelamento', 'linkFluig', 'justificativaBacklog', 'statusMarco'].forEach(id => {
             document.getElementById(id).addEventListener('input', gerarEmail);
         });
 
@@ -462,8 +512,76 @@
 
         formElements.tipoJustificativa.addEventListener('change', mudarJustificativa);
         formElements.possuiBacklog.addEventListener('change', mudarBacklog);
-        document.querySelectorAll('input[name="tipoAssunto"]').forEach(radio => {
-            radio.addEventListener('change', gerarEmail);
+        formElements.tipoAssunto.addEventListener('change', gerarEmail);
+
+        // --- NOME DO CP: lista com busca + digitação livre ---
+        const nomesCP = ['Davi', 'Leonardo', 'Petter', 'Renata'];
+        const listaCP = document.getElementById('listaCP');
+        let itemAtivoCP = -1;
+
+        const fecharListaCP = () => {
+            listaCP.style.display = 'none';
+            itemAtivoCP = -1;
+        };
+
+        const abrirListaCP = (filtrar) => {
+            const termo = filtrar ? formElements.nomeCP.value.trim().toLowerCase() : '';
+            const encontrados = nomesCP.filter(n => n.toLowerCase().includes(termo));
+            listaCP.innerHTML = '';
+            itemAtivoCP = -1;
+            if (encontrados.length === 0) {
+                fecharListaCP();
+                return;
+            }
+            encontrados.forEach(nome => {
+                const item = document.createElement('div');
+                item.textContent = nome;
+                item.addEventListener('mousedown', (e) => {
+                    e.preventDefault();
+                    escolherCP(nome);
+                });
+                listaCP.appendChild(item);
+            });
+            listaCP.style.display = 'block';
+        };
+
+        const escolherCP = (nome) => {
+            formElements.nomeCP.value = nome;
+            fecharListaCP();
+            gerarEmail();
+        };
+
+        formElements.nomeCP.addEventListener('input', () => abrirListaCP(true));
+        formElements.nomeCP.addEventListener('blur', fecharListaCP);
+        formElements.nomeCP.addEventListener('keydown', (e) => {
+            const itens = listaCP.querySelectorAll('div');
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                if (listaCP.style.display !== 'block') { abrirListaCP(false); return; }
+                itemAtivoCP = Math.min(itemAtivoCP + 1, itens.length - 1);
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                itemAtivoCP = Math.max(itemAtivoCP - 1, 0);
+            } else if (e.key === 'Enter' && itemAtivoCP >= 0) {
+                e.preventDefault();
+                escolherCP(itens[itemAtivoCP].textContent);
+                return;
+            } else if (e.key === 'Escape') {
+                fecharListaCP();
+                return;
+            } else {
+                return;
+            }
+            itens.forEach((it, i) => it.classList.toggle('ativo', i === itemAtivoCP));
+        });
+        document.getElementById('cpSeta').addEventListener('mousedown', (e) => {
+            e.preventDefault();
+            if (listaCP.style.display === 'block') {
+                fecharListaCP();
+            } else {
+                formElements.nomeCP.focus();
+                abrirListaCP(false);
+            }
         });
         
         document.getElementById('btnCopiarAssunto').addEventListener('click', () => copiarTextoPuro('resultadoAssunto'));
@@ -522,7 +640,7 @@
             formElements.numTicket.value = ticket;
             
             // Mesma lógica original: copia apenas data e texto se estiver vazio
-            const tipoAssuntoStatus = document.querySelector('input[name="tipoAssunto"]:checked').value;
+            const tipoAssuntoStatus = formElements.tipoAssunto.value;
             const txtStatus = tipoAssuntoStatus.includes('encerramento')
                 ? 'Marco solicitado'
                 : 'Marco solicitado';
