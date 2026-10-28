@@ -58,6 +58,13 @@
         .cp-lista div.ativo {
             background-color: var(--az-bg);
         }
+
+        /* Botões Copiar bloqueados enquanto faltar campo obrigatório */
+        .resultado button:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            pointer-events: auto;
+        }
     </style>
    
 </head>
@@ -92,7 +99,7 @@
             <!-- Nome do CP (opcional) + Tipo de solicitação na mesma linha -->
             <div class="input-group">
                 <div class="input-item">
-                    <label for="nomeCP">Nome do CP:</label>
+                    <label for="nomeCP">Responsável:</label>
                     <div class="cp-wrap">
                         <input type="text" id="nomeCP" autocomplete="off">
                         <span class="cp-seta" id="cpSeta"></span>
@@ -357,8 +364,8 @@
                 txtJustificativa = `Faturamento unilateral.`;
             }
 
-            const codExibicao = codProjeto ? codProjeto : '<span style="color: red;">[código do projeto]</span>';
-            const nomeExibicao = nomeProjeto ? nomeProjeto : '<span style="color: red;">[nome do projeto]</span>';
+            const codExibicao = codProjeto;
+            const nomeExibicao = nomeProjeto;
 
             const txtSolicitacao = tipoAssunto.includes('encerramento')
                 ? 'Solicito a aprovação de todos os marcos e o encerramento do projeto abaixo:'
@@ -370,11 +377,7 @@
             corpoEmail += `Nome do projeto: ${nomeExibicao}\n`;
 
             if (nomeCP) {
-                corpoEmail += `CP: ${nomeCP}\n`;
-            }
-
-            if (statusMarco) {
-                corpoEmail += `Status do marco: ${statusMarco}\n`;
+                corpoEmail += `Responsável: ${nomeCP}\n`;
             }
             
             corpoEmail += `\n`;
@@ -385,6 +388,10 @@
 
             if (linkFluig) {
                 corpoEmail += `Link do repositório: ${linkFluig}\n`;
+            }
+
+            if (statusMarco) {
+                corpoEmail += `Status do marco: ${statusMarco}\n`;
             }
             
             corpoEmail += `\n`;
@@ -398,6 +405,20 @@
 
             resultElements.assunto.textContent = assunto;
             resultElements.corpo.innerHTML = corpoEmail.trim().replace(/\n/g, '<br>');
+
+            // Bloqueia os botões Copiar se faltar campo obrigatório
+            const faltando = [];
+            if (!nomeProjeto) faltando.push('Nome do projeto');
+            if (!codProjeto) faltando.push('Código do projeto');
+            if (possuiBacklog === 'Sim' && !justificativaBacklog) faltando.push('Justificativa do backlog');
+            if (tipoJustificativa === 'Cancelamento do projeto' && !ticketCancelamento) faltando.push('Ticket do cancelamento');
+            const bloquear = faltando.length > 0;
+            const dica = bloquear ? 'Preencha: ' + faltando.join(', ') : '';
+            ['btnCopiarAssunto', 'btnCopiarMensagem'].forEach(id => {
+                const btn = document.getElementById(id);
+                btn.disabled = bloquear;
+                btn.title = dica;
+            });
         };
 
 
@@ -424,13 +445,13 @@
             return true;
         };
 
-        const copiarTextoPuro = (idElemento) => {
+        const copiarTextoPuro = (idElemento, mensagem = 'Assunto copiado!') => {
             if (!validarObrigatorios()) return;
 
             const texto = document.getElementById(idElemento).textContent;
             if (!texto.trim()) return;
             
-            navigator.clipboard.writeText(texto).then(() => mostrarToast(texto))
+            navigator.clipboard.writeText(texto).then(() => mostrarToast(mensagem, true))
                 .catch(err => console.error('Erro ao copiar: ', err));
         };
 
@@ -448,10 +469,10 @@
                     "text/plain": new Blob([textoPuro], { type: "text/plain" }) 
                 })];
                 await navigator.clipboard.write(data);
-                mostrarToast("Texto copiado!");
+                mostrarToast("Mensagem copiada!", true);
             } catch (err) {
                 console.warn("ClipboardItem não suportado ou falhou. Usando fallback de texto puro...", err);
-                copiarTextoPuro(idElemento); 
+                copiarTextoPuro(idElemento, 'Mensagem copiada!'); 
             }
         };
 
@@ -586,7 +607,10 @@
         
         document.getElementById('btnCopiarAssunto').addEventListener('click', () => copiarTextoPuro('resultadoAssunto'));
         document.getElementById('btnCopiarMensagem').addEventListener('click', () => copiarTextoRico('resultadoCorpo'));
-        document.getElementById('btnLimpar').addEventListener('click', limparFormulario);
+        // Confirmação antes de limpar
+        document.getElementById('btnLimpar').addEventListener('click', () => {
+            if (confirm("Tem certeza que deseja limpar tudo?")) limparFormulario();
+        });
 
         // Copiar botões de input
         document.getElementById('btnCopiarCodProjeto').addEventListener('click', () => {
@@ -657,6 +681,14 @@
             });
         });
         
+        // Enter no campo do ticket confirma a cópia do status
+        inputTicketModal.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                btnConfirmarStatusModal.click();
+            }
+        });
+
         document.getElementById('btnIndicadores').addEventListener('click', abrirIndicadores);
 
         // Inicializa o estado visual e o email gerado de imediato

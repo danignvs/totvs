@@ -413,6 +413,8 @@
             font-weight: 800;
             text-transform: uppercase;
             font-family: 'TOTVS', 'Segoe UI', Arial, sans-serif;
+            box-sizing: border-box;
+            padding: 10px 20px;
         }
 
         .btn {
@@ -478,6 +480,11 @@
             position: relative;
             padding: 0 5px; /* Pequeno respiro interno */
             margin: 0;
+        }
+
+        .menu button:hover a,
+        .menu a:hover {
+            color: var(--branco);
         }
 
         .menu button:not(:last-child)::after {
@@ -785,7 +792,7 @@
         }
 
 
-        @media (max-width: 370px) {
+        @media (max-width: 600px) {
             .input-group {
                 flex-direction: column;
                 gap: 0;

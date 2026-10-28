@@ -11,8 +11,11 @@
     
     <link rel="icon" type="image/x-icon" href="https://danignvs.github.io/totvs/favicons/encer.ico">
     <style>
-        .hidden {
-            display: none !important;
+        /* Botões Copiar bloqueados enquanto faltar campo obrigatório */
+        .resultado button:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            pointer-events: auto;
         }
     </style>
 </head>
@@ -194,7 +197,7 @@
             const cod = formElements.codProjeto.value;
             if (cod.length > 3) {
                 formElements.codContrato.value = cod.slice(0, -3);
-            } else if (cod.length === 0) {
+            } else {
                 formElements.codContrato.value = "";
             }
         };
@@ -232,9 +235,8 @@
                 txtJustificativa = `Encerramento do projeto devido ao cancelamento registrado no ticket nº ${numTicket || 'XXXXX'}`;
             }
 
-            // Definição dos placeholders com cor vermelha
-            const codExibicao = codProjeto ? codProjeto : '<span style="color: red;">[código do projeto]</span>';
-            const nomeExibicao = nomeProjeto ? nomeProjeto : '<span style="color: red;">[nome do projeto]</span>';
+            const codExibicao = codProjeto;
+            const nomeExibicao = nomeProjeto;
 
             // Define Corpo do Email com Saudação Automática
             let corpoEmail = `Olá, ${obterSaudacao()}!\n\nSolicito o encerramento do projeto abaixo:\n\n`;
@@ -252,6 +254,19 @@
             // Renderiza
             resultElements.assunto.textContent = assunto;
             resultElements.corpo.innerHTML = corpoEmail.trim().replace(/\n/g, '<br>');
+
+            // Bloqueia os botões Copiar se faltar campo obrigatório
+            const faltando = [];
+            if (!nomeProjeto) faltando.push('Nome do projeto');
+            if (!codProjeto) faltando.push('Código do projeto');
+            if (tipoJustificativa === 'Cancelamento do projeto' && !numTicket) faltando.push('Ticket cancelamento');
+            const bloquear = faltando.length > 0;
+            const dica = bloquear ? 'Preencha: ' + faltando.join(', ') : '';
+            ['btnCopiarAssunto', 'btnCopiarMensagem'].forEach(id => {
+                const btn = document.getElementById(id);
+                btn.disabled = bloquear;
+                btn.title = dica;
+            });
         };
 
 
@@ -270,11 +285,11 @@
             setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 4000);
         };
 
-        const copiarTextoPuro = (idElemento) => {
+        const copiarTextoPuro = (idElemento, mensagem = 'Assunto copiado!') => {
             const texto = document.getElementById(idElemento).textContent;
             if (!texto.trim()) return;
             
-            navigator.clipboard.writeText(texto).then(() => mostrarToast(texto))
+            navigator.clipboard.writeText(texto).then(() => mostrarToast(mensagem, true))
                 .catch(err => console.error('Erro ao copiar: ', err));
         };
 
@@ -290,10 +305,10 @@
                     "text/plain": new Blob([textoPuro], { type: "text/plain" }) 
                 })];
                 await navigator.clipboard.write(data);
-                mostrarToast("Texto copiado!");
+                mostrarToast("Mensagem copiada!", true);
             } catch (err) {
                 console.warn("ClipboardItem não suportado ou falhou. Usando fallback de texto puro...", err);
-                copiarTextoPuro(idElemento); 
+                copiarTextoPuro(idElemento, 'Mensagem copiada!'); 
             }
         };
 
@@ -312,6 +327,7 @@
         const limparFormulario = () => {
             document.querySelectorAll('#formEncerramento input[type="text"]').forEach(input => input.value = '');
             formElements.tipoJustificativa.selectedIndex = 0;
+            ticketStatus = '';
             mudarJustificativa();
         };
 
@@ -345,7 +361,10 @@
         
         document.getElementById('btnCopiarAssunto').addEventListener('click', () => copiarTextoPuro('resultadoAssunto'));
         document.getElementById('btnCopiarMensagem').addEventListener('click', () => copiarTextoRico('resultadoCorpo'));
-        document.getElementById('btnLimpar').addEventListener('click', limparFormulario);
+        // Confirmação antes de limpar
+        document.getElementById('btnLimpar').addEventListener('click', () => {
+            if (confirm("Tem certeza que deseja limpar tudo?")) limparFormulario();
+        });
         
         // Listeners dos novos botões de cópia
         document.getElementById('btnCopiarCodProjeto').addEventListener('click', () => copiarValorInput('codProjeto', 'Código do projeto copiado!'));
@@ -356,11 +375,12 @@
         const btnFecharModalStatus = document.getElementById('btnFecharModalStatus');
         const btnConfirmarStatusModal = document.getElementById('btnConfirmarStatusModal');
         const inputTicketModal = document.getElementById('inputTicketModal');
+        let ticketStatus = ''; // Ticket da solicitação (separado do ticket do cancelamento)
 
         // Abre o modal ao clicar no botão "Status"
         document.getElementById('btnCopiarStatus').addEventListener('click', () => {
             modalStatus.style.display = 'flex';
-            inputTicketModal.value = formElements.numTicket.value; 
+            inputTicketModal.value = ticketStatus;
             inputTicketModal.focus();
         });
 
@@ -389,7 +409,7 @@
             
             const ticket = inputTicketModal.value.trim();
             
-            formElements.numTicket.value = ticket;
+            ticketStatus = ticket;
             
             let txt = `${dataFormatada} - Encerramento solicitado`;
             
@@ -401,6 +421,14 @@
                 mostrarToast(`"${txt}" copiado!`, true);
                 fecharModalStatus();
             });
+        });
+
+        // Enter no campo do ticket confirma a cópia do status
+        inputTicketModal.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                btnConfirmarStatusModal.click();
+            }
         });
 
         document.getElementById('btnIndicadores').addEventListener('click', abrirIndicadores);

@@ -9,6 +9,14 @@
 
     <link rel="stylesheet" href="style.css">
     <link rel="icon" type="image/x-icon" href="https://danignvs.github.io/totvs/favicons/fat.ico">
+    <style>
+        /* Botões Copiar bloqueados enquanto faltar campo obrigatório */
+        .resultado button:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            pointer-events: auto;
+        }
+    </style>
 </head>
 
 <body>
@@ -234,7 +242,7 @@
                 const cod = formElements.codProjeto.value;
                 if (cod.length > 3) {
                     formElements.codContratoPSA.value = cod.slice(0, -3);
-                } else if (cod.length === 0) {
+                } else {
                     formElements.codContratoPSA.value = "";
                 }
             };
@@ -303,6 +311,20 @@
 
                 resultElements.assunto.textContent = assunto;
                 resultElements.corpo.innerHTML = corpoEmail.replace(/\n/g, '<br>');
+
+                // Bloqueia os botões Copiar se faltar campo obrigatório
+                const faltando = [];
+                if (!vals.nomeProjeto) faltando.push('Nome do projeto');
+                if (!vals.codProjeto) faltando.push('Código do projeto');
+                if (!valorLiq) faltando.push('Valor líquido');
+                if (vals.tipoJustificativa === 'Outras' && !vals.justificativa) faltando.push('Justificativa');
+                const bloquear = faltando.length > 0;
+                const dica = bloquear ? 'Preencha: ' + faltando.join(', ') : '';
+                ['btnCopiarAssunto', 'btnCopiarMensagem'].forEach(id => {
+                    const btn = document.getElementById(id);
+                    btn.disabled = bloquear;
+                    btn.title = dica;
+                });
             };
 
             // ============================================================
@@ -322,11 +344,11 @@
                 }, 4000);
             };
 
-            const copiarTextoPuro = (idElemento) => {
+            const copiarTextoPuro = (idElemento, mensagem = 'Assunto copiado!') => {
                 const texto = document.getElementById(idElemento).textContent;
                 if (!texto.trim()) return;
                 navigator.clipboard.writeText(texto)
-                    .then(() => mostrarToast(texto))
+                    .then(() => mostrarToast(mensagem, true))
                     .catch(err => console.error('Erro ao copiar: ', err));
             };
 
@@ -344,10 +366,10 @@
                         })
                     ];
                     await navigator.clipboard.write(data);
-                    mostrarToast("Texto copiado!");
+                    mostrarToast("Mensagem copiada!", true);
                 } catch (err) {
                     console.warn("ClipboardItem não suportado ou falhou. Usando fallback de texto puro...", err);
-                    copiarTextoPuro(idElemento);
+                    copiarTextoPuro(idElemento, 'Mensagem copiada!');
                 }
             };
 
@@ -415,7 +437,10 @@
             document.getElementById('btnCopiarCodContrato').addEventListener('click', () => copiarValorInput('codContratoPSA', 'Código do contrato copiado!'));
 
             document.getElementById('btnIndicadores').addEventListener('click', abrirIndicadores);
-            document.getElementById('btnLimpar').addEventListener('click', limparFormulario);
+            // Confirmação antes de limpar
+            document.getElementById('btnLimpar').addEventListener('click', () => {
+                if (confirm("Tem certeza que deseja limpar tudo?")) limparFormulario();
+            });
 
             // ============================================================
             // --- LÓGICA DO MODAL DE STATUS ---
@@ -470,6 +495,14 @@
                     mostrarToast(`"${txt}" copiado!`, true);
                     fecharModalStatus();
                 });
+            });
+
+            // Enter no campo do ticket confirma a cópia do status
+            inputTicketModal.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    btnConfirmarStatusModal.click();
+                }
             });
 
             // ============================================================

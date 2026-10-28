@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
     <title>Calculadora de Horas</title>
     
     <link rel="icon" type="image/x-icon" href="https://danignvs.github.io/totvs/favicons/calc.ico">
@@ -60,13 +61,9 @@
             padding: 5px 15px; 
             font-size: 1.2em; 
             background: transparent; 
-            color: var(--az-claro); 
+            color: var(--cinza); 
             border: none;
             cursor: pointer;
-        }
-
-        .calendario-header button:hover { 
-            background: rgba(0, 219, 255, 0.1); 
         }
 
         /* --- LAYOUT DUPLO MESES --- */
@@ -180,24 +177,25 @@
             font-weight: bold;
             color: var(--az-escuro);
         }
+        
 
         /* RESPONSIVIDADE PARA DOIS MESES */
-        @media (min-width: 700px) {
-            #containerPrincipal {
-                max-width: 850px;
-            }
-            .calendarios-container {
-                flex-direction: row;
-                justify-content: space-between; 
-                gap: 80px; 
-            }
-            .mes-proximo {
-                display: block;
-            }
-            .calendario-header {
-                max-width: 500px;
-            }
+        
+        #containerPrincipal {
+            max-width: 850px;
         }
+        .calendarios-container {
+            flex-direction: row;
+            justify-content: space-between; 
+            gap: 80px; 
+        }
+        .mes-proximo {
+            display: block;
+        }
+        .calendario-header {
+            max-width: 370px;
+        }
+
 
         @media (max-width: 700px) {
             .mes-proximo {
@@ -218,7 +216,9 @@
 </head>
 <body>
 
-    <h1><strong class="azul-claro">Calculadora</strong> de Horas</h1>
+    <header>
+        <h1><strong class="azul-claro">Calculadora</strong> de Horas</h1>
+    </header>
 
     <div class="container container-azul" id="containerPrincipal">
         
@@ -298,7 +298,7 @@
                 <div class="bloco-resultado-texto">
                     <div class="topo">
                         <label>Planejamento Diário:</label>
-                        <button class="btn-roxo btn-aux" onclick="copiarTabelaDetalhamento()">Copiar</button>
+                        <button class="btn-azul btn-aux" onclick="copiarTabelaDetalhamento()">Copiar</button>
                     </div>
 
                     <div id="areaTabelaDetalhamento" class="tabela-container resultado">
